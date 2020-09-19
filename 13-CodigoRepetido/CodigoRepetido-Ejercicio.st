@@ -21,80 +21,61 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 4/3/2019 10:50:19'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 15:01:29'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
-	| customerBook millisecondsBeforeRunning millisecondsAfterRunning |
-	
+	| customerBook |
 	customerBook := CustomerBook new.
-	
-	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
-	customerBook addCustomerNamed: 'John Lennon'.
-	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
-	
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (50 * millisecond)
+	self testearQueElMensaje: #addCustomerNamed: conParametro: 'John Lennon' alObjeto: customerBook tardeMenosDe: (50 * millisecond). 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 4/3/2019 10:50:13'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 15:00:35'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
-	| customerBook millisecondsBeforeRunning millisecondsAfterRunning paulMcCartney |
+	| customerBook paulMcCartney |
 	
-	customerBook := CustomerBook new.
-	paulMcCartney := 'Paul McCartney'.
-	
-	customerBook addCustomerNamed: paulMcCartney.
-	  
-	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
-	customerBook removeCustomerNamed: paulMcCartney.
-	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
-	
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (100 * millisecond)
+	paulMcCartney := 'paulMcCartney'.
+	customerBook := self inicializarCustomerBookConNombre: paulMcCartney.
+	self testearQueElMensaje: #removeCustomerNamed: conParametro: 'paulMcCartney' alObjeto: customerBook tardeMenosDe: 100*millisecond. 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HernanWilkinson 5/9/2012 18:12'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 14:42:46'!
 test03CanNotAddACustomerWithEmptyName 
 
-	| customerBook |
+	| customerBook unClosureDeVerificacion |
 			
 	customerBook := CustomerBook new.
-
-	[ customerBook addCustomerNamed: ''.
-	self fail ]
-		on: Error 
-		do: [ :anError | 
+	unClosureDeVerificacion := [ :anError | 
 			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
-			self assert: customerBook isEmpty ]! !
+			self assert: customerBook isEmpty ].
+	
+	self testearErrorAlEnviarElMensaje: #addCustomerNamed: alObjeto: customerBook conParametro: '' conError: Error conVerificacionDelTest: unClosureDeVerificacion.  ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HAW 8/28/2017 08:57:25'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 14:50:05'!
 test04CanNotRemoveAnInvalidCustomer
 	
-	| customerBook johnLennon |
-			
-	customerBook := CustomerBook new.
-	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
+	| customerBook johnLennon unClosureDeVerificacion |
 	
-	[ customerBook removeCustomerNamed: 'Paul McCartney'.
-	self fail ]
-		on: NotFound 
-		do: [ :anError | 
+	johnLennon := 'John Lennon'.
+	customerBook := self inicializarCustomerBookConNombre: johnLennon.
+	
+	unClosureDeVerificacion := [ :anError | 
 			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]
-! !
+			self assert: (customerBook includesCustomerNamed: johnLennon) ].
+	
+	^self testearErrorAlEnviarElMensaje: #removeCustomerNamed: alObjeto: customerBook conParametro: 'Paul McCartney' conError: NotFound conVerificacionDelTest: unClosureDeVerificacion.  
+	
+	! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 4/3/2019 10:50:25'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 15:21:51'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney|
 	
-	customerBook := CustomerBook new.
 	paulMcCartney := 'Paul McCartney'.
-	
-	customerBook addCustomerNamed: paulMcCartney.
-	customerBook suspendCustomerNamed: paulMcCartney.
+	customerBook := self inicializarCustomerBookConCustomerSuspendido: paulMcCartney.
 	
 	self assert: 0 equals: customerBook numberOfActiveCustomers.
 	self assert: 1 equals: customerBook numberOfSuspendedCustomers.
@@ -161,6 +142,71 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 			self assert: (customerBook includesCustomerNamed: johnLennon) ]
 ! !
 
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 15:19:33'!
+inicializarCustomerBookConCustomerSuspendido: unNombre
+	
+	| customerBookConSuspendido |
+	
+	customerBookConSuspendido := self inicializarCustomerBookConNombre: unNombre.
+	customerBookConSuspendido suspendCustomerNamed: unNombre.
+	^customerBookConSuspendido.! !
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 14:47:36'!
+inicializarCustomerBookConNombre: unNombre
+
+	^CustomerBook new addCustomerNamed: unNombre.! !
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 14:41:27'!
+medirTiempoDeEjecucionEnMilisegundos: unClosure
+	
+	| millisecondsAfterRunning millisecondsBeforeRunning |
+	
+	millisecondsBeforeRunning := self tiempoActual.
+	unClosure value.
+	millisecondsAfterRunning := self tiempoActual.
+	
+	^(millisecondsAfterRunning-millisecondsBeforeRunning).! !
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 14:23:46'!
+testearErrorAlEnviarElMensaje: unMensaje alObjeto: unCustomerBook conParametro: unString conError: unTipoDeError conVerificacionDelTest: unClosure.  
+
+	[ unMensaje sendTo: unCustomerBook with: unString.
+	self fail ]
+		on: unTipoDeError 
+		do: unClosure.! !
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 15:00:51'!
+testearQueElMensaje: unMensaje conParametro: unNombre alObjeto: unCustomerBook tardeMenosDe: unNumero 
+
+	| tiempoDeEjecucion |
+	tiempoDeEjecucion := self medirTiempoDeEjecucionEnMilisegundos: [unMensaje sendTo: unCustomerBook with: unNombre].
+	self assert: tiempoDeEjecucion < unNumero
+	
+	
+	
+	! !
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 15:46:04'!
+testearQueElObjeto: unCustomerBook tengaSuspendidos: unaCantidadDeCustomersSuspendidos tengaCantidadTotal: unaCantidadDeCustomers conCustomerDeNombre: unCustomer
+	
+	| mensaje | 
+	mensaje := #assert:.
+	
+	self assert: 0 equals: unCustomerBook numberOfActiveCustomers.
+	self assert: unaCantidadDeCustomersSuspendidos equals: unCustomerBook numberOfSuspendedCustomers.
+	self assert: unaCantidadDeCustomers equals: unCustomerBook numberOfCustomers.
+	
+	(unaCantidadDeCustomers == 0) ifTrue: [ mensaje:=#deny: ].
+	
+	mensaje sendTo: self with: (unCustomerBook includesCustomerNamed: unCustomer).
+! !
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 14:33:52'!
+tiempoActual
+	
+	^Time millisecondClockValue * millisecond.! !
+
 
 !classDefinition: #CustomerBook category: #'CodigoRepetido-Ejercicio'!
 Object subclass: #CustomerBook
@@ -210,9 +256,9 @@ numberOfSuspendedCustomers
 	
 	^suspended size! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'NR 4/3/2019 10:14:26'!
+!CustomerBook methodsFor: 'customer management' stamp: 'HG 9/17/2020 21:39:56'!
 removeCustomerNamed: aName 
- 
+ 	
 	1 to: active size do: 
 	[ :index |
 		aName = (active at: index)
