@@ -21,23 +21,25 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 15:01:29'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 21:14:57'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
-	| customerBook |
+	| customerBook johnLennon |
+	
+	johnLennon := 'John Lennon'.
 	customerBook := CustomerBook new.
-	self testearQueElMensaje: #addCustomerNamed: conParametro: 'John Lennon' alObjeto: customerBook tardeMenosDe: (50 * millisecond). 
+	self testearQueElMensaje: #addCustomerNamed: conParametro: johnLennon alObjeto: customerBook tardeMenosDe: (50 * millisecond). 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 15:00:35'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 21:14:37'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
 	| customerBook paulMcCartney |
 	
 	paulMcCartney := 'paulMcCartney'.
 	customerBook := self inicializarCustomerBookConNombre: paulMcCartney.
-	self testearQueElMensaje: #removeCustomerNamed: conParametro: 'paulMcCartney' alObjeto: customerBook tardeMenosDe: 100*millisecond. 
+	self testearQueElMensaje: #removeCustomerNamed: conParametro: paulMcCartney alObjeto: customerBook tardeMenosDe: 100*millisecond. 
 	
 ! !
 
@@ -53,19 +55,21 @@ test03CanNotAddACustomerWithEmptyName
 	
 	self testearErrorAlEnviarElMensaje: #addCustomerNamed: alObjeto: customerBook conParametro: '' alLevantarError: Error ejecute: unClosureDeVerificacion.  ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 19:53:39'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 21:13:51'!
 test04CanNotRemoveAnInvalidCustomer
 	
-	| customerBook johnLennon unClosureDeVerificacion |
+	| customerBook johnLennon unClosureDeVerificacion paulMcCartney |
 	
 	johnLennon := 'John Lennon'.
+	paulMcCartney := 'Paul McCartney'.
+	
 	customerBook := self inicializarCustomerBookConNombre: johnLennon.
 	
 	unClosureDeVerificacion := [ :anError | 
 			self assert: customerBook numberOfCustomers = 1.
 			self assert: (customerBook includesCustomerNamed: johnLennon) ].
 	
-	^self testearErrorAlEnviarElMensaje: #removeCustomerNamed: alObjeto: customerBook conParametro: 'Paul McCartney' alLevantarError: NotFound ejecute: unClosureDeVerificacion.  
+	^self testearErrorAlEnviarElMensaje: #removeCustomerNamed: alObjeto: customerBook conParametro: paulMcCartney alLevantarError: NotFound ejecute: unClosureDeVerificacion.  
 	
 	! !
 
@@ -93,15 +97,16 @@ test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 20:19:13'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 21:14:21'!
 test07CanNotSuspendAnInvalidCustomer
 	
-	| customerBook johnLennon |
+	| customerBook johnLennon georgeHarrison |
 	
 	johnLennon := 'John Lennon'.
+	georgeHarrison := 'George Harrison'.
 	customerBook := self inicializarCustomerBookConNombre: johnLennon.
 		
-	self testearErrorAlEnviarElMensaje: #suspendCustomerNamed: alCustomerBook: customerBook conParametro: 'George Harrison' alLevantarError: CantSuspend aseguraQueSoloEste: johnLennon.  
+	self testearErrorAlEnviarElMensaje: #suspendCustomerNamed: alCustomerBook: customerBook conParametro: georgeHarrison alLevantarError: CantSuspend aseguraQueSoloEste: johnLennon.  
 	
 ! !
 
