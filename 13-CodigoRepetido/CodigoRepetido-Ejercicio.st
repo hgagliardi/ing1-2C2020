@@ -143,14 +143,6 @@ inicializarCustomerBookConNombre: unNombre
 
 	^CustomerBook new addCustomerNamed: unNombre.! !
 
-!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 18:12:33'!
-m1: unCustomer m2: unCustomerBook m3: unaCantidadDeCustomers
-
-	| customerEstaIncluido |
-	
-	customerEstaIncluido := (unCustomerBook includesCustomerNamed: unCustomer).
-	(unaCantidadDeCustomers == 0) ifTrue: [ self deny: customerEstaIncluido ] ifFalse: [ self assert: customerEstaIncluido ]! !
-
 !CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 14:41:27'!
 medirTiempoDeEjecucionEnMilisegundos: unClosure
 	
@@ -171,10 +163,10 @@ testearErrorAlEnviarElMensaje: unMensaje alCustomerBook: unCustomerBook conParam
 	self testearErrorAlEnviarElMensaje: unMensaje alObjeto: unCustomerBook conParametro: unObjeto alLevantarError: unTipoDeError ejecute: unClosureDeVerificacion. 
 	! !
 
-!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/21/2020 19:55:01'!
-testearErrorAlEnviarElMensaje: unMensaje alObjeto: unCustomerBook conParametro: unString alLevantarError: unTipoDeError ejecute: unClosure.  
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'FS 9/21/2020 21:23:37'!
+testearErrorAlEnviarElMensaje: unMensaje alObjeto: unCustomerBook conParametro: unObjeto alLevantarError: unTipoDeError ejecute: unClosure.  
 
-	[ unMensaje sendTo: unCustomerBook with: unString.
+	[ unMensaje sendTo: unCustomerBook with: unObjeto.
 	self fail ]
 		on: unTipoDeError 
 		do: unClosure.! !
