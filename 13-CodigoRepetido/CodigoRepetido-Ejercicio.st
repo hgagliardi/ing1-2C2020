@@ -41,7 +41,7 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 14:42:46'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 19:54:47'!
 test03CanNotAddACustomerWithEmptyName 
 
 	| customerBook unClosureDeVerificacion |
@@ -51,9 +51,9 @@ test03CanNotAddACustomerWithEmptyName
 			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
 			self assert: customerBook isEmpty ].
 	
-	self testearErrorAlEnviarElMensaje: #addCustomerNamed: alObjeto: customerBook conParametro: '' conError: Error conVerificacionDelTest: unClosureDeVerificacion.  ! !
+	self testearErrorAlEnviarElMensaje: #addCustomerNamed: alObjeto: customerBook conParametro: '' alLevantarError: Error ejecute: unClosureDeVerificacion.  ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 14:50:05'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 19:53:39'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon unClosureDeVerificacion |
@@ -65,7 +65,7 @@ test04CanNotRemoveAnInvalidCustomer
 			self assert: customerBook numberOfCustomers = 1.
 			self assert: (customerBook includesCustomerNamed: johnLennon) ].
 	
-	^self testearErrorAlEnviarElMensaje: #removeCustomerNamed: alObjeto: customerBook conParametro: 'Paul McCartney' conError: NotFound conVerificacionDelTest: unClosureDeVerificacion.  
+	^self testearErrorAlEnviarElMensaje: #removeCustomerNamed: alObjeto: customerBook conParametro: 'Paul McCartney' alLevantarError: NotFound ejecute: unClosureDeVerificacion.  
 	
 	! !
 
@@ -93,41 +93,36 @@ test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/19/2020 18:26:45'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 20:19:13'!
 test07CanNotSuspendAnInvalidCustomer
 	
-	| customerBook johnLennon unClosureDeVerificacion |
-			
-	customerBook := CustomerBook new.
+	| customerBook johnLennon |
+	
 	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
-	
-	unClosureDeVerificacion := [ :anError | 
-			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ].
-	
-	self testearErrorAlEnviarElMensaje: #suspendCustomerNamed: alObjeto: customerBook conParametro: 'George Harrison' conError: CantSuspend conVerificacionDelTest: unClosureDeVerificacion.  
+	customerBook := self inicializarCustomerBookConNombre: johnLennon.
+		
+	self testearErrorAlEnviarElMensaje: #suspendCustomerNamed: alCustomerBook: customerBook conParametro: 'George Harrison' alLevantarError: CantSuspend aseguraQueSoloEste: johnLennon.  
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 9/19/2018 17:57:11'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'HG 9/21/2020 20:26:05'!
 test08CanNotSuspendAnAlreadySuspendedCustomer
 	
 	| customerBook johnLennon |
-			
-	customerBook := CustomerBook new.
-	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
-	customerBook suspendCustomerNamed: johnLennon.
 	
-	[ customerBook suspendCustomerNamed: johnLennon.
-	self fail ]
-		on: CantSuspend 
-		do: [ :anError | 
-			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]
+	johnLennon := 'John Lennon'.	
+	customerBook := self inicializarCustomerBookConCustomerSuspendido: johnLennon.
+	
+	self testearErrorAlEnviarElMensaje: #suspendCustomerNamed: alCustomerBook: customerBook conParametro: johnLennon alLevantarError: CantSuspend aseguraQueSoloEste: johnLennon.  
+	
 ! !
 
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/21/2020 20:00:36'!
+asegurarQueSoloEste: unCustomer enCustomerBook: unCustomerBook
+	
+	self assert: unCustomerBook numberOfCustomers = 1.
+	self assert: (unCustomerBook includesCustomerNamed: unCustomer).! !
 
 !CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 15:19:33'!
 inicializarCustomerBookConCustomerSuspendido: unNombre
@@ -162,8 +157,17 @@ medirTiempoDeEjecucionEnMilisegundos: unClosure
 	
 	^(millisecondsAfterRunning-millisecondsBeforeRunning).! !
 
-!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/19/2020 14:23:46'!
-testearErrorAlEnviarElMensaje: unMensaje alObjeto: unCustomerBook conParametro: unString conError: unTipoDeError conVerificacionDelTest: unClosure.  
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/21/2020 20:25:30'!
+testearErrorAlEnviarElMensaje: unMensaje alCustomerBook: unCustomerBook conParametro: unObjeto alLevantarError: unTipoDeError aseguraQueSoloEste: unCustomer
+
+	| unClosureDeVerificacion |
+.	
+	unClosureDeVerificacion := [ :anError | self asegurarQueSoloEste: unCustomer enCustomerBook: unCustomerBook ].
+	self testearErrorAlEnviarElMensaje: unMensaje alObjeto: unCustomerBook conParametro: unObjeto alLevantarError: unTipoDeError ejecute: unClosureDeVerificacion. 
+	! !
+
+!CustomerBookTest methodsFor: 'auxiliares' stamp: 'HG 9/21/2020 19:55:01'!
+testearErrorAlEnviarElMensaje: unMensaje alObjeto: unCustomerBook conParametro: unString alLevantarError: unTipoDeError ejecute: unClosure.  
 
 	[ unMensaje sendTo: unCustomerBook with: unString.
 	self fail ]
@@ -231,52 +235,34 @@ initialize
 	suspended:= OrderedCollection new.! !
 
 
-!CustomerBook methodsFor: 'customer management' stamp: 'NR 4/3/2019 10:14:26'!
+!CustomerBook methodsFor: 'customer management' stamp: 'HG 9/21/2020 21:04:01'!
 addCustomerNamed: aName
+	self asegurarNombreNoVacio: aName.
+	self asegurarNombreNoEsteAgregado: aName.
+	self agregarACustomersActivos: aName.! !
 
-	aName isEmpty ifTrue: [ self signalCustomerNameCannotBeEmpty ].
-	((active includes: aName) or: [suspended includes: aName]) ifTrue: [ self signalCustomerAlreadyExists ].
-	
-	active add: aName ! !
-
-!CustomerBook methodsFor: 'customer management' stamp: 'NR 4/3/2019 10:14:26'!
+!CustomerBook methodsFor: 'customer management' stamp: 'HG 9/21/2020 21:05:02'!
 numberOfActiveCustomers
-	
 	^active size! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'NR 4/3/2019 10:14:26'!
+!CustomerBook methodsFor: 'customer management' stamp: 'HG 9/21/2020 21:05:09'!
 numberOfCustomers
-	
 	^active size + suspended size! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'NR 9/19/2018 17:36:09'!
+!CustomerBook methodsFor: 'customer management' stamp: 'HG 9/21/2020 21:05:12'!
 numberOfSuspendedCustomers
-	
 	^suspended size! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'HG 9/17/2020 21:39:56'!
+!CustomerBook methodsFor: 'customer management' stamp: 'HG 9/21/2020 20:56:38'!
 removeCustomerNamed: aName 
  	
-	1 to: active size do: 
-	[ :index |
-		aName = (active at: index)
-			ifTrue: [
-				active removeAt: index.
-				^ aName 
-			] 
-	].
-
-	1 to: suspended size do: 	
-	[ :index |
-		aName = (suspended at: index)
-			ifTrue: [
-				suspended removeAt: index.
-				^ aName 
-			] 
-	].
+	| nombreDeActivo nombreDeSuspendido |
 	
-	^ NotFound signal.
-! !
+	nombreDeActivo := self remover: aName deLista: active.
+	(nombreDeActivo == NotFound) ifFalse: [ ^nombreDeActivo ].
+	
+	nombreDeSuspendido := self remover: aName deLista: suspended.
+	(nombreDeSuspendido == NotFound) ifTrue: [ ^NotFound signal ] ifFalse: [ ^nombreDeSuspendido ] .! !
 
 !CustomerBook methodsFor: 'customer management' stamp: 'HernanWilkinson 7/6/2011 17:52'!
 signalCustomerAlreadyExists 
@@ -288,15 +274,43 @@ signalCustomerNameCannotBeEmpty
 
 	self error: self class customerCanNotBeEmptyErrorMessage ! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'NR 4/3/2019 10:14:26'!
+!CustomerBook methodsFor: 'customer management' stamp: 'HG 9/21/2020 21:07:11'!
 suspendCustomerNamed: aName 
 	
 	(active includes: aName) ifFalse: [^CantSuspend signal].
-	
 	active remove: aName.
-	
-	suspended add: aName
+	suspended add: aName.
 ! !
+
+
+!CustomerBook methodsFor: 'as yet unclassified' stamp: 'HG 9/21/2020 21:03:55'!
+agregarACustomersActivos: unNombre.
+	active add: unNombre.! !
+
+!CustomerBook methodsFor: 'as yet unclassified' stamp: 'HG 9/21/2020 21:02:11'!
+asegurarNombreNoEsteAgregado: unNombre
+	
+	((active includes: unNombre) or: [suspended includes: unNombre]) ifTrue: [ self signalCustomerAlreadyExists ].
+! !
+
+!CustomerBook methodsFor: 'as yet unclassified' stamp: 'HG 9/21/2020 21:00:57'!
+asegurarNombreNoVacio: unNombre
+
+	unNombre isEmpty ifTrue: [ self signalCustomerNameCannotBeEmpty ].
+! !
+
+!CustomerBook methodsFor: 'as yet unclassified' stamp: 'HG 9/21/2020 20:41:25'!
+remover: unObjeto deLista: unaLista
+
+	1 to: unaLista size do: 
+	[ :index |
+		unObjeto = (unaLista at: index)
+			ifTrue: [
+				unaLista removeAt: index.
+				^unObjeto
+			] 
+	].
+	^NotFound.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
