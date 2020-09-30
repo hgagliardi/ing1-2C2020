@@ -363,6 +363,9 @@ Numero subclass: #Entero
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
+!Entero commentStamp: '<historical>' prior: 0!
+Zero new!
+
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'FS 9/29/2020 12:35:27'!
 * aMultiplier 
@@ -505,13 +508,41 @@ Entero class
 negativeFibonacciErrorDescription
 	^ ' Fibonacci no está definido aquí para Enteros Negativos'! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'HernanWilkinson 5/7/2016 22:53'!
+!Entero class methodsFor: 'instance creation' stamp: 'FS 9/29/2020 15:10:03'!
 with: aValue 
 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
-	
-	^self new initalizeWith: aValue! !
+	(aValue>0) ifTrue: [^EnteroPositivo new initalizeWith: aValue].
+	(aValue<0) ifTrue: [^EnteroNegativo new initalizeWith: aValue].
+	^Zero new initalizeWith: 0! !
+
+
+!classDefinition: #EnteroNegativo category: #'Numero-Exercise'!
+Entero subclass: #EnteroNegativo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+
+!classDefinition: #EnteroPositivo category: #'Numero-Exercise'!
+Entero subclass: #EnteroPositivo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+
+!classDefinition: #Zero category: #'Numero-Exercise'!
+Entero subclass: #Zero
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+!Zero commentStamp: '<historical>' prior: 0!
+Zero initializeWith: 4!
+
 
 
 !classDefinition: #Fraccion category: #'Numero-Exercise'!
