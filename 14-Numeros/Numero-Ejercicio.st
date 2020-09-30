@@ -419,6 +419,14 @@ greatestCommonDivisorWith: anEntero
 
 	^(anObject isKindOf: self class) and: [ value = anObject integerValue ]! !
 
+!Entero methodsFor: 'comparing' stamp: 'HG 9/30/2020 01:17:48'!
+canBeDenominator
+	self subclassResponsibility.! !
+
+!Entero methodsFor: 'comparing' stamp: 'HG 9/30/2020 01:18:08'!
+canBeNumerator
+	self subclassResponsibility.! !
+
 !Entero methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 20:17'!
 hash
 
@@ -508,11 +516,12 @@ Entero class
 negativeFibonacciErrorDescription
 	^ ' Fibonacci no está definido aquí para Enteros Negativos'! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'FS 9/29/2020 15:10:03'!
+!Entero class methodsFor: 'instance creation' stamp: 'HG 9/30/2020 01:09:27'!
 with: aValue 
 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
+	(aValue==1) ifTrue: [^One new initalizeWith: aValue].
 	(aValue>0) ifTrue: [^EnteroPositivo new initalizeWith: aValue].
 	(aValue<0) ifTrue: [^EnteroNegativo new initalizeWith: aValue].
 	^Zero new initalizeWith: 0! !
@@ -525,6 +534,16 @@ Entero subclass: #EnteroNegativo
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
+!EnteroNegativo methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:00:55'!
+canBeDenominator
+
+	^nil.! !
+
+!EnteroNegativo methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:02:18'!
+canBeNumerator
+
+	^nil.! !
+
 
 !classDefinition: #EnteroPositivo category: #'Numero-Exercise'!
 Entero subclass: #EnteroPositivo
@@ -532,6 +551,32 @@ Entero subclass: #EnteroPositivo
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
+
+!EnteroPositivo methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:14:42'!
+canBeDenominator
+
+	^nil.! !
+
+!EnteroPositivo methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:02:12'!
+canBeNumerator
+
+	^nil.! !
+
+
+!classDefinition: #One category: #'Numero-Exercise'!
+EnteroPositivo subclass: #One
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!One methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:03:17'!
+canBeDenominator
+	^self error: 'una fraccion no puede tener denominador 1 porque sino es un entero'.! !
+
+!One methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:18:33'!
+canBeNumerator
+	^nil.! !
 
 
 !classDefinition: #Zero category: #'Numero-Exercise'!
@@ -543,6 +588,16 @@ Entero subclass: #Zero
 !Zero commentStamp: '<historical>' prior: 0!
 Zero initializeWith: 4!
 
+
+!Zero methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:00:24'!
+canBeDenominator
+	
+	^self error: 'una fraccion no puede ser cero'.! !
+
+!Zero methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:02:04'!
+canBeNumerator
+
+	^self error: 'una fraccion no puede ser cero'.! !
 
 
 !classDefinition: #Fraccion category: #'Numero-Exercise'!
@@ -597,12 +652,12 @@ numerator
 	^ numerator! !
 
 
-!Fraccion methodsFor: 'initialization' stamp: 'HernanWilkinson 5/7/2016 22:54'!
+!Fraccion methodsFor: 'initialization' stamp: 'HG 9/30/2020 01:02:50'!
 initializeWith: aNumerator over: aDenominator
 
 	"Estas precondiciones estan por si se comenten errores en la implementacion - Hernan"
-	aNumerator isZero ifTrue: [ self error: 'una fraccion no puede ser cero' ].
-	aDenominator isOne ifTrue: [ self error: 'una fraccion no puede tener denominador 1 porque sino es un entero' ].
+	aNumerator canBeNumerator.
+	aDenominator canBeDenominator .
 	
 	numerator := aNumerator.
 	denominator := aDenominator ! !
