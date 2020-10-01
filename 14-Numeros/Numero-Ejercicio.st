@@ -394,17 +394,15 @@ Zero new!
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HAW 9/24/2018 08:47:50'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'HG 10/1/2020 00:56:47'!
 fibonacci
 
 	| one two |
 	
 	one := Entero with: 1.
 	two := Entero with: 2.
-	
-	self isNegative ifTrue: [self error: Entero negativeFibonacciErrorDescription ].	
-	(self isZero or: [self isOne]) ifTrue: [^one].
-	
+	self canBeIndexOfFibonacciSequence.
+	(self zeroOrOneReturnsBlock: [^one]) value.
 	^ (self - one) fibonacci + (self - two) fibonacci
 		! !
 
@@ -414,18 +412,39 @@ greatestCommonDivisorWith: anEntero
 	^self class with: (value gcd: anEntero integerValue)! !
 
 
+!Entero methodsFor: 'checks' stamp: 'HG 9/30/2020 01:17:48'!
+canBeDenominator
+	self subclassResponsibility.! !
+
+!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:29'!
+canBeDivisor
+	self subclassResponsibility .! !
+
+!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:48:10'!
+canBeIndexOfFibonacciSequence
+	self subclassResponsibility.! !
+
+!Entero methodsFor: 'checks' stamp: 'HG 9/30/2020 01:18:08'!
+canBeNumerator
+	self subclassResponsibility.! !
+
+!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:44'!
+onNegativeReturnsBlock: aBlock
+	self subclassResponsibility .! !
+
+!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:51:17'!
+onOneReturnsBlock: aBlock
+	 self subclassResponsibility .! !
+
+!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:52:00'!
+onZeroReturnsBlock: aBlock
+	self subclassResponsibility .! !
+
+
 !Entero methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 21:01'!
 = anObject
 
 	^(anObject isKindOf: self class) and: [ value = anObject integerValue ]! !
-
-!Entero methodsFor: 'comparing' stamp: 'HG 9/30/2020 01:17:48'!
-canBeDenominator
-	self subclassResponsibility.! !
-
-!Entero methodsFor: 'comparing' stamp: 'HG 9/30/2020 01:18:08'!
-canBeNumerator
-	self subclassResponsibility.! !
 
 !Entero methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 20:17'!
 hash
@@ -469,27 +488,27 @@ isZero
 	^value = 0! !
 
 
-!Entero methodsFor: 'private--' stamp: 'FS 9/29/2020 13:16:16'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 13:16:16'!
 dividirAEntero: unDividendoEntero
 	^Fraccion with: unDividendoEntero over: self! !
 
-!Entero methodsFor: 'private--' stamp: 'FS 9/29/2020 13:24:04'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 13:24:04'!
 dividirAFraccion: unDividendoFraccionario
 	^unDividendoFraccionario numerator / (unDividendoFraccionario denominator * self)! !
 
-!Entero methodsFor: 'private--' stamp: 'FS 9/29/2020 12:28:46'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:28:46'!
 multiplicarPorEntero: unMultiplicandoEntero
 	^self class with:  unMultiplicandoEntero integerValue * value ! !
 
-!Entero methodsFor: 'private--' stamp: 'FS 9/29/2020 12:36:37'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:36:37'!
 multiplicarPorFraccion: unMultiplicandoFraccionario
 	^unMultiplicandoFraccionario multiplicarPorEntero: self! !
 
-!Entero methodsFor: 'private--' stamp: 'FS 9/29/2020 12:52:24'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:52:24'!
 restarmeAEntero: unSubstraendoEntero
 	^ self class with: unSubstraendoEntero integerValue - value.! !
 
-!Entero methodsFor: 'private--' stamp: 'FS 9/29/2020 12:51:54'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:51:54'!
 restarmeAFraccion: unSubstraendoFraccionario
 	| newNumerator newDenominator |
 			
@@ -498,11 +517,11 @@ restarmeAFraccion: unSubstraendoFraccionario
 			
 	^newNumerator / newDenominator ! !
 
-!Entero methodsFor: 'private--' stamp: 'FS 9/29/2020 12:09:08'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:09:08'!
 sumarEntero: unSumandoEntero
 	^self class with: unSumandoEntero integerValue + value! !
 
-!Entero methodsFor: 'private--' stamp: 'FS 9/29/2020 12:11:39'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:11:39'!
 sumarFraccion: unSumandoFraccionario
 	^unSumandoFraccionario sumarEntero: self! !
 
@@ -534,14 +553,38 @@ Entero subclass: #EnteroNegativo
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!EnteroNegativo methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:00:55'!
+!EnteroNegativo methodsFor: 'checks' stamp: 'HG 9/30/2020 01:00:55'!
 canBeDenominator
 
 	^nil.! !
 
-!EnteroNegativo methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:02:18'!
+!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:02'!
+canBeDivisor
+	^nil.! !
+
+!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:53:39'!
+canBeIndexOfFibonacciSequence
+	^self error: self class negativeFibonacciErrorDescription.! !
+
+!EnteroNegativo methodsFor: 'checks' stamp: 'HG 9/30/2020 01:02:18'!
 canBeNumerator
 
+	^nil.! !
+
+!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:49'!
+onNegativeReturnsBlock: aBlock
+	^aBlock.! !
+
+!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:51:31'!
+onOneReturnsBlock: aBlock
+	 ^nil.! !
+
+!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:52:07'!
+onZeroReturnsBlock: aBlock
+	^nil.! !
+
+!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:56:34'!
+zeroOrOneReturnsBlock: aBlock
 	^nil.! !
 
 
@@ -552,14 +595,38 @@ Entero subclass: #EnteroPositivo
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!EnteroPositivo methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:14:42'!
+!EnteroPositivo methodsFor: 'checks' stamp: 'HG 9/30/2020 01:14:42'!
 canBeDenominator
 
 	^nil.! !
 
-!EnteroPositivo methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:02:12'!
+!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:07'!
+canBeDivisor
+	^nil.! !
+
+!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:53:56'!
+canBeIndexOfFibonacciSequence
+	^nil.! !
+
+!EnteroPositivo methodsFor: 'checks' stamp: 'HG 9/30/2020 01:02:12'!
 canBeNumerator
 
+	^nil.! !
+
+!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:54'!
+onNegativeReturnsBlock: aBlock
+	^nil.! !
+
+!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:51:44'!
+onOneReturnsBlock: aBlock
+	 ^nil.! !
+
+!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:52:10'!
+onZeroReturnsBlock: aBlock
+	^nil.! !
+
+!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:56:20'!
+zeroOrOneReturnsBlock: aBlock
 	^nil.! !
 
 
@@ -570,13 +637,21 @@ EnteroPositivo subclass: #One
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!One methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:03:17'!
+!One methodsFor: 'checks' stamp: 'HG 9/30/2020 01:03:17'!
 canBeDenominator
 	^self error: 'una fraccion no puede tener denominador 1 porque sino es un entero'.! !
 
-!One methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:18:33'!
+!One methodsFor: 'checks' stamp: 'HG 9/30/2020 01:18:33'!
 canBeNumerator
 	^nil.! !
+
+!One methodsFor: 'checks' stamp: 'HG 10/1/2020 00:24:31'!
+onOneReturnsBlock: aBlock
+	 ^aBlock.! !
+
+!One methodsFor: 'checks' stamp: 'HG 10/1/2020 00:56:08'!
+zeroOrOneReturnsBlock: aBlock
+	^aBlock.! !
 
 
 !classDefinition: #Zero category: #'Numero-Exercise'!
@@ -589,15 +664,40 @@ Entero subclass: #Zero
 Zero initializeWith: 4!
 
 
-!Zero methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:00:24'!
+!Zero methodsFor: 'checks' stamp: 'HG 9/30/2020 23:35:40'!
 canBeDenominator
 	
-	^self error: 'una fraccion no puede ser cero'.! !
+	^self error: 'el cero no puede ser denominador'.! !
 
-!Zero methodsFor: 'as yet unclassified' stamp: 'HG 9/30/2020 01:02:04'!
+!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:18:45'!
+canBeDivisor
+
+	^self error: self class canNotDivideByZeroErrorDescription.! !
+
+!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:54:00'!
+canBeIndexOfFibonacciSequence
+	^nil.! !
+
+!Zero methodsFor: 'checks' stamp: 'HG 9/30/2020 01:02:04'!
 canBeNumerator
 
 	^self error: 'una fraccion no puede ser cero'.! !
+
+!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:59'!
+onNegativeReturnsBlock: aBlock
+	^nil.! !
+
+!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:51:35'!
+onOneReturnsBlock: aBlock
+	 ^nil.! !
+
+!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:13:00'!
+onZeroReturnsBlock: aBlock
+	^aBlock.! !
+
+!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:56:12'!
+zeroOrOneReturnsBlock: aBlock
+	^aBlock.! !
 
 
 !classDefinition: #Fraccion category: #'Numero-Exercise'!
@@ -688,24 +788,24 @@ printOn: aStream
 		print: denominator ! !
 
 
-!Fraccion methodsFor: 'private--' stamp: 'FS 9/29/2020 13:24:44'!
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 13:24:44'!
 dividirAEntero: unDividendoEntero
 	^ ( unDividendoEntero * denominator) /  numerator ! !
 
-!Fraccion methodsFor: 'private--' stamp: 'FS 9/29/2020 13:17:12'!
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 13:17:12'!
 dividirAFraccion: unDividendoFraccionario
 	^(unDividendoFraccionario numerator * self denominator) / (unDividendoFraccionario denominator * self numerator)! !
 
-!Fraccion methodsFor: 'private--' stamp: 'FS 9/29/2020 12:31:13'!
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:31:13'!
 multiplicarPorEntero: unMultiplicando
 	 ^(numerator * unMultiplicando ) / denominator ! !
 
-!Fraccion methodsFor: 'private--' stamp: 'FS 9/29/2020 12:33:57'!
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:33:57'!
 multiplicarPorFraccion: unMultiplicandoFraccionario
 	^(numerator * unMultiplicandoFraccionario numerator) / (denominator * unMultiplicandoFraccionario denominator)
 	! !
 
-!Fraccion methodsFor: 'private--' stamp: 'FS 9/29/2020 12:52:24'!
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:52:24'!
 restarmeAEntero: unSubstraendoEntero
 	| newNumerator newDenominator |
 			
@@ -714,7 +814,7 @@ restarmeAEntero: unSubstraendoEntero
 			
 	^newNumerator / newDenominator ! !
 
-!Fraccion methodsFor: 'private--' stamp: 'FS 9/29/2020 12:51:54'!
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:51:54'!
 restarmeAFraccion: unSubstraendoFraccionario
 	| newNumerator newDenominator |
 		
@@ -723,14 +823,14 @@ restarmeAFraccion: unSubstraendoFraccionario
 		
 	^newNumerator / newDenominator ! !
 
-!Fraccion methodsFor: 'private--' stamp: 'FS 9/29/2020 12:21:07'!
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:21:07'!
 sumarEntero: unSumandoEntero
 	|nuevoDenominador nuevoNumerador|
 	nuevoDenominador := denominator.
 	nuevoNumerador := numerator + (unSumandoEntero * denominator).
 	^nuevoNumerador / nuevoDenominador! !
 
-!Fraccion methodsFor: 'private--' stamp: 'FS 9/29/2020 12:13:10'!
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:13:10'!
 sumarFraccion: unSumandoFraccionario
 
 	| newNumerator newDenominator |
@@ -746,21 +846,21 @@ sumarFraccion: unSumandoFraccionario
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'NR 9/23/2018 23:45:19'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'HG 10/1/2020 00:25:41'!
 with: aDividend over: aDivisor
 
 	| greatestCommonDivisor numerator denominator |
 	
-	aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
-	aDividend isZero ifTrue: [ ^aDividend ].
 	
-	aDivisor isNegative ifTrue:[ ^aDividend negated / aDivisor negated].
-	
+	aDivisor canBeDivisor.
+	(aDividend onZeroReturnsBlock: [ ^aDividend ]) value.
+	(aDivisor onNegativeReturnsBlock: [ ^aDividend negated / aDivisor negated]) value.
+		
 	greatestCommonDivisor := aDividend greatestCommonDivisorWith: aDivisor. 
 	numerator := aDividend // greatestCommonDivisor.
 	denominator := aDivisor // greatestCommonDivisor.
 	
-	denominator isOne ifTrue: [ ^numerator ].
+	(denominator onOneReturnsBlock: [^numerator]) value.
 
-	^self new initializeWith: numerator over: denominator
+	^self new initializeWith: numerator over: denominator.
 	! !
