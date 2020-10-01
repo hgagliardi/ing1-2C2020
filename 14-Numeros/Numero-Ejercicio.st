@@ -379,15 +379,15 @@ Zero new!
 	^anAdder sumarEntero: self
 ! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 12:36:28'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 12:43:23'!
 - aSubtrahend 
 	
-	^aSubtrahend comoSubstraendoDeEntero: self! !
+	^aSubtrahend restarComoSubstraendoDeEntero: self! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 12:35:09'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 12:42:59'!
 / aDivisor 
 	
-	^aDivisor comoDivisorDeEntero: self! !
+	^aDivisor dividirComoDivisorDeEntero: self! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:55'!
 // aDivisor 
@@ -488,26 +488,13 @@ isZero
 	^value = 0! !
 
 
-!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:35:09'!
-comoDivisorDeEntero: unDividendoEntero
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:42:59'!
+dividirComoDivisorDeEntero: unDividendoEntero
 	^Fraccion with: unDividendoEntero over: self! !
 
-!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:35:49'!
-comoDivisorDeFraccion: unDividendoFraccionario
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:43:12'!
+dividirComoDivisorDeFraccion: unDividendoFraccionario
 	^unDividendoFraccionario numerator / (unDividendoFraccionario denominator * self)! !
-
-!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:36:28'!
-comoSubstraendoDeEntero: unSubstraendoEntero
-	^ self class with: unSubstraendoEntero integerValue - value.! !
-
-!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:36:41'!
-comoSubstraendoDeFraccion: unSubstraendoFraccionario
-	| newNumerator newDenominator |
-			
-	newNumerator :=  unSubstraendoFraccionario numerator - (unSubstraendoFraccionario denominator * self)   .
-	newDenominator := unSubstraendoFraccionario denominator .
-			
-	^newNumerator / newDenominator ! !
 
 !Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:28:46'!
 multiplicarPorEntero: unMultiplicandoEntero
@@ -516,6 +503,19 @@ multiplicarPorEntero: unMultiplicandoEntero
 !Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:36:37'!
 multiplicarPorFraccion: unMultiplicandoFraccionario
 	^unMultiplicandoFraccionario multiplicarPorEntero: self! !
+
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:43:23'!
+restarComoSubstraendoDeEntero: unSubstraendoEntero
+	^ self class with: unSubstraendoEntero integerValue - value.! !
+
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:43:39'!
+restarComoSubstraendoDeFraccion: unSubstraendoFraccionario
+	| newNumerator newDenominator |
+			
+	newNumerator :=  unSubstraendoFraccionario numerator - (unSubstraendoFraccionario denominator * self)   .
+	newDenominator := unSubstraendoFraccionario denominator .
+			
+	^newNumerator / newDenominator ! !
 
 !Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:09:08'!
 sumarEntero: unSumandoEntero
@@ -718,16 +718,16 @@ Numero subclass: #Fraccion
 	^anAdder sumarFraccion: self
 	! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 12:36:41'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 12:43:39'!
 - aSubtrahend 
 	
-	^aSubtrahend comoSubstraendoDeFraccion: self
+	^aSubtrahend restarComoSubstraendoDeFraccion: self
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 12:35:49'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 12:43:12'!
 / aDivisor 
 	
-	^aDivisor comoDivisorDeFraccion: self! !
+	^aDivisor dividirComoDivisorDeFraccion: self! !
 
 
 !Fraccion methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 20:42'!
@@ -788,31 +788,13 @@ printOn: aStream
 		print: denominator ! !
 
 
-!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:35:09'!
-comoDivisorDeEntero: unDividendoEntero
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:42:59'!
+dividirComoDivisorDeEntero: unDividendoEntero
 	^ ( unDividendoEntero * denominator) /  numerator ! !
 
-!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:35:49'!
-comoDivisorDeFraccion: unDividendoFraccionario
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:43:12'!
+dividirComoDivisorDeFraccion: unDividendoFraccionario
 	^(unDividendoFraccionario numerator * self denominator) / (unDividendoFraccionario denominator * self numerator)! !
-
-!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:36:28'!
-comoSubstraendoDeEntero: unSubstraendoEntero
-	| newNumerator newDenominator |
-			
-	newNumerator :=  (denominator * unSubstraendoEntero) - numerator  .
-	newDenominator := denominator .
-			
-	^newNumerator / newDenominator ! !
-
-!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:36:41'!
-comoSubstraendoDeFraccion: unSubstraendoFraccionario
-	| newNumerator newDenominator |
-		
-	newNumerator :=  (denominator * unSubstraendoFraccionario numerator) - (numerator * unSubstraendoFraccionario denominator) .
-	newDenominator := denominator * unSubstraendoFraccionario denominator.
-		
-	^newNumerator / newDenominator ! !
 
 !Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:31:13'!
 multiplicarPorEntero: unMultiplicando
@@ -822,6 +804,24 @@ multiplicarPorEntero: unMultiplicando
 multiplicarPorFraccion: unMultiplicandoFraccionario
 	^(numerator * unMultiplicandoFraccionario numerator) / (denominator * unMultiplicandoFraccionario denominator)
 	! !
+
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:43:23'!
+restarComoSubstraendoDeEntero: unSubstraendoEntero
+	| newNumerator newDenominator |
+			
+	newNumerator :=  (denominator * unSubstraendoEntero) - numerator  .
+	newDenominator := denominator .
+			
+	^newNumerator / newDenominator ! !
+
+!Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:43:39'!
+restarComoSubstraendoDeFraccion: unSubstraendoFraccionario
+	| newNumerator newDenominator |
+		
+	newNumerator :=  (denominator * unSubstraendoFraccionario numerator) - (numerator * unSubstraendoFraccionario denominator) .
+	newDenominator := denominator * unSubstraendoFraccionario denominator.
+		
+	^newNumerator / newDenominator ! !
 
 !Fraccion methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 9/29/2020 12:21:07'!
 sumarEntero: unSumandoEntero
@@ -846,7 +846,7 @@ sumarFraccion: unSumandoFraccionario
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'HG 10/1/2020 00:25:41'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'FS 10/1/2020 12:42:20'!
 with: aDividend over: aDivisor
 
 	| greatestCommonDivisor numerator denominator |
