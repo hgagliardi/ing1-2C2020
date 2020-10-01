@@ -508,17 +508,17 @@ sumarFraccion: unSumandoFraccionario
 	^unSumandoFraccionario sumarEntero: self! !
 
 
-!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:04:24'!
-comoDenominadorCoprimoDeNumerador: aDividend
+!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:32:01'!
+comoDenominadorCoprimoDeNumerador: unNumeradorEntero
 	self subclassResponsibility ! !
 
-!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:04:17'!
-comoDenominadordeFraccionConNumerador: aDividend
+!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:32:08'!
+comoDenominadordeFraccionConNumerador: unNumeradorEntero
 	self subclassResponsibility ! !
 
-!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:38:50'!
-comoNumeradorDeFraccionConDenominador: aDivisor
-	^aDivisor comoDenominadorDeFraccionConNumerador: self! !
+!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:32:18'!
+comoNumeradorDeFraccionConDenominador: unDenominadorEntero
+	^unDenominadorEntero comoDenominadorDeFraccionConNumerador: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -548,13 +548,13 @@ Entero subclass: #EnteroNegativo
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!EnteroNegativo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:14:52'!
-comoDenominadorCoprimoDeNumerador: aDividend
+!EnteroNegativo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:32:31'!
+comoDenominadorCoprimoDeNumerador: unNumeradorEntero
 	^self error: 'el denominador de una fraccion no puede ser negativo'! !
 
-!EnteroNegativo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 12:56:30'!
-comoDenominadorDeFraccionConNumerador: aDividend
-	^aDividend negated / self negated! !
+!EnteroNegativo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:32:39'!
+comoDenominadorDeFraccionConNumerador: unNumeradorEntero
+	^unNumeradorEntero negated / self negated! !
 
 
 !EnteroNegativo methodsFor: 'operaciones fibonacci' stamp: 'FS 10/1/2020 13:33:38'!
@@ -569,15 +569,16 @@ Entero subclass: #EnteroPositivo
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!EnteroPositivo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:04:37'!
-comoDenominadorCoprimoDeNumerador: aDividend
-	^Fraccion new initializeWith: aDividend over: self.! !
+!EnteroPositivo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:32:47'!
+comoDenominadorCoprimoDeNumerador: unNumeradorEntero
+	^Fraccion new initializeWith: unNumeradorEntero over: self.! !
 
-!EnteroPositivo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:07:13'!
-comoDenominadorDeFraccionConNumerador: aDividend
+!EnteroPositivo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:33:02'!
+comoDenominadorDeFraccionConNumerador: unNumeradorEntero
 	| greatestCommonDivisor numerator denominator |
-	greatestCommonDivisor := aDividend greatestCommonDivisorWith: self. 
-	numerator := aDividend // greatestCommonDivisor.
+	
+	greatestCommonDivisor := unNumeradorEntero greatestCommonDivisorWith: self. 
+	numerator := unNumeradorEntero // greatestCommonDivisor.
 	denominator := self // greatestCommonDivisor.
 	^denominator comoDenominadorCoprimoDeNumerador: numerator! !
 
@@ -603,13 +604,13 @@ canBeDenominator
 	^self error: 'una fraccion no puede tener denominador 1 porque sino es un entero'.! !
 
 
-!One methodsFor: 'generadores de Fracciones' stamp: 'FS 10/1/2020 13:15:40'!
-comoDenominadorCoprimoDeNumerador: aDividend
-	^aDividend! !
+!One methodsFor: 'generadores de Fracciones' stamp: 'FS 10/1/2020 15:33:20'!
+comoDenominadorCoprimoDeNumerador: unNumeradorEntero
+	^unNumeradorEntero! !
 
-!One methodsFor: 'generadores de Fracciones' stamp: 'FS 10/1/2020 12:59:41'!
-comoDenominadorDeFraccionConNumerador: aDividend
-	^aDividend! !
+!One methodsFor: 'generadores de Fracciones' stamp: 'FS 10/1/2020 15:33:27'!
+comoDenominadorDeFraccionConNumerador: unNumeradorEntero
+	^unNumeradorEntero! !
 
 
 !One methodsFor: 'operaciones fibonacci' stamp: 'FS 10/1/2020 13:24:32'!
@@ -643,19 +644,19 @@ canBeNumerator
 	^self error: 'una fraccion no puede ser cero'.! !
 
 
-!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:19:02'!
-comoDenominadorCoprimoDeNumerador: aDividend
+!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:33:36'!
+comoDenominadorCoprimoDeNumerador: unNumeradorEntero
 	self class canNotDivideByZeroErrorDescription
 ! !
 
-!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:18:23'!
-comoDenominadorDeFraccionConNumerador: aDividend
+!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:33:44'!
+comoDenominadorDeFraccionConNumerador: unNumeradorEntero
 	self class canNotDivideByZeroErrorDescription
 
 	! !
 
-!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 12:51:06'!
-comoNumeradorDeFraccionConDenominador: aDivisor
+!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 15:33:51'!
+comoNumeradorDeFraccionConDenominador: unDenominadorEntero
 	^self! !
 
 
