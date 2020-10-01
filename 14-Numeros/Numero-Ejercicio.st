@@ -394,16 +394,10 @@ Zero new!
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HG 10/1/2020 00:56:47'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'FS 10/1/2020 13:32:57'!
 fibonacci
 
-	| one two |
-	
-	one := Entero with: 1.
-	two := Entero with: 2.
-	self canBeIndexOfFibonacciSequence.
-	(self zeroOrOneReturnsBlock: [^one]) value.
-	^ (self - one) fibonacci + (self - two) fibonacci
+	^self comoIndiceDeSecuenciaDeFibonacci.
 		! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
@@ -412,33 +406,21 @@ greatestCommonDivisorWith: anEntero
 	^self class with: (value gcd: anEntero integerValue)! !
 
 
-!Entero methodsFor: 'checks' stamp: 'HG 9/30/2020 01:17:48'!
+!Entero methodsFor: 'chequeos fraccionarios' stamp: 'FS 10/1/2020 13:43:33'!
 canBeDenominator
-	self subclassResponsibility.! !
+	^nil! !
 
-!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:29'!
+!Entero methodsFor: 'chequeos fraccionarios' stamp: 'FS 10/1/2020 13:45:10'!
 canBeDivisor
-	self subclassResponsibility .! !
+	^nil! !
 
-!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:48:10'!
+!Entero methodsFor: 'chequeos fraccionarios' stamp: 'HG 10/1/2020 00:48:10'!
 canBeIndexOfFibonacciSequence
 	self subclassResponsibility.! !
 
-!Entero methodsFor: 'checks' stamp: 'HG 9/30/2020 01:18:08'!
+!Entero methodsFor: 'chequeos fraccionarios' stamp: 'FS 10/1/2020 13:44:56'!
 canBeNumerator
-	self subclassResponsibility.! !
-
-!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:44'!
-onNegativeReturnsBlock: aBlock
-	self subclassResponsibility .! !
-
-!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:51:17'!
-onOneReturnsBlock: aBlock
-	 self subclassResponsibility .! !
-
-!Entero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:52:00'!
-onZeroReturnsBlock: aBlock
-	self subclassResponsibility .! !
+	^nil! !
 
 
 !Entero methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 21:01'!
@@ -488,7 +470,7 @@ isZero
 	^value = 0! !
 
 
-!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 12:42:59'!
+!Entero methodsFor: 'operaciones aritmeticas privadas' stamp: 'FS 10/1/2020 13:20:22'!
 dividirComoDivisorDeEntero: unDividendoEntero
 	^Fraccion with: unDividendoEntero over: self! !
 
@@ -525,6 +507,19 @@ sumarEntero: unSumandoEntero
 sumarFraccion: unSumandoFraccionario
 	^unSumandoFraccionario sumarEntero: self! !
 
+
+!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:04:24'!
+comoDenominadorCoprimoDeNumerador: aDividend
+	self subclassResponsibility ! !
+
+!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:04:17'!
+comoDenominadordeFraccionConNumerador: aDividend
+	self subclassResponsibility ! !
+
+!Entero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:38:50'!
+comoNumeradorDeFraccionConDenominador: aDivisor
+	^aDivisor comoDenominadorDeFraccionConNumerador: self! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Entero class' category: #'Numero-Exercise'!
@@ -553,39 +548,18 @@ Entero subclass: #EnteroNegativo
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!EnteroNegativo methodsFor: 'checks' stamp: 'HG 9/30/2020 01:00:55'!
-canBeDenominator
+!EnteroNegativo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:14:52'!
+comoDenominadorCoprimoDeNumerador: aDividend
+	^self error: 'el denominador de una fraccion no puede ser negativo'! !
 
-	^nil.! !
+!EnteroNegativo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 12:56:30'!
+comoDenominadorDeFraccionConNumerador: aDividend
+	^aDividend negated / self negated! !
 
-!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:02'!
-canBeDivisor
-	^nil.! !
 
-!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:53:39'!
-canBeIndexOfFibonacciSequence
-	^self error: self class negativeFibonacciErrorDescription.! !
-
-!EnteroNegativo methodsFor: 'checks' stamp: 'HG 9/30/2020 01:02:18'!
-canBeNumerator
-
-	^nil.! !
-
-!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:49'!
-onNegativeReturnsBlock: aBlock
-	^aBlock.! !
-
-!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:51:31'!
-onOneReturnsBlock: aBlock
-	 ^nil.! !
-
-!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:52:07'!
-onZeroReturnsBlock: aBlock
-	^nil.! !
-
-!EnteroNegativo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:56:34'!
-zeroOrOneReturnsBlock: aBlock
-	^nil.! !
+!EnteroNegativo methodsFor: 'operaciones fibonacci' stamp: 'FS 10/1/2020 13:33:38'!
+comoIndiceDeSecuenciaDeFibonacci
+ 	^self error: self class negativeFibonacciErrorDescription.! !
 
 
 !classDefinition: #EnteroPositivo category: #'Numero-Exercise'!
@@ -595,39 +569,26 @@ Entero subclass: #EnteroPositivo
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!EnteroPositivo methodsFor: 'checks' stamp: 'HG 9/30/2020 01:14:42'!
-canBeDenominator
+!EnteroPositivo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:04:37'!
+comoDenominadorCoprimoDeNumerador: aDividend
+	^Fraccion new initializeWith: aDividend over: self.! !
 
-	^nil.! !
+!EnteroPositivo methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:07:13'!
+comoDenominadorDeFraccionConNumerador: aDividend
+	| greatestCommonDivisor numerator denominator |
+	greatestCommonDivisor := aDividend greatestCommonDivisorWith: self. 
+	numerator := aDividend // greatestCommonDivisor.
+	denominator := self // greatestCommonDivisor.
+	^denominator comoDenominadorCoprimoDeNumerador: numerator! !
 
-!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:07'!
-canBeDivisor
-	^nil.! !
 
-!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:53:56'!
-canBeIndexOfFibonacciSequence
-	^nil.! !
-
-!EnteroPositivo methodsFor: 'checks' stamp: 'HG 9/30/2020 01:02:12'!
-canBeNumerator
-
-	^nil.! !
-
-!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:54'!
-onNegativeReturnsBlock: aBlock
-	^nil.! !
-
-!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:51:44'!
-onOneReturnsBlock: aBlock
-	 ^nil.! !
-
-!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:52:10'!
-onZeroReturnsBlock: aBlock
-	^nil.! !
-
-!EnteroPositivo methodsFor: 'checks' stamp: 'HG 10/1/2020 00:56:20'!
-zeroOrOneReturnsBlock: aBlock
-	^nil.! !
+!EnteroPositivo methodsFor: 'operaciones fibonacci' stamp: 'FS 10/1/2020 13:27:58'!
+comoIndiceDeSecuenciaDeFibonacci
+ 	|one two |
+	
+	one := Entero with: 1.
+	two := Entero with: 2.
+	^ (self - one) fibonacci + (self - two) fibonacci! !
 
 
 !classDefinition: #One category: #'Numero-Exercise'!
@@ -637,21 +598,23 @@ EnteroPositivo subclass: #One
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!One methodsFor: 'checks' stamp: 'HG 9/30/2020 01:03:17'!
+!One methodsFor: 'chequeos fraccionarios' stamp: 'HG 9/30/2020 01:03:17'!
 canBeDenominator
 	^self error: 'una fraccion no puede tener denominador 1 porque sino es un entero'.! !
 
-!One methodsFor: 'checks' stamp: 'HG 9/30/2020 01:18:33'!
-canBeNumerator
-	^nil.! !
 
-!One methodsFor: 'checks' stamp: 'HG 10/1/2020 00:24:31'!
-onOneReturnsBlock: aBlock
-	 ^aBlock.! !
+!One methodsFor: 'generadores de Fracciones' stamp: 'FS 10/1/2020 13:15:40'!
+comoDenominadorCoprimoDeNumerador: aDividend
+	^aDividend! !
 
-!One methodsFor: 'checks' stamp: 'HG 10/1/2020 00:56:08'!
-zeroOrOneReturnsBlock: aBlock
-	^aBlock.! !
+!One methodsFor: 'generadores de Fracciones' stamp: 'FS 10/1/2020 12:59:41'!
+comoDenominadorDeFraccionConNumerador: aDividend
+	^aDividend! !
+
+
+!One methodsFor: 'operaciones fibonacci' stamp: 'FS 10/1/2020 13:24:32'!
+comoIndiceDeSecuenciaDeFibonacci
+	^self! !
 
 
 !classDefinition: #Zero category: #'Numero-Exercise'!
@@ -664,40 +627,41 @@ Entero subclass: #Zero
 Zero initializeWith: 4!
 
 
-!Zero methodsFor: 'checks' stamp: 'HG 9/30/2020 23:35:40'!
+!Zero methodsFor: 'chequeos fraccionarios' stamp: 'HG 9/30/2020 23:35:40'!
 canBeDenominator
 	
 	^self error: 'el cero no puede ser denominador'.! !
 
-!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:18:45'!
+!Zero methodsFor: 'chequeos fraccionarios' stamp: 'HG 10/1/2020 00:18:45'!
 canBeDivisor
 
 	^self error: self class canNotDivideByZeroErrorDescription.! !
 
-!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:54:00'!
-canBeIndexOfFibonacciSequence
-	^nil.! !
-
-!Zero methodsFor: 'checks' stamp: 'HG 9/30/2020 01:02:04'!
+!Zero methodsFor: 'chequeos fraccionarios' stamp: 'HG 9/30/2020 01:02:04'!
 canBeNumerator
 
 	^self error: 'una fraccion no puede ser cero'.! !
 
-!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:50:59'!
-onNegativeReturnsBlock: aBlock
-	^nil.! !
 
-!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:51:35'!
-onOneReturnsBlock: aBlock
-	 ^nil.! !
+!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:19:02'!
+comoDenominadorCoprimoDeNumerador: aDividend
+	self class canNotDivideByZeroErrorDescription
+! !
 
-!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:13:00'!
-onZeroReturnsBlock: aBlock
-	^aBlock.! !
+!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 13:18:23'!
+comoDenominadorDeFraccionConNumerador: aDividend
+	self class canNotDivideByZeroErrorDescription
 
-!Zero methodsFor: 'checks' stamp: 'HG 10/1/2020 00:56:12'!
-zeroOrOneReturnsBlock: aBlock
-	^aBlock.! !
+	! !
+
+!Zero methodsFor: 'generadores de fracciones' stamp: 'FS 10/1/2020 12:51:06'!
+comoNumeradorDeFraccionConDenominador: aDivisor
+	^self! !
+
+
+!Zero methodsFor: 'operaciones fibonacci' stamp: 'FS 10/1/2020 13:28:48'!
+comoIndiceDeSecuenciaDeFibonacci
+	^self class with: 1! !
 
 
 !classDefinition: #Fraccion category: #'Numero-Exercise'!
@@ -846,21 +810,10 @@ sumarFraccion: unSumandoFraccionario
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'FS 10/1/2020 12:42:20'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'FS 10/1/2020 13:39:23'!
 with: aDividend over: aDivisor
 
-	| greatestCommonDivisor numerator denominator |
-	
-	
 	aDivisor canBeDivisor.
-	(aDividend onZeroReturnsBlock: [ ^aDividend ]) value.
-	(aDivisor onNegativeReturnsBlock: [ ^aDividend negated / aDivisor negated]) value.
-		
-	greatestCommonDivisor := aDividend greatestCommonDivisorWith: aDivisor. 
-	numerator := aDividend // greatestCommonDivisor.
-	denominator := aDivisor // greatestCommonDivisor.
+	^(aDividend comoNumeradorDeFraccionConDenominador: aDivisor).
 	
-	(denominator onOneReturnsBlock: [^numerator]) value.
-
-	^self new initializeWith: numerator over: denominator.
 	! !
