@@ -147,10 +147,24 @@ TestCase subclass: #SentenceFinderByPrefixTest
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: ''
+	instanceVariableNames: 'stackAlgo'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:06:19'!
+initialize
+	stack := StackAlgo new.
+	
+	! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 16:38:44'!
+isEmpty
+	^stack isEmpty ! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:33:02'!
+push: anElement
+	stackAlgo := stackAlgo pushStackAlgo: anElement .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -170,3 +184,79 @@ Object subclass: #SentenceFinderByPrefix
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+
+!classDefinition: #StackAlgo category: #'Stack-Exercise'!
+Object subclass: #StackAlgo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:28:01'!
+apilarUn: anElement
+	^self class apilarUn: anElement en: self ! !
+
+!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:05:34'!
+pushStackAlgo: anElement
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StackAlgo class' category: #'Stack-Exercise'!
+StackAlgo class
+	instanceVariableNames: ''!
+
+!StackAlgo class methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:30:58'!
+newStack
+	^StackVacio new ! !
+
+!StackAlgo class methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:31:29'!
+with: anElement
+	^StackNoVacio new initializeWith: anElement
+	! !
+
+
+!classDefinition: #StackNoVacio category: #'Stack-Exercise'!
+StackAlgo subclass: #StackNoVacio
+	instanceVariableNames: 'top restoStack'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:17:29'!
+initializeWith: anElement
+	top := anElement. 
+	restoStack := StackVacio new! !
+
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:05:12'!
+pushStackAlgo: anElement
+	restoStack := restoStack pushStackAlgo: top.
+	top := anElement. 
+	^self! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StackNoVacio class' category: #'Stack-Exercise'!
+StackNoVacio class
+	instanceVariableNames: ''!
+
+!StackNoVacio class methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:16:55'!
+with: anElement
+	self new initializeWith: anElement! !
+
+
+!classDefinition: #StackVacio category: #'Stack-Exercise'!
+StackAlgo subclass: #StackVacio
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 16:37:39'!
+isEmpty
+	^true! !
+
+!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:12:53'!
+pushStackAlgo: anElement
+	^StackNoVacio with: anElement! !
