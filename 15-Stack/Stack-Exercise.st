@@ -152,17 +152,24 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:06:19'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:37'!
 initialize
-	stack := StackAlgo new.
+	stackAlgo := StackAlgo newStack.
 	
 	! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 16:38:44'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:36:23'!
 isEmpty
-	^stack isEmpty ! !
+	^stackAlgo isEmpty ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:33:02'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:45:04'!
+pop
+	| anteriorTop |
+	anteriorTop := stackAlgo lastPushed.
+	stackAlgo := stackAlgo pop.
+	^anteriorTop ! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:13'!
 push: anElement
 	stackAlgo := stackAlgo pushStackAlgo: anElement .! !
 
@@ -193,9 +200,9 @@ Object subclass: #StackAlgo
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:28:01'!
-apilarUn: anElement
-	^self class apilarUn: anElement en: self ! !
+!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:54'!
+isEmpty
+	self subclassResponsibility ! !
 
 !StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:05:34'!
 pushStackAlgo: anElement
@@ -224,26 +231,20 @@ StackAlgo subclass: #StackNoVacio
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:17:29'!
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:49:32'!
 initializeWith: anElement
 	top := anElement. 
-	restoStack := StackVacio new! !
+	restoStack := StackAlgo newStack ! !
+
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:36:06'!
+isEmpty 
+	^false! !
 
 !StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:05:12'!
 pushStackAlgo: anElement
 	restoStack := restoStack pushStackAlgo: top.
 	top := anElement. 
 	^self! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'StackNoVacio class' category: #'Stack-Exercise'!
-StackNoVacio class
-	instanceVariableNames: ''!
-
-!StackNoVacio class methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:16:55'!
-with: anElement
-	self new initializeWith: anElement! !
 
 
 !classDefinition: #StackVacio category: #'Stack-Exercise'!
@@ -257,6 +258,6 @@ StackAlgo subclass: #StackVacio
 isEmpty
 	^true! !
 
-!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:12:53'!
+!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:49:05'!
 pushStackAlgo: anElement
-	^StackNoVacio with: anElement! !
+	^StackAlgo with: anElement! !
