@@ -14,14 +14,13 @@ test01StackShouldBeEmptyWhenCreated
 	
 	self assert: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:29:55'!
+!OOStackTest methodsFor: 'test' stamp: 'FS 10/3/2020 18:05:18'!
 test02PushAddElementsToTheStack
 
-	| stack |
-	
+	| stack |.
 	stack := OOStack new.
 	stack push: 'something'.
-	
+
 	self deny: stack isEmpty! !
 
 !OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:01'!
@@ -162,16 +161,26 @@ initialize
 isEmpty
 	^stackAlgo isEmpty ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:45:04'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:59:24'!
 pop
-	| anteriorTop |
-	anteriorTop := stackAlgo lastPushed.
+	| previousTop |
+	
+	previousTop := stackAlgo lastPushed.
 	stackAlgo := stackAlgo pop.
-	^anteriorTop ! !
+	
+	^previousTop ! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:13'!
 push: anElement
 	stackAlgo := stackAlgo pushStackAlgo: anElement .! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:05:54'!
+size
+	^stackAlgo size! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:03:55'!
+top
+	^stackAlgo lastPushed ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -204,8 +213,20 @@ Object subclass: #StackAlgo
 isEmpty
 	self subclassResponsibility ! !
 
+!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:01:20'!
+lastPushed
+	self subclassResponsibility ! !
+
+!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:59:36'!
+pop
+	self subclassResponsibility ! !
+
 !StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:05:34'!
 pushStackAlgo: anElement
+	self subclassResponsibility ! !
+
+!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:12:32'!
+size
 	self subclassResponsibility ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -240,11 +261,23 @@ initializeWith: anElement
 isEmpty 
 	^false! !
 
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:01:30'!
+lastPushed
+	^top! !
+
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:01:02'!
+pop
+	^restoStack ! !
+
 !StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:05:12'!
 pushStackAlgo: anElement
 	restoStack := restoStack pushStackAlgo: top.
 	top := anElement. 
 	^self! !
+
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:04:56'!
+size
+	^1 + restoStack size! !
 
 
 !classDefinition: #StackVacio category: #'Stack-Exercise'!
@@ -258,6 +291,18 @@ StackAlgo subclass: #StackVacio
 isEmpty
 	^true! !
 
+!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:11:20'!
+lastPushed
+	^self error: OOStack stackEmptyErrorDescription! !
+
+!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:11:58'!
+pop
+	^self error: OOStack stackEmptyErrorDescription 	! !
+
 !StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:49:05'!
 pushStackAlgo: anElement
 	^StackAlgo with: anElement! !
+
+!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:04:31'!
+size
+	^0! !
