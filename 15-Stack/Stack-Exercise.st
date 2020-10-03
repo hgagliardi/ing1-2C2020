@@ -143,6 +143,18 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:43:00'!
+test01EmptyPrefixGetsError
+	
+	| stack finder  |
+	stack := OOStack new.
+	finder := SentenceFinderByPrefix with: stack.
+	self
+		should: [ finder find: ''.]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix finderEmptyPrefixErrorDescription ]! !
+
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
@@ -196,10 +208,34 @@ stackEmptyErrorDescription
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
-	instanceVariableNames: ''
+	instanceVariableNames: 'searchStack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:44:59'!
+find: aPrefix
+	
+	(aPrefix size == 0) ifTrue: [ ^self error: self class finderEmptyPrefixErrorDescription. ]! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:24:22'!
+initialize: aStack
+	searchStack := aStack.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: #'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: ''!
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:37:24'!
+finderEmptyPrefixErrorDescription
+	^'No puede haber un prefijo vacío'.
+	! !
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:41:14'!
+with: aStack
+	^self new initialize: aStack.! !
 
 
 !classDefinition: #StackAlgo category: #'Stack-Exercise'!
