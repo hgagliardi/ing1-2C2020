@@ -211,37 +211,133 @@ test05SearchInStackWithPrefixNotFoundReturnsAnEmptyStack
 	self assert: (finder find: aSearchPrefix) isEmpty.! !
 
 
-!classDefinition: #OOStack category: #'Stack-Exercise'!
-Object subclass: #OOStack
-	instanceVariableNames: 'stackEstatico'
+!classDefinition: #ElementoDeStack category: #'Stack-Exercise'!
+Object subclass: #ElementoDeStack
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:17:03'!
+!ElementoDeStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:21:44'!
+elementUnderneath
+	self subclassResponsibility ! !
+
+!ElementoDeStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:01:07'!
+esBase
+	self subclassResponsibility ! !
+
+!ElementoDeStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:33:27'!
+height
+	self subclassResponsibility ! !
+
+!ElementoDeStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:33:23'!
+value
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ElementoDeStack class' category: #'Stack-Exercise'!
+ElementoDeStack class
+	instanceVariableNames: ''!
+
+!ElementoDeStack class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:18:37'!
+newElement
+	^BaseStack new! !
+
+
+!classDefinition: #BaseStack category: #'Stack-Exercise'!
+ElementoDeStack subclass: #BaseStack
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!BaseStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:37:08'!
+elementUnderneath
+	^self error: OOStack  stackEmptyErrorDescription! !
+
+!BaseStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:03:04'!
+esBase
+	^true! !
+
+!BaseStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:32:56'!
+height
+	^0! !
+
+!BaseStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:37:00'!
+value
+	^self error: OOStack stackEmptyErrorDescription! !
+
+
+!classDefinition: #StackedElement category: #'Stack-Exercise'!
+ElementoDeStack subclass: #StackedElement
+	instanceVariableNames: 'nextElement value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:26:45'!
+elementUnderneath
+	 
+	^nextElement ! !
+
+!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:01:18'!
+esBase
+	^false! !
+
+!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:32:51'!
+height
+	^1 + nextElement height! !
+
+!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:21:09'!
+initializeWith: anElementValue onTopOf: anElementUnderneath
+	value := anElementValue.
+	nextElement := anElementUnderneath! !
+
+!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:29:06'!
+value
+	^value ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StackedElement class' category: #'Stack-Exercise'!
+StackedElement class
+	instanceVariableNames: ''!
+
+!StackedElement class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:14:53'!
+with: anElement onTopOf: anElementUnderneath
+	^self new initializeWith: anElement onTopOf: anElementUnderneath! !
+
+
+!classDefinition: #OOStack category: #'Stack-Exercise'!
+Object subclass: #OOStack
+	instanceVariableNames: 'top'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:10:09'!
 initialize
-	stackEstatico := StackEstatico new.
+	top := ElementoDeStack newElement ! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:02:25'!
+isEmpty
+	^top esBase ! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:28:39'!
+pop
+	|previousTop|
 	
+	previousTop := top value.
+	top:= top elementUnderneath.
+	^previousTop
 	! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
-isEmpty
-	^stackEstatico isEmpty ! !
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:44:02'!
+push: anElementValue
+	top := StackedElement with: anElementValue onTopOf: top! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
-pop
-	| previousTop |
-	
-	previousTop := stackEstatico lastPushed.
-	stackEstatico := stackEstatico pop.
-	
-	^previousTop ! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:12'!
-push: anElement
-	stackEstatico := stackEstatico push: anElement .! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:03:49'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:47:03'!
 searchWithCondition:  aConditionBlock
 	
 	| filtered backupStack |
@@ -256,13 +352,13 @@ searchWithCondition:  aConditionBlock
 					].
 	^filtered.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:33:51'!
 size
-	^stackEstatico size! !
+	^top height! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:29:20'!
 top
-	^stackEstatico lastPushed ! !
+	^top value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -274,6 +370,7 @@ OOStack class
 stackEmptyErrorDescription
 	
 	^ 'Stack is empty!!'! !
+
 
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
@@ -338,109 +435,3 @@ finderWithSpacesPrefixErrorDescription
 !SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:41:14'!
 with: aStack
 	^self new initialize: aStack.! !
-
-
-!classDefinition: #StackEstatico category: #'Stack-Exercise'!
-Object subclass: #StackEstatico
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:54'!
-isEmpty
-	self subclassResponsibility ! !
-
-!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:01:20'!
-lastPushed
-	self subclassResponsibility ! !
-
-!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:59:36'!
-pop
-	self subclassResponsibility ! !
-
-!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:11'!
-push: anElement
-	self subclassResponsibility ! !
-
-!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:12:32'!
-size
-	self subclassResponsibility ! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'StackEstatico class' category: #'Stack-Exercise'!
-StackEstatico class
-	instanceVariableNames: ''!
-
-!StackEstatico class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:16:04'!
-new
-	^StackVacio basicNew ! !
-
-!StackEstatico class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:37'!
-with: anElement
-	^StackNoVacio basicNew initializeWith: anElement
-	! !
-
-
-!classDefinition: #StackNoVacio category: #'Stack-Exercise'!
-StackEstatico subclass: #StackNoVacio
-	instanceVariableNames: 'top restoStack'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:17:38'!
-initializeWith: anElement
-	top := anElement. 
-	restoStack := StackEstatico new ! !
-
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:36:06'!
-isEmpty 
-	^false! !
-
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:01:30'!
-lastPushed
-	^top! !
-
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:01:02'!
-pop
-	^restoStack ! !
-
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:12'!
-push: anElement
-	restoStack := restoStack push: top.
-	top := anElement. 
-	^self! !
-
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:04:56'!
-size
-	^1 + restoStack size! !
-
-
-!classDefinition: #StackVacio category: #'Stack-Exercise'!
-StackEstatico subclass: #StackVacio
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 16:37:39'!
-isEmpty
-	^true! !
-
-!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:11:20'!
-lastPushed
-	^self error: OOStack stackEmptyErrorDescription! !
-
-!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:11:58'!
-pop
-	^self error: OOStack stackEmptyErrorDescription 	! !
-
-!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:11'!
-push: anElement
-	^StackEstatico with: anElement! !
-
-!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:04:31'!
-size
-	^0! !
