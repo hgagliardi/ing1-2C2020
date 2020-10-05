@@ -155,6 +155,61 @@ test01EmptyPrefixGetsError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix finderEmptyPrefixErrorDescription ]! !
 
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 17:42:09'!
+test02WithSpacesPrefixGetsError
+	
+	| stack finder  |
+	stack := OOStack new.
+	finder := SentenceFinderByPrefix with: stack.
+	self
+		should: [ finder find: 'Hola Como estas.'.]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix finderWithSpacesPrefixErrorDescription ]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 17:51:52'!
+test03SearchInEmptyStackReturnsAnEmptyFilteredStack
+	
+	| stack finder unString |
+	stack := OOStack new.
+	finder := SentenceFinderByPrefix with: stack.
+	unString := 'Hola'.
+	self assert: (finder find: unString) isEmpty.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:07:28'!
+test04SearchInStackWithPrefixReturnsAFilteredStack
+	
+	| stack finder aSearchPrefix aFoundString aNotFoundString stackFiltered |
+	stack := OOStack new.
+	aFoundString := 'Winter is coming'.
+	aNotFoundString := 'Winning Eleven'.
+	stack push: aFoundString.
+	stack push: aNotFoundString.
+	
+	finder := SentenceFinderByPrefix with: stack.
+	aSearchPrefix := 'Wint'.
+	
+	stackFiltered := OOStack new.
+	stackFiltered push: 'Winter is coming'.
+	
+	self assert: (finder find: aSearchPrefix) size equals: 1.
+	self assert: (finder find: aSearchPrefix) top equals: aFoundString.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:13:02'!
+test05SearchInStackWithPrefixNotFoundReturnsAnEmptyStack
+	
+	| stack finder aSearchPrefix aNotFoundString |
+	stack := OOStack new.
+	aNotFoundString := 'Winter is coming'.
+	stack push: aNotFoundString.
+	aNotFoundString := 'Winning Eleven'.
+	stack push: aNotFoundString.
+	
+	finder := SentenceFinderByPrefix with: stack.
+	aSearchPrefix := 'Hola'.
+	
+	self assert: (finder find: aSearchPrefix) isEmpty.! !
+
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
@@ -186,6 +241,21 @@ pop
 push: anElement
 	stackEstatico := stackEstatico push: anElement .! !
 
+!OOStack methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:03:49'!
+searchWithCondition:  aConditionBlock
+	
+	| filtered backupStack |
+	
+	filtered := self species new.
+	backupStack := self copy.
+	
+	[ backupStack isEmpty ]
+		whileFalse: [ (aConditionBlock value: (backupStack top)) 
+							ifTrue: [filtered push: backupStack top].  
+							backupStack pop.
+					].
+	^filtered.! !
+
 !OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
 size
 	^stackEstatico size! !
@@ -213,14 +283,42 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:44:59'!
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:29:54'!
 find: aPrefix
 	
-	(aPrefix size == 0) ifTrue: [ ^self error: self class finderEmptyPrefixErrorDescription. ]! !
+	| filteredList prefixSearchBlock |
+	
+	filteredList := OOStack new.
+	
+	(aPrefix size == 0) ifTrue: [ ^self error: self class finderEmptyPrefixErrorDescription. ].
+	(aPrefix findString: ' ')==0 ifFalse: [ ^self error: self class finderWithSpacesPrefixErrorDescription. ].
+	
+	prefixSearchBlock := [:searchElement | 
+			(searchElement beginsWith: aPrefix).
+		].
+	
+	filteredList := self searchWithCondition: prefixSearchBlock.
+	
+	^filteredList.! !
 
 !SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:24:22'!
 initialize: aStack
 	searchStack := aStack.! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:30:07'!
+searchWithCondition: aConditionBlock
+	
+	| filtered backupStack |
+	
+	filtered := OOStack new.
+	backupStack := searchStack copy.
+	
+	[ backupStack isEmpty ]
+		whileFalse: [ (aConditionBlock value: (backupStack top)) 
+							ifTrue: [filtered push: backupStack top].  
+							backupStack pop.
+					].
+	^filtered.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -232,6 +330,10 @@ SentenceFinderByPrefix class
 finderEmptyPrefixErrorDescription
 	^'No puede haber un prefijo vacío'.
 	! !
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 17:42:25'!
+finderWithSpacesPrefixErrorDescription
+	^'No puede haber un prefijo con espacios en blanco'.! !
 
 !SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:41:14'!
 with: aStack
