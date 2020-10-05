@@ -158,41 +158,41 @@ test01EmptyPrefixGetsError
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'stackAlgo'
+	instanceVariableNames: 'stackEstatico'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:37'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:17:03'!
 initialize
-	stackAlgo := StackAlgo newStack.
+	stackEstatico := StackEstatico new.
 	
 	! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:36:23'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
 isEmpty
-	^stackAlgo isEmpty ! !
+	^stackEstatico isEmpty ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:59:24'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
 pop
 	| previousTop |
 	
-	previousTop := stackAlgo lastPushed.
-	stackAlgo := stackAlgo pop.
+	previousTop := stackEstatico lastPushed.
+	stackEstatico := stackEstatico pop.
 	
 	^previousTop ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:13'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:12'!
 push: anElement
-	stackAlgo := stackAlgo pushStackAlgo: anElement .! !
+	stackEstatico := stackEstatico push: anElement .! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:05:54'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
 size
-	^stackAlgo size! !
+	^stackEstatico size! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:03:55'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:14:15'!
 top
-	^stackAlgo lastPushed ! !
+	^stackEstatico lastPushed ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -238,60 +238,60 @@ with: aStack
 	^self new initialize: aStack.! !
 
 
-!classDefinition: #StackAlgo category: #'Stack-Exercise'!
-Object subclass: #StackAlgo
+!classDefinition: #StackEstatico category: #'Stack-Exercise'!
+Object subclass: #StackEstatico
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:54'!
+!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:35:54'!
 isEmpty
 	self subclassResponsibility ! !
 
-!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:01:20'!
+!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:01:20'!
 lastPushed
 	self subclassResponsibility ! !
 
-!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:59:36'!
+!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:59:36'!
 pop
 	self subclassResponsibility ! !
 
-!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:05:34'!
-pushStackAlgo: anElement
+!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:11'!
+push: anElement
 	self subclassResponsibility ! !
 
-!StackAlgo methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:12:32'!
+!StackEstatico methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:12:32'!
 size
 	self subclassResponsibility ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'StackAlgo class' category: #'Stack-Exercise'!
-StackAlgo class
+!classDefinition: 'StackEstatico class' category: #'Stack-Exercise'!
+StackEstatico class
 	instanceVariableNames: ''!
 
-!StackAlgo class methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:30:58'!
-newStack
-	^StackVacio new ! !
+!StackEstatico class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:16:04'!
+new
+	^StackVacio basicNew ! !
 
-!StackAlgo class methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:31:29'!
+!StackEstatico class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:37'!
 with: anElement
-	^StackNoVacio new initializeWith: anElement
+	^StackNoVacio basicNew initializeWith: anElement
 	! !
 
 
 !classDefinition: #StackNoVacio category: #'Stack-Exercise'!
-StackAlgo subclass: #StackNoVacio
+StackEstatico subclass: #StackNoVacio
 	instanceVariableNames: 'top restoStack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:49:32'!
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:17:38'!
 initializeWith: anElement
 	top := anElement. 
-	restoStack := StackAlgo newStack ! !
+	restoStack := StackEstatico new ! !
 
 !StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:36:06'!
 isEmpty 
@@ -305,9 +305,9 @@ lastPushed
 pop
 	^restoStack ! !
 
-!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:05:12'!
-pushStackAlgo: anElement
-	restoStack := restoStack pushStackAlgo: top.
+!StackNoVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:12'!
+push: anElement
+	restoStack := restoStack push: top.
 	top := anElement. 
 	^self! !
 
@@ -317,7 +317,7 @@ size
 
 
 !classDefinition: #StackVacio category: #'Stack-Exercise'!
-StackAlgo subclass: #StackVacio
+StackEstatico subclass: #StackVacio
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -335,9 +335,9 @@ lastPushed
 pop
 	^self error: OOStack stackEmptyErrorDescription 	! !
 
-!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 17:49:05'!
-pushStackAlgo: anElement
-	^StackAlgo with: anElement! !
+!StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 14:15:11'!
+push: anElement
+	^StackEstatico with: anElement! !
 
 !StackVacio methodsFor: 'as yet unclassified' stamp: 'FS 10/3/2020 18:04:31'!
 size
