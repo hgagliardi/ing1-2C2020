@@ -187,7 +187,7 @@ test03SearchInEmptyStackReturnsAnEmptyFilteredStack
 
 	self assert: (finderWithEmptyStack find: stringHola) isEmpty.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:27:00'!
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 17:47:29'!
 test04SearchInStackWithPrefixReturnsAFilteredStack
 	
 	| finder aSearchPrefix |
@@ -196,7 +196,7 @@ test04SearchInStackWithPrefixReturnsAFilteredStack
 	aSearchPrefix := 'Wint'.
 	
 	self assert: (finder find: aSearchPrefix) size equals: 1.
-	self assert: (finder find: aSearchPrefix) top equals: stringWinter.! !
+	self assert: (finder find: aSearchPrefix) last equals: stringWinter.! !
 
 !SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:27:50'!
 test05SearchInStackWithPrefixNotFoundReturnsAnEmptyStack
@@ -204,6 +204,17 @@ test05SearchInStackWithPrefixNotFoundReturnsAnEmptyStack
 	| finder |
 	finder := SentenceFinderByPrefix with: stackWithWinPrefixes .
 	self assert: (finder find: stringHola) isEmpty.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 17:48:11'!
+test06SearchInStackWithFinderMantainsOriginalStack
+	
+	| finder stackFinder filteredCollection |
+	finder := SentenceFinderByPrefix with: stackWithWinPrefixes.
+	filteredCollection := finder find: stringHola.
+	
+	stackFinder := finder getStack.
+	[stackFinder isEmpty]
+		whileFalse: [ self assert: stackFinder top equals: stackWithWinPrefixes top. stackFinder pop. stackWithWinPrefixes pop.].! !
 
 
 !classDefinition: #ElementoDeStack category: #'Stack-Exercise'!
@@ -364,25 +375,25 @@ initialize: aStack
 	searchStack := aStack.! !
 
 
-!SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/6/2020 23:59:34'!
+!SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/7/2020 14:37:42'!
 filterSentencesWithPrefix: aPrefixToSearch
 	
-	| filteredStack copyOfOriginalStack beginsWithPrefixVerificationBlock |
+	| filteredCollection copyOfOriginalStack beginsWithPrefixVerificationBlock |
 	
-	filteredStack := OOStack new.
+	filteredCollection := OrderedCollection new.
 	copyOfOriginalStack := searchStack copy.
 	
 	beginsWithPrefixVerificationBlock := [:aSentenceToCheckPrefix | aSentenceToCheckPrefix beginsWith: aPrefixToSearch].
 	
 	[ copyOfOriginalStack isEmpty ]
 		whileFalse: [ 
-						| topOfOriginalStack |
-						topOfOriginalStack := copyOfOriginalStack top.
-						(beginsWithPrefixVerificationBlock value: topOfOriginalStack)
-							ifTrue: [filteredStack push: topOfOriginalStack].  
+						| topOfStack |
+						topOfStack := copyOfOriginalStack top.
+						(beginsWithPrefixVerificationBlock value: topOfStack)
+							ifTrue: [filteredCollection add: topOfStack].  
 							copyOfOriginalStack pop.
 					].
-	^filteredStack.! !
+	^filteredCollection.! !
 
 !SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/7/2020 00:39:17'!
 find: aPrefixToSearch
@@ -401,6 +412,11 @@ assertPrefixNotEmpty: aPrefixToCheck
 assertPrefixWithNoBlankSpaces: aPrefixToCheck
 	(aPrefixToCheck findString: ' ') ==0 ifFalse: [ ^self error: self class finderWithSpacesPrefixErrorDescription. ].
 ! !
+
+
+!SentenceFinderByPrefix methodsFor: 'accesing' stamp: 'HG 10/7/2020 17:08:30'!
+getStack
+	^searchStack.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
