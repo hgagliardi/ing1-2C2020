@@ -138,77 +138,72 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: #'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: ''
+	instanceVariableNames: 'emptyStack finderWithEmptyStack stringHola stackWithWinPrefixes stackWithWinter stringWinter'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:43:00'!
-test01EmptyPrefixGetsError
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:26:44'!
+setUp
+	| winningString |
 	
-	| stack finder  |
-	stack := OOStack new.
-	finder := SentenceFinderByPrefix with: stack.
+	emptyStack := OOStack new.
+	finderWithEmptyStack := SentenceFinderByPrefix with: emptyStack.
+	stringHola := 'Hola'.
+	
+	
+	stringWinter := 'Winter is coming'.
+	winningString := 'Winning Eleven'.
+	stackWithWinPrefixes := OOStack new.
+	stackWithWinPrefixes push: stringWinter.
+	stackWithWinPrefixes push: winningString.
+	stackWithWinter := OOStack new.
+	stackWithWinter push: stringWinter.
+	
+	
+	
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:06:27'!
+test01EmptyPrefixGetsError
+
 	self
-		should: [ finder find: ''.]
+		should: [ finderWithEmptyStack find: ''.]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix finderEmptyPrefixErrorDescription ]! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 17:42:09'!
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:06:31'!
 test02WithSpacesPrefixGetsError
 	
-	| stack finder  |
-	stack := OOStack new.
-	finder := SentenceFinderByPrefix with: stack.
 	self
-		should: [ finder find: 'Hola Como estas.'.]
+		should: [ finderWithEmptyStack find: 'Hola Como estas.'.]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix finderWithSpacesPrefixErrorDescription ]! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 17:51:52'!
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:12:03'!
 test03SearchInEmptyStackReturnsAnEmptyFilteredStack
-	
-	| stack finder unString |
-	stack := OOStack new.
-	finder := SentenceFinderByPrefix with: stack.
-	unString := 'Hola'.
-	self assert: (finder find: unString) isEmpty.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:07:28'!
+	self assert: (finderWithEmptyStack find: stringHola) isEmpty.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:27:00'!
 test04SearchInStackWithPrefixReturnsAFilteredStack
 	
-	| stack finder aSearchPrefix aFoundString aNotFoundString stackFiltered |
-	stack := OOStack new.
-	aFoundString := 'Winter is coming'.
-	aNotFoundString := 'Winning Eleven'.
-	stack push: aFoundString.
-	stack push: aNotFoundString.
+	| finder aSearchPrefix |
 	
-	finder := SentenceFinderByPrefix with: stack.
+	finder := SentenceFinderByPrefix with: stackWithWinPrefixes.
 	aSearchPrefix := 'Wint'.
 	
-	stackFiltered := OOStack new.
-	stackFiltered push: 'Winter is coming'.
-	
 	self assert: (finder find: aSearchPrefix) size equals: 1.
-	self assert: (finder find: aSearchPrefix) top equals: aFoundString.! !
+	self assert: (finder find: aSearchPrefix) top equals: stringWinter.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:13:02'!
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:27:50'!
 test05SearchInStackWithPrefixNotFoundReturnsAnEmptyStack
 	
-	| stack finder aSearchPrefix aNotFoundString |
-	stack := OOStack new.
-	aNotFoundString := 'Winter is coming'.
-	stack push: aNotFoundString.
-	aNotFoundString := 'Winning Eleven'.
-	stack push: aNotFoundString.
-	
-	finder := SentenceFinderByPrefix with: stack.
-	aSearchPrefix := 'Hola'.
-	
-	self assert: (finder find: aSearchPrefix) isEmpty.! !
+	| finder |
+	finder := SentenceFinderByPrefix with: stackWithWinPrefixes .
+	self assert: (finder find: stringHola) isEmpty.! !
 
 
 !classDefinition: #ElementoDeStack category: #'Stack-Exercise'!
@@ -337,21 +332,6 @@ pop
 push: anElementValue
 	top := StackedElement with: anElementValue onTopOf: top! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:47:03'!
-searchWithCondition:  aConditionBlock
-	
-	| filtered backupStack |
-	
-	filtered := self species new.
-	backupStack := self copy.
-	
-	[ backupStack isEmpty ]
-		whileFalse: [ (aConditionBlock value: (backupStack top)) 
-							ifTrue: [filtered push: backupStack top].  
-							backupStack pop.
-					].
-	^filtered.! !
-
 !OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:33:51'!
 size
 	^top height! !
@@ -371,7 +351,6 @@ stackEmptyErrorDescription
 	
 	^ 'Stack is empty!!'! !
 
-
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
@@ -380,42 +359,48 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:29:54'!
-find: aPrefix
-	
-	| filteredList prefixSearchBlock |
-	
-	filteredList := OOStack new.
-	
-	(aPrefix size == 0) ifTrue: [ ^self error: self class finderEmptyPrefixErrorDescription. ].
-	(aPrefix findString: ' ')==0 ifFalse: [ ^self error: self class finderWithSpacesPrefixErrorDescription. ].
-	
-	prefixSearchBlock := [:searchElement | 
-			(searchElement beginsWith: aPrefix).
-		].
-	
-	filteredList := self searchWithCondition: prefixSearchBlock.
-	
-	^filteredList.! !
-
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:24:22'!
+!SentenceFinderByPrefix methodsFor: 'initialization' stamp: 'HG 10/3/2020 18:24:22'!
 initialize: aStack
 	searchStack := aStack.! !
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 18:30:07'!
-searchWithCondition: aConditionBlock
+
+!SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/6/2020 23:59:34'!
+filterSentencesWithPrefix: aPrefixToSearch
 	
-	| filtered backupStack |
+	| filteredStack copyOfOriginalStack beginsWithPrefixVerificationBlock |
 	
-	filtered := OOStack new.
-	backupStack := searchStack copy.
+	filteredStack := OOStack new.
+	copyOfOriginalStack := searchStack copy.
 	
-	[ backupStack isEmpty ]
-		whileFalse: [ (aConditionBlock value: (backupStack top)) 
-							ifTrue: [filtered push: backupStack top].  
-							backupStack pop.
+	beginsWithPrefixVerificationBlock := [:aSentenceToCheckPrefix | aSentenceToCheckPrefix beginsWith: aPrefixToSearch].
+	
+	[ copyOfOriginalStack isEmpty ]
+		whileFalse: [ 
+						| topOfOriginalStack |
+						topOfOriginalStack := copyOfOriginalStack top.
+						(beginsWithPrefixVerificationBlock value: topOfOriginalStack)
+							ifTrue: [filteredStack push: topOfOriginalStack].  
+							copyOfOriginalStack pop.
 					].
-	^filtered.! !
+	^filteredStack.! !
+
+!SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/7/2020 00:39:17'!
+find: aPrefixToSearch
+	
+	self assertPrefixNotEmpty: aPrefixToSearch.
+	self assertPrefixWithNoBlankSpaces: aPrefixToSearch. 
+	^self filterSentencesWithPrefix: aPrefixToSearch.
+	! !
+
+
+!SentenceFinderByPrefix methodsFor: 'testing' stamp: 'HG 10/7/2020 00:38:16'!
+assertPrefixNotEmpty: aPrefixToCheck
+	(aPrefixToCheck size == 0) ifTrue: [ ^self error: self class finderEmptyPrefixErrorDescription. ].! !
+
+!SentenceFinderByPrefix methodsFor: 'testing' stamp: 'HG 10/7/2020 00:39:07'!
+assertPrefixWithNoBlankSpaces: aPrefixToCheck
+	(aPrefixToCheck findString: ' ') ==0 ifFalse: [ ^self error: self class finderWithSpacesPrefixErrorDescription. ].
+! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
