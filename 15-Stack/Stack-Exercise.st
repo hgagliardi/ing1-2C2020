@@ -337,16 +337,17 @@ assertPrefixWithNoBlankSpaces: aPrefixToCheck
 SentenceFinderByPrefix class
 	instanceVariableNames: ''!
 
-!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:37:24'!
+!SentenceFinderByPrefix class methodsFor: 'error descriptions' stamp: 'HG 10/3/2020 18:37:24'!
 finderEmptyPrefixErrorDescription
 	^'No puede haber un prefijo vacío'.
 	! !
 
-!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/5/2020 17:42:25'!
+!SentenceFinderByPrefix class methodsFor: 'error descriptions' stamp: 'HG 10/5/2020 17:42:25'!
 finderWithSpacesPrefixErrorDescription
 	^'No puede haber un prefijo con espacios en blanco'.! !
 
-!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:41:14'!
+
+!SentenceFinderByPrefix class methodsFor: 'instance creation' stamp: 'HG 10/3/2020 18:41:14'!
 with: aStack
 	^self new initialize: aStack.! !
 
@@ -381,7 +382,7 @@ value
 StackElement class
 	instanceVariableNames: ''!
 
-!StackElement class methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 21:11:18'!
+!StackElement class methodsFor: 'instance creation' stamp: 'HG 10/7/2020 21:11:18'!
 newElement
 	^BaseElement new! !
 
@@ -448,6 +449,6 @@ value
 StackedElement class
 	instanceVariableNames: ''!
 
-!StackedElement class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:14:53'!
+!StackedElement class methodsFor: 'instance creation' stamp: 'FS 10/5/2020 20:14:53'!
 with: anElement onTopOf: anElementUnderneath
 	^self new initializeWith: anElement onTopOf: anElementUnderneath! !
