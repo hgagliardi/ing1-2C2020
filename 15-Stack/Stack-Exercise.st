@@ -385,9 +385,9 @@ StackElement class
 newBaseOfStack
 	^BaseElement new! !
 
-!StackElement class methodsFor: 'instance creation' stamp: 'FS 10/8/2020 12:41:33'!
+!StackElement class methodsFor: 'instance creation' stamp: 'FS 10/8/2020 12:51:36'!
 with: anElementOnTopValue onTopOfStackElement: aStackElementUnderneath
-	^StackedElement new initializeWith: anElementOnTopValue onTopOf: aStackElementUnderneath! !
+	^StackedElement new initializeWith: anElementOnTopValue onTopOfStackElement: aStackElementUnderneath! !
 
 
 !classDefinition: #BaseElement category: #'Stack-Exercise'!
@@ -422,8 +422,8 @@ StackElement subclass: #StackedElement
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackedElement methodsFor: 'initialization' stamp: 'FS 10/8/2020 12:42:14'!
-initializeWith: anElementValue onTopOf: aStackElementUnderneath
+!StackedElement methodsFor: 'initialization' stamp: 'FS 10/8/2020 12:51:36'!
+initializeWith: anElementValue onTopOfStackElement: aStackElementUnderneath
 	value := anElementValue.
 	nextElement := aStackElementUnderneath.! !
 
