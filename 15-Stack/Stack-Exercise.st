@@ -143,7 +143,62 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:26:44'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 00:06:27'!
+test01EmptyPrefixGetsError
+
+	self
+		should: [ finderWithEmptyStack find: ''.]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix finderEmptyPrefixErrorDescription ]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 00:06:31'!
+test02WithSpacesPrefixGetsError
+	
+	self
+		should: [ finderWithEmptyStack find: 'Hola Como estas.'.]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix finderWithSpacesPrefixErrorDescription ]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 21:04:32'!
+test03SearchInEmptyStackReturnsAnEmptyFilteredCollection
+
+	self assert: (finderWithEmptyStack find: stringHola) isEmpty.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 21:04:13'!
+test04SearchInStackWithPrefixReturnsAFilteredCollection
+	
+	| finder aSearchPrefix |
+	
+	finder := SentenceFinderByPrefix with: stackWithWinPrefixes.
+	aSearchPrefix := 'Wint'.
+	
+	self assert: (finder find: aSearchPrefix) size equals: 1.
+	self assert: (finder find: aSearchPrefix) last equals: stringWinter.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 21:04:01'!
+test05SearchInStackWithPrefixNotFoundReturnsAnEmptyCollection
+	
+	| finder |
+	finder := SentenceFinderByPrefix with: stackWithWinPrefixes .
+	self assert: (finder find: stringHola) isEmpty.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 21:38:26'!
+test06SearchInStackWithFinderMantainsOriginalStack
+	
+	| finder aStackCopy |
+	
+	aStackCopy := stackWithWinPrefixes copy.
+	finder := SentenceFinderByPrefix with: stackWithWinPrefixes.
+	finder find: stringHola.
+	
+	self assert: aStackCopy size equals: stackWithWinPrefixes size.
+	[aStackCopy isEmpty]
+		whileFalse: [ self assert: aStackCopy top equals: stackWithWinPrefixes top. aStackCopy pop. stackWithWinPrefixes pop.].! !
+
+
+!SentenceFinderByPrefixTest methodsFor: 'initialization' stamp: 'HG 10/7/2020 00:26:44'!
 setUp
 	| winningString |
 	
@@ -164,156 +219,6 @@ setUp
 	
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:06:27'!
-test01EmptyPrefixGetsError
-
-	self
-		should: [ finderWithEmptyStack find: ''.]
-		raise: Error
-		withExceptionDo: [ :anError |
-			self assert: anError messageText = SentenceFinderByPrefix finderEmptyPrefixErrorDescription ]! !
-
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:06:31'!
-test02WithSpacesPrefixGetsError
-	
-	self
-		should: [ finderWithEmptyStack find: 'Hola Como estas.'.]
-		raise: Error
-		withExceptionDo: [ :anError |
-			self assert: anError messageText = SentenceFinderByPrefix finderWithSpacesPrefixErrorDescription ]! !
-
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:12:03'!
-test03SearchInEmptyStackReturnsAnEmptyFilteredStack
-
-	self assert: (finderWithEmptyStack find: stringHola) isEmpty.! !
-
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 17:47:29'!
-test04SearchInStackWithPrefixReturnsAFilteredStack
-	
-	| finder aSearchPrefix |
-	
-	finder := SentenceFinderByPrefix with: stackWithWinPrefixes.
-	aSearchPrefix := 'Wint'.
-	
-	self assert: (finder find: aSearchPrefix) size equals: 1.
-	self assert: (finder find: aSearchPrefix) last equals: stringWinter.! !
-
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 00:27:50'!
-test05SearchInStackWithPrefixNotFoundReturnsAnEmptyStack
-	
-	| finder |
-	finder := SentenceFinderByPrefix with: stackWithWinPrefixes .
-	self assert: (finder find: stringHola) isEmpty.! !
-
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 17:48:11'!
-test06SearchInStackWithFinderMantainsOriginalStack
-	
-	| finder stackFinder filteredCollection |
-	finder := SentenceFinderByPrefix with: stackWithWinPrefixes.
-	filteredCollection := finder find: stringHola.
-	
-	stackFinder := finder getStack.
-	[stackFinder isEmpty]
-		whileFalse: [ self assert: stackFinder top equals: stackWithWinPrefixes top. stackFinder pop. stackWithWinPrefixes pop.].! !
-
-
-!classDefinition: #ElementoDeStack category: #'Stack-Exercise'!
-Object subclass: #ElementoDeStack
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!ElementoDeStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:21:44'!
-elementUnderneath
-	self subclassResponsibility ! !
-
-!ElementoDeStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:01:07'!
-esBase
-	self subclassResponsibility ! !
-
-!ElementoDeStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:33:27'!
-height
-	self subclassResponsibility ! !
-
-!ElementoDeStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:33:23'!
-value
-	self subclassResponsibility ! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'ElementoDeStack class' category: #'Stack-Exercise'!
-ElementoDeStack class
-	instanceVariableNames: ''!
-
-!ElementoDeStack class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:18:37'!
-newElement
-	^BaseStack new! !
-
-
-!classDefinition: #BaseStack category: #'Stack-Exercise'!
-ElementoDeStack subclass: #BaseStack
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!BaseStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:37:08'!
-elementUnderneath
-	^self error: OOStack  stackEmptyErrorDescription! !
-
-!BaseStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:03:04'!
-esBase
-	^true! !
-
-!BaseStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:32:56'!
-height
-	^0! !
-
-!BaseStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:37:00'!
-value
-	^self error: OOStack stackEmptyErrorDescription! !
-
-
-!classDefinition: #StackedElement category: #'Stack-Exercise'!
-ElementoDeStack subclass: #StackedElement
-	instanceVariableNames: 'nextElement value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:26:45'!
-elementUnderneath
-	 
-	^nextElement ! !
-
-!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:01:18'!
-esBase
-	^false! !
-
-!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:32:51'!
-height
-	^1 + nextElement height! !
-
-!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:21:09'!
-initializeWith: anElementValue onTopOf: anElementUnderneath
-	value := anElementValue.
-	nextElement := anElementUnderneath! !
-
-!StackedElement methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:29:06'!
-value
-	^value ! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'StackedElement class' category: #'Stack-Exercise'!
-StackedElement class
-	instanceVariableNames: ''!
-
-!StackedElement class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:14:53'!
-with: anElement onTopOf: anElementUnderneath
-	^self new initializeWith: anElement onTopOf: anElementUnderneath! !
-
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
@@ -322,15 +227,31 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:10:09'!
+!OOStack methodsFor: 'initialization' stamp: 'HG 10/7/2020 21:10:57'!
 initialize
-	top := ElementoDeStack newElement ! !
+	top := StackElement newElement ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:02:25'!
+
+!OOStack methodsFor: 'accessing' stamp: 'FS 10/5/2020 20:33:51'!
+size
+	^top height! !
+
+!OOStack methodsFor: 'accessing' stamp: 'FS 10/5/2020 20:29:20'!
+top
+	^top value! !
+
+
+!OOStack methodsFor: 'adding' stamp: 'FS 10/5/2020 20:44:02'!
+push: anElementValue
+	top := StackedElement with: anElementValue onTopOf: top! !
+
+
+!OOStack methodsFor: 'testing' stamp: 'HG 10/7/2020 21:12:14'!
 isEmpty
-	^top esBase ! !
+	^top isABaseElement ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:28:39'!
+
+!OOStack methodsFor: 'removing' stamp: 'FS 10/5/2020 20:28:39'!
 pop
 	|previousTop|
 	
@@ -338,18 +259,6 @@ pop
 	top:= top elementUnderneath.
 	^previousTop
 	! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:44:02'!
-push: anElementValue
-	top := StackedElement with: anElementValue onTopOf: top! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:33:51'!
-size
-	^top height! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:29:20'!
-top
-	^top value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -375,25 +284,33 @@ initialize: aStack
 	searchStack := aStack.! !
 
 
-!SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/7/2020 14:37:42'!
-filterSentencesWithPrefix: aPrefixToSearch
+!SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/7/2020 21:32:53'!
+filterFrom: aStackToFilter withCondition: aConditionToCheckBlock
 	
-	| filteredCollection copyOfOriginalStack beginsWithPrefixVerificationBlock |
+	| filteredCollection |
 	
 	filteredCollection := OrderedCollection new.
+	[ aStackToFilter isEmpty ]
+		whileFalse: [ 
+						| topOfStack |
+						topOfStack := aStackToFilter top.
+						(aConditionToCheckBlock value: topOfStack)
+							ifTrue: [filteredCollection add: topOfStack].  
+							aStackToFilter pop.
+					].
+	^filteredCollection.! !
+
+!SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/7/2020 21:32:18'!
+filterSentencesWithPrefix: aPrefixToSearch
+	
+	| copyOfOriginalStack beginsWithPrefixVerificationBlock |
+	
 	copyOfOriginalStack := searchStack copy.
 	
 	beginsWithPrefixVerificationBlock := [:aSentenceToCheckPrefix | aSentenceToCheckPrefix beginsWith: aPrefixToSearch].
 	
-	[ copyOfOriginalStack isEmpty ]
-		whileFalse: [ 
-						| topOfStack |
-						topOfStack := copyOfOriginalStack top.
-						(beginsWithPrefixVerificationBlock value: topOfStack)
-							ifTrue: [filteredCollection add: topOfStack].  
-							copyOfOriginalStack pop.
-					].
-	^filteredCollection.! !
+	^self filterFrom: copyOfOriginalStack withCondition: beginsWithPrefixVerificationBlock.
+	! !
 
 !SentenceFinderByPrefix methodsFor: 'finder management' stamp: 'HG 10/7/2020 00:39:17'!
 find: aPrefixToSearch
@@ -414,10 +331,6 @@ assertPrefixWithNoBlankSpaces: aPrefixToCheck
 ! !
 
 
-!SentenceFinderByPrefix methodsFor: 'accesing' stamp: 'HG 10/7/2020 17:08:30'!
-getStack
-	^searchStack.! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'SentenceFinderByPrefix class' category: #'Stack-Exercise'!
@@ -436,3 +349,105 @@ finderWithSpacesPrefixErrorDescription
 !SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'HG 10/3/2020 18:41:14'!
 with: aStack
 	^self new initialize: aStack.! !
+
+
+!classDefinition: #StackElement category: #'Stack-Exercise'!
+Object subclass: #StackElement
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackElement methodsFor: 'testing' stamp: 'HG 10/7/2020 21:12:14'!
+isABaseElement
+	self subclassResponsibility ! !
+
+
+!StackElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:21:44'!
+elementUnderneath
+	self subclassResponsibility ! !
+
+!StackElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:33:27'!
+height
+	self subclassResponsibility ! !
+
+!StackElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:33:23'!
+value
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StackElement class' category: #'Stack-Exercise'!
+StackElement class
+	instanceVariableNames: ''!
+
+!StackElement class methodsFor: 'as yet unclassified' stamp: 'HG 10/7/2020 21:11:18'!
+newElement
+	^BaseElement new! !
+
+
+!classDefinition: #BaseElement category: #'Stack-Exercise'!
+StackElement subclass: #BaseElement
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!BaseElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:37:08'!
+elementUnderneath
+	^self error: OOStack  stackEmptyErrorDescription! !
+
+!BaseElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:32:56'!
+height
+	^0! !
+
+!BaseElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:37:00'!
+value
+	^self error: OOStack stackEmptyErrorDescription! !
+
+
+!BaseElement methodsFor: 'testing' stamp: 'HG 10/7/2020 21:12:19'!
+isABaseElement
+	^true.! !
+
+
+!classDefinition: #StackedElement category: #'Stack-Exercise'!
+StackElement subclass: #StackedElement
+	instanceVariableNames: 'nextElement value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackedElement methodsFor: 'initialization' stamp: 'HG 10/7/2020 21:13:09'!
+initializeWith: anElementValue onTopOf: anElementUnderneath
+	value := anElementValue.
+	nextElement := anElementUnderneath.! !
+
+
+!StackedElement methodsFor: 'testing' stamp: 'HG 10/7/2020 21:12:14'!
+isABaseElement
+	^false! !
+
+
+!StackedElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:26:45'!
+elementUnderneath
+	 
+	^nextElement ! !
+
+!StackedElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:32:51'!
+height
+	^1 + nextElement height! !
+
+!StackedElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:29:06'!
+value
+	^value ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StackedElement class' category: #'Stack-Exercise'!
+StackedElement class
+	instanceVariableNames: ''!
+
+!StackedElement class methodsFor: 'as yet unclassified' stamp: 'FS 10/5/2020 20:14:53'!
+with: anElement onTopOf: anElementUnderneath
+	^self new initializeWith: anElement onTopOf: anElementUnderneath! !
