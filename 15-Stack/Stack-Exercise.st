@@ -227,9 +227,9 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'initialization' stamp: 'HG 10/7/2020 21:10:57'!
+!OOStack methodsFor: 'initialization' stamp: 'FS 10/8/2020 12:37:13'!
 initialize
-	top := StackElement newElement ! !
+	top := StackElement newBaseOfStack ! !
 
 
 !OOStack methodsFor: 'accessing' stamp: 'FS 10/5/2020 20:33:51'!
@@ -241,9 +241,9 @@ top
 	^top value! !
 
 
-!OOStack methodsFor: 'adding' stamp: 'FS 10/5/2020 20:44:02'!
+!OOStack methodsFor: 'adding' stamp: 'FS 10/8/2020 12:39:26'!
 push: anElementValue
-	top := StackedElement with: anElementValue onTopOf: top! !
+	top := StackedElement with: anElementValue onTopOfStackElement: top! !
 
 
 !OOStack methodsFor: 'testing' stamp: 'HG 10/7/2020 21:12:14'!
@@ -330,7 +330,6 @@ assertPrefixWithNoBlankSpaces: aPrefixToCheck
 	(aPrefixToCheck findString: ' ') ==0 ifFalse: [ ^self error: self class finderWithSpacesPrefixErrorDescription. ].
 ! !
 
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'SentenceFinderByPrefix class' category: #'Stack-Exercise'!
@@ -382,9 +381,13 @@ value
 StackElement class
 	instanceVariableNames: ''!
 
-!StackElement class methodsFor: 'instance creation' stamp: 'HG 10/7/2020 21:11:18'!
-newElement
+!StackElement class methodsFor: 'instance creation' stamp: 'FS 10/8/2020 12:37:13'!
+newBaseOfStack
 	^BaseElement new! !
+
+!StackElement class methodsFor: 'instance creation' stamp: 'FS 10/8/2020 12:41:33'!
+with: anElementOnTopValue onTopOfStackElement: aStackElementUnderneath
+	^StackedElement new initializeWith: anElementOnTopValue onTopOf: aStackElementUnderneath! !
 
 
 !classDefinition: #BaseElement category: #'Stack-Exercise'!
@@ -419,10 +422,10 @@ StackElement subclass: #StackedElement
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackedElement methodsFor: 'initialization' stamp: 'HG 10/7/2020 21:13:09'!
-initializeWith: anElementValue onTopOf: anElementUnderneath
+!StackedElement methodsFor: 'initialization' stamp: 'FS 10/8/2020 12:42:14'!
+initializeWith: anElementValue onTopOf: aStackElementUnderneath
 	value := anElementValue.
-	nextElement := anElementUnderneath.! !
+	nextElement := aStackElementUnderneath.! !
 
 
 !StackedElement methodsFor: 'testing' stamp: 'HG 10/7/2020 21:12:14'!
@@ -442,13 +445,3 @@ height
 !StackedElement methodsFor: 'accesing' stamp: 'FS 10/5/2020 20:29:06'!
 value
 	^value ! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'StackedElement class' category: #'Stack-Exercise'!
-StackedElement class
-	instanceVariableNames: ''!
-
-!StackedElement class methodsFor: 'instance creation' stamp: 'FS 10/5/2020 20:14:53'!
-with: anElement onTopOf: anElementUnderneath
-	^self new initializeWith: anElement onTopOf: anElementUnderneath! !
