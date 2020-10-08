@@ -143,20 +143,20 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 00:06:27'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 21:44:24'!
 test01EmptyPrefixGetsError
 
 	self
-		should: [ finderWithEmptyStack find: ''.]
+		should: [ finderWithEmptyStack find: ''. self fail.]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix finderEmptyPrefixErrorDescription ]! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 00:06:31'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'HG 10/7/2020 21:44:34'!
 test02WithSpacesPrefixGetsError
 	
 	self
-		should: [ finderWithEmptyStack find: 'Hola Como estas.'.]
+		should: [ finderWithEmptyStack find: 'Hola Como estas.'. self fail.]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix finderWithSpacesPrefixErrorDescription ]! !
