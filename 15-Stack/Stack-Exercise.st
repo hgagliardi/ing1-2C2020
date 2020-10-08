@@ -222,41 +222,41 @@ setUp
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'top'
+	instanceVariableNames: 'topStackElement'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'initialization' stamp: 'FS 10/8/2020 12:37:13'!
+!OOStack methodsFor: 'initialization' stamp: 'FS 10/8/2020 14:59:27'!
 initialize
-	top := StackElement newBaseOfStack ! !
+	topStackElement := StackElement newBaseOfStack ! !
 
 
-!OOStack methodsFor: 'accessing' stamp: 'FS 10/5/2020 20:33:51'!
+!OOStack methodsFor: 'accessing' stamp: 'FS 10/8/2020 14:59:27'!
 size
-	^top height! !
+	^topStackElement height! !
 
-!OOStack methodsFor: 'accessing' stamp: 'FS 10/5/2020 20:29:20'!
+!OOStack methodsFor: 'accessing' stamp: 'FS 10/8/2020 14:59:27'!
 top
-	^top value! !
+	^topStackElement value! !
 
 
-!OOStack methodsFor: 'adding' stamp: 'FS 10/8/2020 12:39:26'!
+!OOStack methodsFor: 'adding' stamp: 'FS 10/8/2020 14:59:27'!
 push: anElementValue
-	top := StackedElement with: anElementValue onTopOfStackElement: top! !
+	topStackElement := StackedElement with: anElementValue onTopOfStackElement: topStackElement! !
 
 
-!OOStack methodsFor: 'testing' stamp: 'HG 10/7/2020 21:12:14'!
+!OOStack methodsFor: 'testing' stamp: 'FS 10/8/2020 14:59:27'!
 isEmpty
-	^top isABaseElement ! !
+	^topStackElement isABaseElement ! !
 
 
-!OOStack methodsFor: 'removing' stamp: 'FS 10/5/2020 20:28:39'!
+!OOStack methodsFor: 'removing' stamp: 'FS 10/8/2020 14:59:27'!
 pop
 	|previousTop|
 	
-	previousTop := top value.
-	top:= top elementUnderneath.
+	previousTop := topStackElement value.
+	topStackElement:= topStackElement elementUnderneath.
 	^previousTop
 	! !
 
