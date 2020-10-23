@@ -1,4 +1,4 @@
-!classDefinition: #GameOfLifeTest category: 'ConwayGameOfLife'!
+!classDefinition: #GameOfLifeTest category: #ConwayGameOfLife!
 TestCase subclass: #GameOfLifeTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -55,8 +55,15 @@ test03
 		      x
 	"! !
 
+!GameOfLifeTest methodsFor: 'as yet unclassified' stamp: 'FS 10/23/2020 12:39:21'!
+testDeadCellWithThreeAliveNeighborsBecomesAlive
+	|gameOfLife|
+  gameOfLife := GameOfLife withAliveCells: {1@1. 1@2. 2@1} ofSize:  3@3.
+  gameOfLife next.
+  self assert: (gameOfLife hasAliveCellAt: 2@2).! !
+
 
-!classDefinition: #GameOfLife category: 'ConwayGameOfLife'!
+!classDefinition: #GameOfLife category: #ConwayGameOfLife!
 Object subclass: #GameOfLife
 	instanceVariableNames: 'size aliveCells livingCellsArray'
 	classVariableNames: ''
@@ -73,7 +80,7 @@ initializeWithAliveCells: aLivingCellsArray ofSize: aSize
 aliveNeightborsSumOf: anAliveCell 
 	^ ((anAliveCell eightNeighbors) intersection: aliveCells) size! !
 
-!GameOfLife methodsFor: 'game actions' stamp: 'HG 10/23/2020 11:17:28'!
+!GameOfLife methodsFor: 'game actions' stamp: 'FS 10/23/2020 12:23:12'!
 hasNotConditionsToKeepAlive: anAliveCell
 
 	^ ((self aliveNeightborsSumOf: anAliveCell) between: 2 and: 3) not! !
@@ -97,7 +104,7 @@ hasDeadCellAt: aPoint
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'GameOfLife class' category: 'ConwayGameOfLife'!
+!classDefinition: 'GameOfLife class' category: #ConwayGameOfLife!
 GameOfLife class
 	instanceVariableNames: ''!
 
