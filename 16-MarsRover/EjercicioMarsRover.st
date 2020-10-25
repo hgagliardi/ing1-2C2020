@@ -259,16 +259,22 @@ test26assertValidOrderSequenceGoingForwardAndRotate
 	self assert: Rover pointsWest.! !
 
 
-!MarsRoverTest methodsFor: 'invalid order test' stamp: 'HG 10/25/2020 14:42:24'!
+!MarsRoverTest methodsFor: 'invalid order test' stamp: 'HG 10/25/2020 19:59:23'!
 test27assertStopExecutionAtInvalidOrder
 	| Rover|
-	Rover _ MarsRover startingAt: 1@1 pointingTo: south withMapHeight: 3 withMapWidth: 3.
 	
-	Rover receiveOrder: 'frNKf'.
+	self
+		should:[
+			Rover _ MarsRover startingAt: 1@1 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+			Rover receiveOrder: 'frNKf'.
+			]
+		raise: Error
+		withMessageText: MarsRover invalidErrorCharacterDescription. 
 	
 	self assert: Rover currentPosition equals: 1@2.
 	self assert: Rover pointsWest .
-	 ! !
+	
+! !
 
 
 !MarsRoverTest methodsFor: 'setUp' stamp: 'HG 10/25/2020 12:38:23'!
@@ -505,12 +511,12 @@ executeValidOrder: aValidOrderToExecute
 	(validOrders at: aValidOrderToExecute) value.
 	self fixPositionWithinBorder.! !
 
-!MarsRover methodsFor: 'actions' stamp: 'HG 10/25/2020 14:13:59'!
+!MarsRover methodsFor: 'actions' stamp: 'HG 10/25/2020 19:59:32'!
 receiveOrder: aSequenceOfOrders 
 						
 	aSequenceOfOrders do: [:anOrder | (self shouldBeExecuted: anOrder) 
 									ifTrue: [ self executeValidOrder: anOrder ] 
-									ifFalse: [ ^nil. ]].! !
+									ifFalse: [ self class signalInvalidOrderCharacter. ]].! !
 
 !MarsRover methodsFor: 'actions' stamp: 'HG 10/25/2020 14:19:27'!
 shouldBeExecuted: anOrderToExecute
@@ -555,3 +561,15 @@ startingAt: aStartingPoint pointingTo: aCardinalPoint withMapHeight: aMapHeight 
 !MarsRover class methodsFor: 'actions' stamp: 'FS 10/24/2020 20:05:44'!
 receiveOrder
 	^nil! !
+
+
+!MarsRover class methodsFor: 'exceptions' stamp: 'HG 10/25/2020 19:53:25'!
+signalInvalidOrderCharacter
+	
+	self error: self invalidErrorCharacterDescription.! !
+
+
+!MarsRover class methodsFor: 'error messages' stamp: 'HG 10/25/2020 19:54:18'!
+invalidErrorCharacterDescription
+	
+	^'Invalid Order Character Error'! !
