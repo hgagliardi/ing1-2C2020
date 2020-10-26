@@ -1,257 +1,242 @@
-!classDefinition: #MarsRoverTest category: 'EjercicioMarsRover'!
+!classDefinition: #MarsRoverTest category: #EjercicioMarsRover!
 TestCase subclass: #MarsRoverTest
-	instanceVariableNames: 'south north west east'
+	instanceVariableNames: 'south north west east forwardOrder backwardOrder rotateRightOrder rotateLeftOrder centerPoint3by3Grid'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'EjercicioMarsRover'!
 
-!MarsRoverTest methodsFor: 'rotating tests' stamp: 'HG 10/25/2020 14:27:16'!
+!MarsRoverTest methodsFor: 'rotating tests' stamp: 'FS 10/26/2020 14:19:20'!
 test04rotatingLeftDirectionFromSouthPointsEast
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: south.
 	
-	Rover receiveOrder: 'l'.
+	Rover receiveOrder: rotateLeftOrder .
 	
-	self assert: Rover pointsEast.
-	self deny: Rover pointsWest.
-	self deny: Rover pointsSouth.
-	self deny: Rover pointsNorth.! !
+	self assertThatOnlyPointsEast: Rover.! !
 
-!MarsRoverTest methodsFor: 'rotating tests' stamp: 'HG 10/25/2020 14:27:04'!
+!MarsRoverTest methodsFor: 'rotating tests' stamp: 'FS 10/26/2020 14:19:43'!
 test05rotatingRightDirectionFromSouthPointsWest
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: south.
 	
-	Rover receiveOrder: 'r'.
+	Rover receiveOrder: rotateRightOrder .
 	
-	self deny: Rover pointsEast.
-	self assert: Rover pointsWest.
-	self deny: Rover pointsSouth.
-	self deny: Rover pointsNorth.! !
+	self assertThatOnlyPointsWest: Rover.! !
 
-!MarsRoverTest methodsFor: 'rotating tests' stamp: 'HG 10/25/2020 14:30:39'!
+!MarsRoverTest methodsFor: 'rotating tests' stamp: 'FS 10/26/2020 14:20:10'!
 test08rotatingRightDirectionFromNorthPointsEast
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: north withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: north.
 	
-	Rover receiveOrder: 'r'.
+	Rover receiveOrder: rotateRightOrder .
 	
-	self assert: Rover pointsEast.
-	self deny: Rover pointsWest.
-	self deny: Rover pointsSouth.
-	self deny: Rover pointsNorth.! !
+	self assertThatOnlyPointsEast: Rover
+! !
 
-!MarsRoverTest methodsFor: 'rotating tests' stamp: 'HG 10/25/2020 14:30:59'!
+!MarsRoverTest methodsFor: 'rotating tests' stamp: 'FS 10/26/2020 14:20:24'!
 test09rotatingLeftDirectionFromNorthPointsWest
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: north withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: north.
 	
-	Rover receiveOrder: 'l'.
+	Rover receiveOrder: rotateLeftOrder .
 	
-	self deny: Rover pointsEast.
-	self assert: Rover pointsWest.
-	self deny: Rover pointsSouth.
-	self deny: Rover pointsNorth.! !
+	self assertThatOnlyPointsWest: Rover
+! !
 
-!MarsRoverTest methodsFor: 'rotating tests' stamp: 'HG 10/25/2020 14:32:06'!
+!MarsRoverTest methodsFor: 'rotating tests' stamp: 'FS 10/26/2020 14:20:49'!
 test12rotatingRightDirectionFromWestPointsNorth
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: west withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: west.
 	
-	Rover receiveOrder: 'r'.
+	Rover receiveOrder: rotateRightOrder .
 	
-	self deny: Rover pointsEast.
-	self deny: Rover pointsWest.
-	self deny: Rover pointsSouth.
-	self assert: Rover pointsNorth.! !
+	self assertThatOnlyPointsNorth: Rover.! !
 
-!MarsRoverTest methodsFor: 'rotating tests' stamp: 'HG 10/25/2020 14:32:45'!
+!MarsRoverTest methodsFor: 'rotating tests' stamp: 'FS 10/26/2020 14:21:14'!
 test13rotatingLeftDirectionFromWestPointsSouth
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: west withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: west.
 	
-	Rover receiveOrder: 'l'.
+	Rover receiveOrder: rotateLeftOrder .
 	
-	self deny: Rover pointsEast.
-	self deny: Rover pointsWest.
-	self assert: Rover pointsSouth.
-	self deny: Rover pointsNorth.! !
+	self assertThatOnlyPointsSouth: Rover.! !
 
-!MarsRoverTest methodsFor: 'rotating tests' stamp: 'HG 10/25/2020 14:33:44'!
+!MarsRoverTest methodsFor: 'rotating tests' stamp: 'FS 10/26/2020 14:21:23'!
 test16rotatingRightDirectionFromEastPointsSouth
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: east withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: east.
 	
-	Rover receiveOrder: 'r'.
+	Rover receiveOrder: rotateRightOrder.
 	
-	self deny: Rover pointsEast.
-	self deny: Rover pointsWest.
-	self assert: Rover pointsSouth.
-	self deny: Rover pointsNorth.! !
+	self assertThatOnlyPointsSouth: Rover.! !
 
-!MarsRoverTest methodsFor: 'rotating tests' stamp: 'HG 10/25/2020 14:34:00'!
+!MarsRoverTest methodsFor: 'rotating tests' stamp: 'FS 10/26/2020 14:21:32'!
 test17rotatingLeftDirectionFromEastPointsNorth
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: east withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: east.
 	
-	Rover receiveOrder: 'l'.
+	Rover receiveOrder: rotateLeftOrder .
 	
-	self deny: Rover pointsEast.
-	self deny: Rover pointsWest.
-	self deny: Rover pointsSouth.
-	self assert: Rover pointsNorth.! !
+	self assertThatOnlyPointsNorth: Rover.! !
 
 
-!MarsRoverTest methodsFor: 'movement tests' stamp: 'HG 10/25/2020 14:29:21'!
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:05:15'!
+RoverIn3by3GridStartingAt: aStartingPoint pointing: aCardinalDirection
+	 
+	^MarsRover startingAt: aStartingPoint pointingTo: aCardinalDirection withMapHeight: 3 withMapWidth: 3.
+	
+	 ! !
+
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:17:39'!
 test02movingForwardWithSouthDirectionGoesDownInGrid
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: south.
 	
-	Rover receiveOrder: 'f'.
+	Rover receiveOrder: forwardOrder .
 	
 	self assert: Rover currentPosition equals: 2@3.! !
 
-!MarsRoverTest methodsFor: 'movement tests' stamp: 'HG 10/25/2020 14:25:57'!
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:17:42'!
 test03movingBackwardWithSouthDirectionGoesUpInGrid
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: south.
 	
-	Rover receiveOrder: 'b'.
+	Rover receiveOrder: backwardOrder .
 	
 	self assert: Rover currentPosition equals: 2@1.! !
 
-!MarsRoverTest methodsFor: 'movement tests' stamp: 'HG 10/25/2020 14:29:53'!
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:17:45'!
 test06movingForwardWithNorthDirectionGoesUpInGrid
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: north withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: north.
 	
-	Rover receiveOrder: 'f'.
+	Rover receiveOrder: forwardOrder.
 	
 	self assert: Rover currentPosition equals: 2@1.! !
 
-!MarsRoverTest methodsFor: 'movement tests' stamp: 'HG 10/25/2020 14:30:12'!
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:17:47'!
 test07movingBackwardWithNorthDirectionGoesDownInGrid
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: north withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: north.
 	
-	Rover receiveOrder: 'b'.
+	Rover receiveOrder: backwardOrder .
 	
 	self assert: Rover currentPosition equals: 2@3.! !
 
-!MarsRoverTest methodsFor: 'movement tests' stamp: 'HG 10/25/2020 14:31:26'!
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:17:51'!
 test10movingForwardWithWestDirectionGoesLeftInGrid
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: west withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: west.
 	
-	Rover receiveOrder: 'f'.
+	Rover receiveOrder: forwardOrder.
 	
 	self assert: Rover currentPosition equals: 1@2! !
 
-!MarsRoverTest methodsFor: 'movement tests' stamp: 'HG 10/25/2020 14:31:45'!
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:17:55'!
 test11movingBackwardWithWestDirectionGoesRightInGrid
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: west withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: west.
 	
-	Rover receiveOrder: 'b'.
+	Rover receiveOrder: backwardOrder .
 	
 	self assert: Rover currentPosition equals: 3@2! !
 
-!MarsRoverTest methodsFor: 'movement tests' stamp: 'HG 10/25/2020 14:33:05'!
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:17:58'!
 test14movingForwardWithEastDirectionGoesRightInGrid
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: east withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: east.
 	
-	Rover receiveOrder: 'f'.
+	Rover receiveOrder: forwardOrder .
 	
 	self assert: Rover currentPosition equals: 3@2.! !
 
-!MarsRoverTest methodsFor: 'movement tests' stamp: 'HG 10/25/2020 14:33:24'!
+!MarsRoverTest methodsFor: 'movement tests' stamp: 'FS 10/26/2020 14:18:02'!
 test15movingBackwardWithEastDirectionGoesLeftInGrid
 	| Rover|
-	Rover _ MarsRover startingAt: 2@2 pointingTo: east withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: centerPoint3by3Grid pointing: east.
 	
-	Rover receiveOrder: 'b'.
+	Rover receiveOrder: backwardOrder .
 	
 	self assert: Rover currentPosition equals: 1@2.! !
 
 
-!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'HG 10/25/2020 14:35:13'!
+!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'FS 10/26/2020 14:15:18'!
 test18movingForwardWithWestDirectionInWestBorderGoesToEastBorder
 	| Rover|
-	Rover _ MarsRover startingAt: 1@1 pointingTo: west withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 1@1 pointing: west.
 	
-	Rover receiveOrder: 'f'.
+	Rover receiveOrder: forwardOrder.
 	
 	self assert: Rover currentPosition equals: 3@1.! !
 
-!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'HG 10/25/2020 14:35:57'!
+!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'FS 10/26/2020 14:15:23'!
 test19movingForwardWithNorthDirectionInNorthBorderGoesToSouthBorder
 	| Rover|
-	Rover _ MarsRover startingAt: 1@1 pointingTo: north withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 1@1 pointing: north.
 	
-	Rover receiveOrder: 'f'.
+	Rover receiveOrder: forwardOrder.
 	
 	self assert: Rover currentPosition equals: 1@3.! !
 
-!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'HG 10/25/2020 14:36:17'!
+!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'FS 10/26/2020 14:15:26'!
 test20movingForwardWithSouthDirectionInSouthBorderGoesToNorthBorder
 	| Rover|
-	Rover _ MarsRover startingAt: 1@3 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 1@3 pointing: south.
 	
-	Rover receiveOrder: 'f'.
+	Rover receiveOrder: forwardOrder.
 	
 	self assert: Rover currentPosition equals: 1@1.! !
 
-!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'HG 10/25/2020 14:36:37'!
+!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'FS 10/26/2020 14:15:31'!
 test21movingForwardWithEastDirectionInEastBorderGoesToWestBorder
 	| Rover|
-	Rover _ MarsRover startingAt: 3@1 pointingTo: east withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 3@1 pointing: east.
 	
-	Rover receiveOrder: 'f'.
+	Rover receiveOrder: forwardOrder.
 	
 	self assert: Rover currentPosition equals: 1@1.! !
 
-!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'HG 10/25/2020 14:37:53'!
+!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'FS 10/26/2020 14:15:37'!
 test22movingBackwardWithWestDirectionInEastBorderGoesToWestBorder
 	| Rover|
-	Rover _ MarsRover startingAt: 3@1 pointingTo: west withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 3@1 pointing: west.
 	
-	Rover receiveOrder: 'b'.
+	Rover receiveOrder: backwardOrder .
 	
 	self assert: Rover currentPosition equals: 1@1.! !
 
-!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'HG 10/25/2020 14:38:28'!
+!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'FS 10/26/2020 14:15:40'!
 test23movingBackwardWithNorthDirectionInSouthBorderGoesToNorthBorder
 	| Rover|
-	Rover _ MarsRover startingAt: 1@3 pointingTo: north withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 1@3 pointing: north.
 	
-	Rover receiveOrder: 'b'.
+	Rover receiveOrder: backwardOrder .
 	
 	self assert: Rover currentPosition equals: 1@1.! !
 
-!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'HG 10/25/2020 14:38:59'!
+!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'FS 10/26/2020 14:15:44'!
 test24movingBackwardWithEastDirectionInWestBorderGoesToEastBorder
 	| Rover|
-	Rover _ MarsRover startingAt: 1@1 pointingTo: east withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 1@1 pointing: east.
 	
-	Rover receiveOrder: 'b'.
+	Rover receiveOrder: backwardOrder .
 	
 	self assert: Rover currentPosition equals: 3@1.! !
 
-!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'HG 10/25/2020 14:39:18'!
+!MarsRoverTest methodsFor: 'movement grid border tests' stamp: 'FS 10/26/2020 14:15:47'!
 test25movingBackwardWithSouthDirectionInNorthBorderGoesToSouthBorder
 	| Rover|
-	Rover _ MarsRover startingAt: 1@1 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 1@1 pointing: south.
 	
-	Rover receiveOrder: 'b'.
+	Rover receiveOrder: backwardOrder .
 	
 	self assert: Rover currentPosition equals: 1@3.! !
 
 
-!MarsRoverTest methodsFor: 'multiple orders tests' stamp: 'HG 10/25/2020 14:41:06'!
+!MarsRoverTest methodsFor: 'multiple orders tests' stamp: 'FS 10/26/2020 14:10:57'!
 test26assertValidOrderSequenceGoingForwardAndRotate
 	| Rover|
-	Rover _ MarsRover startingAt: 1@1 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+	Rover _ self RoverIn3by3GridStartingAt: 1@1 pointing: south.
 	
 	Rover receiveOrder: 'ffr'.
 	
@@ -259,13 +244,13 @@ test26assertValidOrderSequenceGoingForwardAndRotate
 	self assert: Rover pointsWest.! !
 
 
-!MarsRoverTest methodsFor: 'invalid order test' stamp: 'HG 10/25/2020 19:59:23'!
+!MarsRoverTest methodsFor: 'invalid order test' stamp: 'FS 10/26/2020 14:11:08'!
 test27assertStopExecutionAtInvalidOrder
 	| Rover|
 	
 	self
 		should:[
-			Rover _ MarsRover startingAt: 1@1 pointingTo: south withMapHeight: 3 withMapWidth: 3.
+			Rover _ self RoverIn3by3GridStartingAt: 1@1 pointing: south.
 			Rover receiveOrder: 'frNKf'.
 			]
 		raise: Error
@@ -277,212 +262,252 @@ test27assertStopExecutionAtInvalidOrder
 ! !
 
 
-!MarsRoverTest methodsFor: 'setUp' stamp: 'HG 10/25/2020 12:38:23'!
+!MarsRoverTest methodsFor: 'setUp' stamp: 'FS 10/26/2020 14:16:46'!
 setUp
-	south _ South new.
-	north _ North new.
-	west _ West new.
-	east _ East new.! !
+	south _ SouthDirection new.
+	north _ NorthDirection new.
+	west _ WestDirection new.
+	east _ EastDirection new.
+	
+	forwardOrder _ 'f'.
+	backwardOrder _ 'b'.
+	rotateRightOrder _ 'r'.
+	rotateLeftOrder _ 'l'.
+	
+	centerPoint3by3Grid _ 2@2.! !
+
+
+!MarsRoverTest methodsFor: 'assertions' stamp: 'FS 10/26/2020 14:19:20'!
+assertThatOnlyPointsEast: Rover
+
+	self assert: Rover pointsEast.
+	self deny: Rover pointsWest.
+	self deny: Rover pointsSouth.
+	self deny: Rover pointsNorth! !
+
+!MarsRoverTest methodsFor: 'assertions' stamp: 'FS 10/26/2020 14:20:49'!
+assertThatOnlyPointsNorth: Rover
+
+	self deny: Rover pointsEast.
+	self deny: Rover pointsWest.
+	self deny: Rover pointsSouth.
+	self assert: Rover pointsNorth! !
+
+!MarsRoverTest methodsFor: 'assertions' stamp: 'FS 10/26/2020 14:21:14'!
+assertThatOnlyPointsSouth: Rover
+
+	self deny: Rover pointsEast.
+	self deny: Rover pointsWest.
+	self assert: Rover pointsSouth.
+	self deny: Rover pointsNorth! !
+
+!MarsRoverTest methodsFor: 'assertions' stamp: 'FS 10/26/2020 14:19:43'!
+assertThatOnlyPointsWest: Rover
+
+	self deny: Rover pointsEast.
+	self assert: Rover pointsWest.
+	self deny: Rover pointsSouth.
+	self deny: Rover pointsNorth! !
 
 
-!classDefinition: #GridCardinalPoints category: 'EjercicioMarsRover'!
-Object subclass: #GridCardinalPoints
+!classDefinition: #GridCardinalDirection category: #EjercicioMarsRover!
+Object subclass: #GridCardinalDirection
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'EjercicioMarsRover'!
 
-!GridCardinalPoints methodsFor: 'movement directions' stamp: 'HG 10/25/2020 13:08:15'!
-movementValue
+!GridCardinalDirection methodsFor: 'movement arithmetic' stamp: 'FS 10/26/2020 13:40:14'!
+forwardPointOffset
 	self subclassResponsibility.! !
 
 
-!GridCardinalPoints methodsFor: 'rotating directions' stamp: 'HG 10/25/2020 13:08:36'!
+!GridCardinalDirection methodsFor: 'rotating ' stamp: 'HG 10/25/2020 13:08:36'!
 rotateLeft
 	self subclassResponsibility.! !
 
-!GridCardinalPoints methodsFor: 'rotating directions' stamp: 'HG 10/25/2020 13:08:39'!
+!GridCardinalDirection methodsFor: 'rotating ' stamp: 'HG 10/25/2020 13:08:39'!
 rotateRight
 	self subclassResponsibility.! !
 
 
-!GridCardinalPoints methodsFor: 'testing' stamp: 'HG 10/25/2020 13:13:29'!
-isEast
+!GridCardinalDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:07'!
+pointsEast
 	self subclassResponsibility.! !
 
-!GridCardinalPoints methodsFor: 'testing' stamp: 'HG 10/25/2020 13:13:22'!
-isNorth
+!GridCardinalDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:27'!
+pointsNorth
 	self subclassResponsibility.! !
 
-!GridCardinalPoints methodsFor: 'testing' stamp: 'HG 10/25/2020 13:13:24'!
-isSouth
+!GridCardinalDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:46'!
+pointsSouth
 	self subclassResponsibility.! !
 
-!GridCardinalPoints methodsFor: 'testing' stamp: 'HG 10/25/2020 13:13:27'!
-isWest
+!GridCardinalDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:39'!
+pointsWest
 	self subclassResponsibility.! !
 
 
-!classDefinition: #East category: 'EjercicioMarsRover'!
-GridCardinalPoints subclass: #East
+!classDefinition: #EastDirection category: #EjercicioMarsRover!
+GridCardinalDirection subclass: #EastDirection
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'EjercicioMarsRover'!
 
-!East methodsFor: 'rotating' stamp: 'HG 10/25/2020 13:20:26'!
+!EastDirection methodsFor: 'rotating' stamp: 'FS 10/26/2020 13:37:34'!
 rotateLeft
-	^North new.! !
+	^NorthDirection new.! !
 
-!East methodsFor: 'rotating' stamp: 'HG 10/25/2020 12:54:27'!
+!EastDirection methodsFor: 'rotating' stamp: 'FS 10/26/2020 13:37:40'!
 rotateRight
-	^South new.! !
+	^SouthDirection new.! !
 
 
-!East methodsFor: 'movement' stamp: 'HG 10/25/2020 12:31:21'!
-movementValue
-	^-1@0.! !
-
-
-!East methodsFor: 'testing' stamp: 'HG 10/25/2020 13:13:57'!
-isEast
-	^true.! !
-
-!East methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:05'!
-isNorth
-	^false.! !
-
-!East methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:08'!
-isSouth
-	^false.! !
-
-!East methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:11'!
-isWest
-	^false.! !
-
-
-!classDefinition: #North category: 'EjercicioMarsRover'!
-GridCardinalPoints subclass: #North
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'EjercicioMarsRover'!
-
-!North methodsFor: 'movement' stamp: 'HG 10/25/2020 12:28:50'!
-movementValue
-	^0@1.! !
-
-
-!North methodsFor: 'rotating' stamp: 'HG 10/25/2020 12:52:06'!
-rotateLeft
-	^West new.! !
-
-!North methodsFor: 'rotating' stamp: 'HG 10/25/2020 12:51:56'!
-rotateRight
-	^East new.! !
-
-
-!North methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:25'!
-isEast
-	^false.! !
-
-!North methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:35'!
-isNorth
-	^true.! !
-
-!North methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:28'!
-isSouth
-	^false.! !
-
-!North methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:22'!
-isWest
-	^false.! !
-
-
-!classDefinition: #South category: 'EjercicioMarsRover'!
-GridCardinalPoints subclass: #South
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'EjercicioMarsRover'!
-
-!South methodsFor: 'movement' stamp: 'HG 10/25/2020 12:27:02'!
-movementValue
-	^0@-1.! !
-
-
-!South methodsFor: 'rotating' stamp: 'HG 10/25/2020 12:50:55'!
-rotateLeft
-	^East new.! !
-
-!South methodsFor: 'rotating' stamp: 'HG 10/25/2020 12:51:32'!
-rotateRight
-	^West new.! !
-
-
-!South methodsFor: 'testing' stamp: 'HG 10/25/2020 13:15:00'!
-isEast	
-	^false.! !
-
-!South methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:56'!
-isNorth
-	^false.! !
-
-!South methodsFor: 'testing' stamp: 'HG 10/25/2020 13:14:46'!
-isSouth
-	^true.! !
-
-!South methodsFor: 'testing' stamp: 'HG 10/25/2020 13:15:03'!
-isWest	
-	^false.! !
-
-
-!classDefinition: #West category: 'EjercicioMarsRover'!
-GridCardinalPoints subclass: #West
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'EjercicioMarsRover'!
-
-!West methodsFor: 'rotating' stamp: 'HG 10/25/2020 12:53:52'!
-rotateLeft
-	^South new.! !
-
-!West methodsFor: 'rotating' stamp: 'HG 10/25/2020 12:54:00'!
-rotateRight
-	^North new.! !
-
-
-!West methodsFor: 'movement' stamp: 'HG 10/25/2020 12:31:10'!
-movementValue
+!EastDirection methodsFor: 'movement arithmetic' stamp: 'FS 10/26/2020 13:53:36'!
+forwardPointOffset
 	^1@0.! !
 
 
-!West methodsFor: 'testing' stamp: 'HG 10/25/2020 13:15:37'!
-isEast	
+!EastDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:07'!
+pointsEast
+	^true.! !
+
+!EastDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:27'!
+pointsNorth
 	^false.! !
 
-!West methodsFor: 'testing' stamp: 'HG 10/25/2020 13:15:55'!
-isNorth
+!EastDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:46'!
+pointsSouth
 	^false.! !
 
-!West methodsFor: 'testing' stamp: 'HG 10/25/2020 13:15:49'!
-isSouth
+!EastDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:39'!
+pointsWest
 	^false.! !
 
-!West methodsFor: 'testing' stamp: 'HG 10/25/2020 13:15:32'!
-isWest	
+
+!classDefinition: #NorthDirection category: #EjercicioMarsRover!
+GridCardinalDirection subclass: #NorthDirection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'EjercicioMarsRover'!
+
+!NorthDirection methodsFor: 'movement arithmetic' stamp: 'FS 10/26/2020 13:53:30'!
+forwardPointOffset
+	^0@-1.! !
+
+
+!NorthDirection methodsFor: 'rotating' stamp: 'FS 10/26/2020 13:37:47'!
+rotateLeft
+	^WestDirection new.! !
+
+!NorthDirection methodsFor: 'rotating' stamp: 'FS 10/26/2020 13:37:26'!
+rotateRight
+	^EastDirection new.! !
+
+
+!NorthDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:07'!
+pointsEast
+	^false.! !
+
+!NorthDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:27'!
+pointsNorth
+	^true.! !
+
+!NorthDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:46'!
+pointsSouth
+	^false.! !
+
+!NorthDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:39'!
+pointsWest
+	^false.! !
+
+
+!classDefinition: #SouthDirection category: #EjercicioMarsRover!
+GridCardinalDirection subclass: #SouthDirection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'EjercicioMarsRover'!
+
+!SouthDirection methodsFor: 'movement arithmetic' stamp: 'FS 10/26/2020 13:53:26'!
+forwardPointOffset
+	^0@1.! !
+
+
+!SouthDirection methodsFor: 'rotating' stamp: 'FS 10/26/2020 13:37:26'!
+rotateLeft
+	^EastDirection new.! !
+
+!SouthDirection methodsFor: 'rotating' stamp: 'FS 10/26/2020 13:37:47'!
+rotateRight
+	^WestDirection new.! !
+
+
+!SouthDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:07'!
+pointsEast	
+	^false.! !
+
+!SouthDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:27'!
+pointsNorth
+	^false.! !
+
+!SouthDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:46'!
+pointsSouth
+	^true.! !
+
+!SouthDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:39'!
+pointsWest	
+	^false.! !
+
+
+!classDefinition: #WestDirection category: #EjercicioMarsRover!
+GridCardinalDirection subclass: #WestDirection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'EjercicioMarsRover'!
+
+!WestDirection methodsFor: 'rotating' stamp: 'FS 10/26/2020 13:37:40'!
+rotateLeft
+	^SouthDirection new.! !
+
+!WestDirection methodsFor: 'rotating' stamp: 'FS 10/26/2020 13:37:34'!
+rotateRight
+	^NorthDirection new.! !
+
+
+!WestDirection methodsFor: 'movement arithmetic' stamp: 'FS 10/26/2020 13:53:19'!
+forwardPointOffset
+	^-1@0.! !
+
+
+!WestDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:07'!
+pointsEast	
+	^false.! !
+
+!WestDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:27'!
+pointsNorth
+	^false.! !
+
+!WestDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:46'!
+pointsSouth
+	^false.! !
+
+!WestDirection methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:39'!
+pointsWest	
 	^true.! !
 
 
-!classDefinition: #MarsRover category: 'EjercicioMarsRover'!
+!classDefinition: #MarsRover category: #EjercicioMarsRover!
 Object subclass: #MarsRover
 	instanceVariableNames: 'position direction mapHeight mapWidth validOrders'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'EjercicioMarsRover'!
 
-!MarsRover methodsFor: 'initialization' stamp: 'HG 10/25/2020 14:21:03'!
+!MarsRover methodsFor: 'initialization' stamp: 'FS 10/26/2020 13:55:57'!
 initializeStartingAt: aStartingPoint pointingTo: aCardinalPoint MapHeight: aMapHeight MapWidth: aMapWidth 
 	position := aStartingPoint.
 	direction := aCardinalPoint.
@@ -490,26 +515,40 @@ initializeStartingAt: aStartingPoint pointingTo: aCardinalPoint MapHeight: aMapH
 	mapWidth := aMapWidth.
 	
 	validOrders _ {
-		$f -> [position _ position - (direction movementValue).].
-		$b -> [position _ position + (direction movementValue).].
-		$r -> [direction _ direction rotateRight.].
-		$l -> [direction _ direction rotateLeft.].
+		$f -> self forwardOperationBlock.
+		$b -> self backwardOperationBlock.
+		$r -> self rotateRightOperationBlock.
+		$l -> self rotateLeftOperationBlock.
 	} asDictionary.! !
 
 
-!MarsRover methodsFor: '- private' stamp: 'HG 10/25/2020 14:22:52'!
-fixPositionWithinBorder
+!MarsRover methodsFor: 'movement - private' stamp: 'FS 10/26/2020 14:25:21'!
+fixPositionWhenOutsideBorder
+
+	self fixYCoordinateWhenOutsideGrid.
+	self fixXCoordinateWhenOutsideGrid.! !
+
+!MarsRover methodsFor: 'movement - private' stamp: 'FS 10/26/2020 14:24:49'!
+fixXCoordinateWhenOutsideGrid
+
+	position x <1 ifTrue: [position _ mapWidth@(position y)].
+	position x > mapWidth ifTrue: [position _ 1@(position y)]! !
+
+!MarsRover methodsFor: 'movement - private' stamp: 'FS 10/26/2020 14:25:00'!
+fixYCoordinateWhenOutsideGrid
 
 	position y <1 ifTrue:[position _ (position x)@(mapHeight)].
-	position y > mapHeight ifTrue:[position _ (position x)@1].
-	position x <1 ifTrue: [position _ mapWidth@(position y)].
-	position x > mapWidth ifTrue: [position _ 1@(position y)].! !
+	position y > mapHeight ifTrue:[position _ (position x)@1]! !
 
 
-!MarsRover methodsFor: 'actions' stamp: 'HG 10/25/2020 14:22:52'!
+!MarsRover methodsFor: 'actions' stamp: 'FS 10/26/2020 14:25:21'!
 executeValidOrder: aValidOrderToExecute
-	(validOrders at: aValidOrderToExecute) value.
-	self fixPositionWithinBorder.! !
+	| OrderOperationBlock |
+	
+	OrderOperationBlock := validOrders at: aValidOrderToExecute.
+	(OrderOperationBlock) value.
+	
+	self fixPositionWhenOutsideBorder.! !
 
 !MarsRover methodsFor: 'actions' stamp: 'HG 10/25/2020 19:59:32'!
 receiveOrder: aSequenceOfOrders 
@@ -518,11 +557,11 @@ receiveOrder: aSequenceOfOrders
 									ifTrue: [ self executeValidOrder: anOrder ] 
 									ifFalse: [ self class signalInvalidOrderCharacter. ]].! !
 
-!MarsRover methodsFor: 'actions' stamp: 'HG 10/25/2020 14:19:27'!
+!MarsRover methodsFor: 'actions' stamp: 'FS 10/26/2020 13:52:31'!
 shouldBeExecuted: anOrderToExecute
 
-	(validOrders at: anOrderToExecute ifAbsent: [^false]).
-	^true.! !
+	^validOrders includesKey: anOrderToExecute  .
+	 ! !
 
 
 !MarsRover methodsFor: 'accessing' stamp: 'FS 10/24/2020 20:06:55'!
@@ -530,25 +569,46 @@ currentPosition
 	^position ! !
 
 
-!MarsRover methodsFor: 'testing' stamp: 'HG 10/25/2020 13:12:43'!
+!MarsRover methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:07'!
 pointsEast
-	^direction isEast.! !
+	^direction pointsEast.! !
 
-!MarsRover methodsFor: 'testing' stamp: 'HG 10/25/2020 13:12:51'!
+!MarsRover methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:27'!
 pointsNorth
-	^direction isNorth.! !
+	^direction pointsNorth.! !
 
-!MarsRover methodsFor: 'testing' stamp: 'HG 10/25/2020 13:12:58'!
+!MarsRover methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:46'!
 pointsSouth
-	^ direction isSouth.! !
+	^ direction pointsSouth.! !
 
-!MarsRover methodsFor: 'testing' stamp: 'HG 10/25/2020 13:13:04'!
+!MarsRover methodsFor: 'testing' stamp: 'FS 10/26/2020 13:39:39'!
 pointsWest
-	^direction isWest.! !
+	^direction pointsWest.! !
+
+
+!MarsRover methodsFor: 'initialization - private' stamp: 'FS 10/26/2020 13:55:32'!
+backwardOperationBlock
+
+	^ [position _ position - (direction forwardPointOffset).]! !
+
+!MarsRover methodsFor: 'initialization - private' stamp: 'FS 10/26/2020 13:55:17'!
+forwardOperationBlock
+
+	^ [position _ position + (direction forwardPointOffset).]! !
+
+!MarsRover methodsFor: 'initialization - private' stamp: 'FS 10/26/2020 13:55:57'!
+rotateLeftOperationBlock
+
+	^ [direction _ direction rotateLeft.]! !
+
+!MarsRover methodsFor: 'initialization - private' stamp: 'FS 10/26/2020 13:55:46'!
+rotateRightOperationBlock
+
+	^ [direction _ direction rotateRight.]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'MarsRover class' category: 'EjercicioMarsRover'!
+!classDefinition: 'MarsRover class' category: #EjercicioMarsRover!
 MarsRover class
 	instanceVariableNames: ''!
 
