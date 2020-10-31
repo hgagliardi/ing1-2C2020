@@ -313,6 +313,87 @@ test15
 	
 	! !
 
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'FS 10/31/2020 18:54:16'!
+test16
+	
+	| aTerniLapilliGame |
+	
+	aTerniLapilliGame _ TerniLapilli new.
+	aTerniLapilliGame putXAt: 1@1.
+	aTerniLapilliGame putOAt: 3@3.
+	aTerniLapilliGame putXAt: 2@1.
+	aTerniLapilliGame putOAt: 3@2.
+	aTerniLapilliGame putXAt: 1@2.
+	aTerniLapilliGame putOAt: 2@2.
+	
+	self 
+		should: [ aTerniLapilliGame movePlayerXPositionFrom: 1@1 to: 3@1.  ]
+		raise: Error
+		withMessageText: TerniLapilli invalidMovementErrorDescription .
+		
+			
+	self assert: (aTerniLapilliGame isAnXPlayerPosition: 1@1).
+	self deny: (aTerniLapilliGame isAnXPlayerPosition: 3@1).
+
+	self deny: aTerniLapilliGame isPlayingO.
+	self assert: aTerniLapilliGame isPlayingX.
+	self deny: aTerniLapilliGame hasPlayerXWon.
+	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame isOver.
+	
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'FS 10/31/2020 18:54:32'!
+test17
+	
+	| aTerniLapilliGame |
+	
+	aTerniLapilliGame _ TerniLapilli new.
+	aTerniLapilliGame putXAt: 2@1.
+	aTerniLapilliGame putOAt: 3@3.
+	aTerniLapilliGame putXAt: 2@2.
+	aTerniLapilliGame putOAt: 3@2.
+	aTerniLapilliGame putXAt: 1@3.
+	aTerniLapilliGame putOAt: 1@1.
+	
+	self 
+		should: [ aTerniLapilliGame movePlayerXPositionFrom: 2@1 to: 1@2.  ]
+		raise: Error
+		withMessageText: TerniLapilli invalidMovementErrorDescription .
+		
+			
+	self assert: (aTerniLapilliGame isAnXPlayerPosition: 2@1).
+	self deny: (aTerniLapilliGame isAnXPlayerPosition: 1@2).
+
+	self deny: aTerniLapilliGame isPlayingO.
+	self assert: aTerniLapilliGame isPlayingX.
+	self deny: aTerniLapilliGame hasPlayerXWon.
+	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame isOver.
+	
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'FS 10/31/2020 18:56:28'!
+test18
+	
+	| aTerniLapilliGame |
+	
+	aTerniLapilliGame _ TerniLapilli new.
+	
+	self 
+		should: [ aTerniLapilliGame putXAt: 0@0.  ]
+		raise: Error
+		withMessageText: TerniLapilli invalidBoardPosition .
+		
+			
+	self deny: (aTerniLapilliGame isAnXPlayerPosition: 0@0).
+	self assert: aTerniLapilliGame isPlayingX.
+	self deny: aTerniLapilliGame hasPlayerXWon.
+	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame isOver.
+	
+	! !
+
 
 !classDefinition: #TerniLapilli category: #TerniLapilliGame!
 Object subclass: #TerniLapilli
@@ -363,6 +444,14 @@ isPlayingO
 isPlayingX
 	^turn = #X.! !
 
+!TerniLapilli methodsFor: 'testing' stamp: 'FS 10/31/2020 18:52:17'!
+isValidMoveFrom: aSourceBoardPosition to: aDestionationBoardPosition 
+	(aSourceBoardPosition = (2@2)) ifTrue:[
+								^aSourceBoardPosition eightNeighbors includes: aDestionationBoardPosition ]
+							ifFalse:[
+								^aSourceBoardPosition fourNeighbors includes: aDestionationBoardPosition ]
+					! !
+
 !TerniLapilli methodsFor: 'testing' stamp: 'HG 10/29/2020 21:02:06'!
 playerOWinsByDiagonal
 	^((oPlayerPositions intersection: self toLeftDiagonal) size) =3
@@ -410,9 +499,10 @@ addXPlayerPositionIn: aBoardPosition
 	turn _ #O.
 					xPlayerPositions add: aBoardPosition! !
 
-!TerniLapilli methodsFor: 'game actions' stamp: 'HG 10/31/2020 17:04:04'!
+!TerniLapilli methodsFor: 'game actions' stamp: 'FS 10/31/2020 19:20:03'!
 putOAt: aBoardPosition 
-
+	(self class isValidPosition: aBoardPosition) ifFalse: [self error: self class invalidBoardPosition ].
+				
 	self isPlayingO
 		ifTrue: [
 			(self isAnOccupiedPosition: aBoardPosition)
@@ -431,9 +521,10 @@ putOAt: aBoardPosition
 	
 	! !
 
-!TerniLapilli methodsFor: 'game actions' stamp: 'HG 10/31/2020 17:43:48'!
+!TerniLapilli methodsFor: 'game actions' stamp: 'FS 10/31/2020 19:19:51'!
 putXAt: aBoardPosition 
-
+	(self class isValidPosition: aBoardPosition) ifFalse: [self error: self class invalidBoardPosition ].
+	
 	self isPlayingX
 		ifTrue: [
 			(self isAnOccupiedPosition: aBoardPosition)
@@ -446,7 +537,9 @@ putXAt: aBoardPosition
 		]
 		ifFalse: [
 			self error: self class InvalidTurnErrorDescription. 
-		]
+		].
+	
+	
 	! !
 
 
@@ -457,40 +550,54 @@ initialize
 	xPlayerPositions _ OrderedCollection new.! !
 
 
-!TerniLapilli methodsFor: 'private boardgame' stamp: 'HG 10/29/2020 19:35:21'!
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 10/31/2020 19:40:20'!
 firstColumn
-	^{1@1},{1@2},{1@3}! !
+	^self getColumn: 1! !
 
-!TerniLapilli methodsFor: 'private boardgame' stamp: 'HG 10/29/2020 19:16:00'!
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 10/31/2020 19:39:47'!
 firstRow
-	^{1@1},{2@1},{3@1}! !
+	^self getRow:1! !
 
-!TerniLapilli methodsFor: 'private boardgame' stamp: 'HG 10/29/2020 19:35:30'!
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 10/31/2020 19:25:02'!
+getColumn: aColumnIndex
+	 |indexedColumn|
+	 indexedColumn _ OrderedCollection new.
+	 1 to: 3 do:[ :aRowIndex | indexedColumn add: (aColumnIndex@aRowIndex )].
+	^indexedColumn ! !
+
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 10/31/2020 19:27:25'!
+getRow: aRowIndex
+	 |indexedRow|
+	 indexedRow _ OrderedCollection new.
+	 1 to: 3 do:[ :aColumnIndex | indexedRow add: (aColumnIndex@aRowIndex )].
+	 ^indexedRow ! !
+
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 10/31/2020 19:40:16'!
 secondColumn
-	^{2@1},{2@2},{2@3}! !
+	^self getColumn: 2! !
 
-!TerniLapilli methodsFor: 'private boardgame' stamp: 'HG 10/29/2020 19:16:18'!
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 10/31/2020 19:39:52'!
 secondRow
-	^{1@2},{2@2},{3@2}! !
+	^self getRow:2! !
 
-!TerniLapilli methodsFor: 'private boardgame' stamp: 'HG 10/29/2020 19:35:39'!
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 10/31/2020 19:40:11'!
 thirdColumn
-	^{3@1},{3@2},{3@3}! !
+	^self getColumn: 3! !
 
-!TerniLapilli methodsFor: 'private boardgame' stamp: 'HG 10/29/2020 19:16:27'!
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 10/31/2020 19:39:59'!
 thirdRow
-	^{1@3},{2@3},{3@3}! !
+	^self getRow:3! !
 
-!TerniLapilli methodsFor: 'private boardgame' stamp: 'HG 10/29/2020 19:25:16'!
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'HG 10/29/2020 19:25:16'!
 toLeftDiagonal
 	^{1@3},{2@2},{3@1}! !
 
-!TerniLapilli methodsFor: 'private boardgame' stamp: 'HG 10/29/2020 19:25:28'!
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'HG 10/29/2020 19:25:28'!
 toRightDiagonal
 	^{1@1},{2@2},{3@3}! !
 
 
-!TerniLapilli methodsFor: 'moving' stamp: 'HG 10/31/2020 18:06:02'!
+!TerniLapilli methodsFor: 'moving' stamp: 'FS 10/31/2020 18:57:25'!
 movePlayerOPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition 
 	
 	self isPlayingO
@@ -511,7 +618,10 @@ movePlayerOPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition
 		ifTrue:[
 			self error: self class InvalidDestinationPositionToMove. 
 			].
-	
+		
+	(self isValidMoveFrom: aSourceBoardPosition to: aDestinationBoardPosition )
+		ifFalse:[self error: self class invalidMovementErrorDescription ].
+		
 	oPlayerPositions add: aDestinationBoardPosition.
 	oPlayerPositions remove: aSourceBoardPosition.
 	self playerXTakeTurn.
@@ -519,7 +629,7 @@ movePlayerOPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition
 	
 	! !
 
-!TerniLapilli methodsFor: 'moving' stamp: 'HG 10/31/2020 18:05:49'!
+!TerniLapilli methodsFor: 'moving' stamp: 'FS 10/31/2020 19:41:29'!
 movePlayerXPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition 
 	
 	self isPlayingX
@@ -542,6 +652,9 @@ movePlayerXPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition
 		ifTrue:[
 			self error: self class InvalidDestinationPositionToMove. 
 			].
+	
+	(self isValidMoveFrom: aSourceBoardPosition to: aDestinationBoardPosition )
+		ifFalse:[self error: self class invalidMovementErrorDescription ].
 		
 	xPlayerPositions remove: aSourceBoardPosition.
 	xPlayerPositions add: aDestinationBoardPosition.
@@ -562,7 +675,7 @@ playerXTakeTurn
 
 !classDefinition: 'TerniLapilli class' category: #TerniLapilliGame!
 TerniLapilli class
-	instanceVariableNames: ''!
+	instanceVariableNames: 'validPositions firstRow secondRow thirdRow firstColumn secondColumn thirdColumn rightDiagonal leftDiagonal'!
 
 !TerniLapilli class methodsFor: 'error description' stamp: 'HG 10/31/2020 17:30:00'!
 InvalidDestinationPositionToMove
@@ -583,3 +696,21 @@ InvalidTurnErrorDescription
 !TerniLapilli class methodsFor: 'error description' stamp: 'HG 10/31/2020 18:01:02'!
 cantMoveBeforePuttingAllChipsOnBoardErrorDescription
 	^'You cant move a chip before put all chips on board'.! !
+
+!TerniLapilli class methodsFor: 'error description' stamp: 'FS 10/31/2020 18:56:59'!
+invalidBoardPosition
+	^'position is outside board!!'! !
+
+!TerniLapilli class methodsFor: 'error description' stamp: 'FS 10/31/2020 18:54:00'!
+invalidMovementErrorDescription
+	^'Invalid movement error'! !
+
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'FS 10/31/2020 19:12:08'!
+isValidPosition: aBoardPosition
+	^validPositions includes: aBoardPosition ! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'FS 10/31/2020 19:22:07'!
+new
+	validPositions _ {1@1} , {1@2},{1@3},{2@1} , {2@2},{2@3},{3@1} , {3@2},{3@3}..
+	^(self basicNew) initialize! !
