@@ -5,17 +5,15 @@ TestCase subclass: #TerniLapilliTest
 	poolDictionaries: ''
 	category: 'TerniLapilliGame'!
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 10/29/2020 21:04:01'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 14:11:32'!
 test01AssertPlayerXStartsPlayingInNewGame
 	
 	| aTerniLapilliGame |
 	
 	aTerniLapilliGame _ TerniLapilli new.
-	self assert: aTerniLapilliGame isPlayingX. 
-	self deny: aTerniLapilliGame isPlayingO.
-	self deny: aTerniLapilliGame isOver.! !
+	self assertThatGameContinuesAndIsXTurn: aTerniLapilliGame! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 10/29/2020 21:03:58'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 14:11:53'!
 test02AssertPlayerOTurnIsAfterPlayerX
 	
 	| aTerniLapilliGame |
@@ -23,13 +21,12 @@ test02AssertPlayerOTurnIsAfterPlayerX
 	aTerniLapilliGame _ TerniLapilli new.
 	aTerniLapilliGame putXAt: 1@1.
 	
-	self assert: aTerniLapilliGame isPlayingO. 
-	self deny: aTerniLapilliGame isPlayingX.
+	self assertThatGameContinuesAndIsOTurn: aTerniLapilliGame .
 	self assert: (aTerniLapilliGame isAnXPlayerPosition: 1@1).
 	self deny: (aTerniLapilliGame isAnOPlayerPosition: 1@1).
-	self deny: aTerniLapilliGame isOver.! !
+ ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 10/29/2020 21:03:51'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 14:12:08'!
 test03AssertPlayerXTurnIsAfterPlayerO
 	
 	| aTerniLapilliGame |
@@ -38,30 +35,12 @@ test03AssertPlayerXTurnIsAfterPlayerO
 	aTerniLapilliGame putXAt: 1@1.
 	aTerniLapilliGame putOAt: 2@2.
 	
-	self assert: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame isPlayingO. 
+	self assertThatGameContinuesAndIsXTurn: aTerniLapilliGame .
 	self assert: (aTerniLapilliGame isAnXPlayerPosition: 1@1).
 	self assert: (aTerniLapilliGame isAnOPlayerPosition: 2@2).
-	self deny: aTerniLapilliGame isOver.! !
-
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:37:53'!
-test04AssertPlayerXWinsWhenPutsChip
-	
-	| aTerniLapilliGame |
-	
-	aTerniLapilliGame _ TerniLapilli new.
-	aTerniLapilliGame putXAt: 1@1.
-	aTerniLapilliGame putOAt: 1@2.
-	aTerniLapilliGame putXAt: 2@1.
-	aTerniLapilliGame putOAt: 2@2.
-	aTerniLapilliGame putXAt: 3@1.
-	
-	self assert: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
-	self assert: aTerniLapilliGame isOver.
 ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:38:12'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:53:57'!
 test05AssertPlayerOWinsWhenPutsLastChip
 	
 	| aTerniLapilliGame |
@@ -74,12 +53,30 @@ test05AssertPlayerOWinsWhenPutsLastChip
 	aTerniLapilliGame putXAt: 3@3.
 	aTerniLapilliGame putOAt: 3@2.
 
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self assert: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self assert: aTerniLapilliGame playerOHasWon.
 	self assert: aTerniLapilliGame isOver.
 ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:42:42'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 14:16:50'!
+test05AssertPlayerWinsWhenPutsLastChipFormingAThreeLinedPattern
+	
+	| aTerniLapilliGame |
+	
+	aTerniLapilliGame _ TerniLapilli new.
+	aTerniLapilliGame putXAt: 1@1.
+	aTerniLapilliGame putOAt: 1@2.
+	aTerniLapilliGame putXAt: 3@1.
+	aTerniLapilliGame putOAt: 2@2.
+	aTerniLapilliGame putXAt: 3@3.
+	aTerniLapilliGame putOAt: 3@2.
+
+	self deny: aTerniLapilliGame playerXHasWon.
+	self assert: aTerniLapilliGame playerOHasWon.
+	self assert: aTerniLapilliGame isOver.
+! !
+
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 14:17:22'!
 test06AssertPlayerXMovesAChipCorrectly
 	
 	| aTerniLapilliGame |
@@ -96,17 +93,18 @@ test06AssertPlayerXMovesAChipCorrectly
 
 	self deny: (aTerniLapilliGame isAnXPlayerPosition: 2@2).	
 	self assert: (aTerniLapilliGame isAnXPlayerPosition: 2@1).
-	self assert: aTerniLapilliGame isPlayingO.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
-	self deny: aTerniLapilliGame isOver.
+	
+	self assertThatGameContinuesAndIsOTurn: aTerniLapilliGame .
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
+
 	
 	
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:43:25'!
-test07AssertPlayerXWinsAfterMovingAChipCorrectly
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 14:20:01'!
+test07AssertPlayerWinsAfterMovingAChipFormingAThreeLinedPatern
 	
 	| aTerniLapilliGame |
 	
@@ -122,13 +120,15 @@ test07AssertPlayerXWinsAfterMovingAChipCorrectly
 
 	self deny: (aTerniLapilliGame isAnXPlayerPosition: 2@2).	
 	self assert: (aTerniLapilliGame isAnXPlayerPosition: 1@3).
-	self assert: aTerniLapilliGame isPlayingO.
-	self assert: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame isPlayingO.
+	self deny: aTerniLapilliGame isPlayingX.
+
+	self assert: aTerniLapilliGame playerXHasWon .
+	self deny: aTerniLapilliGame playerOHasWon .
 	self assert: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:45:32'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:55:33'!
 test08CanNotPutAChipAtInvalidTurn
 	
 	| aTerniLapilliGame |
@@ -139,19 +139,19 @@ test08CanNotPutAChipAtInvalidTurn
 	self 
 		should: [ aTerniLapilliGame putXAt: 2@1. ]
 		raise: Error
-		withMessageText: TerniLapilli InvalidTurnErrorDescription.
+		withMessageText: TerniLapilli invalidTurnErrorDescription.
 		
 		
 	self deny: (aTerniLapilliGame isAnXPlayerPosition: 2@1).	
 	self assert: (aTerniLapilliGame isAnXPlayerPosition: 1@1).
 	self assert: aTerniLapilliGame isPlayingO.
 	self deny: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:46:06'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:53:57'!
 test09CanNotPutAChipInOccupiedPosition
 	
 	| aTerniLapilliGame |
@@ -168,12 +168,12 @@ test09CanNotPutAChipInOccupiedPosition
 	self deny: (aTerniLapilliGame isAnOPlayerPosition: 1@1).
 	self assert: aTerniLapilliGame isPlayingO.
 	self deny: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:46:25'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:55:33'!
 test10CanNotMoveAChipAtInvalidTurn
 	
 	| aTerniLapilliGame |
@@ -189,19 +189,19 @@ test10CanNotMoveAChipAtInvalidTurn
 	self 
 		should: [ aTerniLapilliGame movePlayerOPositionFrom: 3@3 to: 2@3.  ]
 		raise: Error
-		withMessageText: TerniLapilli InvalidTurnErrorDescription.
+		withMessageText: TerniLapilli invalidTurnErrorDescription.
 		
 		
 	self deny: (aTerniLapilliGame isAnOPlayerPosition: 2@3).	
 	self assert: (aTerniLapilliGame isAnOPlayerPosition: 3@3).
 	self deny: aTerniLapilliGame isPlayingO.
 	self assert: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:48:56'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:55:08'!
 test11CanNotMoveAChipFromInvalidSourcePosition
 	
 	| aTerniLapilliGame |
@@ -217,18 +217,18 @@ test11CanNotMoveAChipFromInvalidSourcePosition
 	self 
 		should: [ aTerniLapilliGame movePlayerXPositionFrom: 3@3 to: 2@3.  ]
 		raise: Error
-		withMessageText: TerniLapilli InvalidSourcePositionToMove.
+		withMessageText: TerniLapilli invalidSourcePositionToMove.
 		
 			
 	self assert: (aTerniLapilliGame isAnOPlayerPosition: 3@3).
 	self deny: aTerniLapilliGame isPlayingO.
 	self assert: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:49:34'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:53:57'!
 test12CanNotMoveAChipToAnOccupiedPosition
 	
 	| aTerniLapilliGame |
@@ -250,13 +250,13 @@ test12CanNotMoveAChipToAnOccupiedPosition
 	self assert: (aTerniLapilliGame isAnOPlayerPosition: 3@3).
 	self deny: aTerniLapilliGame isPlayingO.
 	self assert: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:50:25'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:53:57'!
 test13CanNotMoveChipsBeforeAllChipsOnBoard
 	
 	| aTerniLapilliGame |
@@ -274,13 +274,13 @@ test13CanNotMoveChipsBeforeAllChipsOnBoard
 	self assert: (aTerniLapilliGame isAnXPlayerPosition: 1@1).
 	self deny: aTerniLapilliGame isPlayingO.
 	self assert: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:51:21'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:53:57'!
 test14CanNotMoveChipIfMovementIsTooLong
 	
 	| aTerniLapilliGame |
@@ -304,13 +304,13 @@ test14CanNotMoveChipIfMovementIsTooLong
 
 	self deny: aTerniLapilliGame isPlayingO.
 	self assert: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:51:43'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:53:57'!
 test15CanNotMoveChipIfMovementIsFakeDiagonal
 	
 	| aTerniLapilliGame |
@@ -334,14 +334,14 @@ test15CanNotMoveChipIfMovementIsFakeDiagonal
 
 	self deny: aTerniLapilliGame isPlayingO.
 	self assert: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:52:04'!
-test16CanNotPutChipsAtInvalidBoardPositions
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 14:18:38'!
+test16CanNotPutChipsOutsideTheBoard
 	
 	| aTerniLapilliGame |
 	
@@ -355,13 +355,13 @@ test16CanNotPutChipsAtInvalidBoardPositions
 			
 	self deny: (aTerniLapilliGame isAnXPlayerPosition: 0@0).
 	self assert: aTerniLapilliGame isPlayingX.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
+	self deny: aTerniLapilliGame playerXHasWon.
+	self deny: aTerniLapilliGame playerOHasWon.
 	self deny: aTerniLapilliGame isOver.
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:52:25'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:53:57'!
 test17CanNotMoveChipsAfterGameIsOver
 	
 	| aTerniLapilliGame |
@@ -374,8 +374,8 @@ test17CanNotMoveChipsAfterGameIsOver
 	aTerniLapilliGame putXAt: 3@3.
 	aTerniLapilliGame putOAt: 1@3.
 	
-	self assert: aTerniLapilliGame hasPlayerOWon.
-	self deny: aTerniLapilliGame hasPlayerXWon.
+	self assert: aTerniLapilliGame playerOHasWon.
+	self deny: aTerniLapilliGame playerXHasWon.
 	self assert: aTerniLapilliGame isOver.
 	
 	self 
@@ -404,6 +404,21 @@ test18CanNotPutChipsAfterGameIsOver
 		withMessageText: TerniLapilli allChipsAlreadyOnTheBoardErrorDescription.
 		
 ! !
+
+
+!TerniLapilliTest methodsFor: 'assertions' stamp: 'FS 11/2/2020 14:10:34'!
+assertThatGameContinuesAndIsOTurn: aTerniLapilliGame
+
+	self assert: aTerniLapilliGame isPlayingO. 
+	self deny: aTerniLapilliGame isPlayingX.
+	self deny: aTerniLapilliGame isOver! !
+
+!TerniLapilliTest methodsFor: 'assertions' stamp: 'FS 11/2/2020 14:09:03'!
+assertThatGameContinuesAndIsXTurn: aTerniLapilliGame
+
+	self assert: aTerniLapilliGame isPlayingX. 
+	self deny: aTerniLapilliGame isPlayingO.
+	self deny: aTerniLapilliGame isOver! !
 
 
 !classDefinition: #TerniLapilli category: #TerniLapilliGame!
@@ -470,15 +485,15 @@ playerOWinsByHorizontalRow
 	boardRowIndexs do: [:aRowIndex | (self playerWinsByRowIndex: aRowIndex withPositions: oPlayerPositions ) ifTrue: [ oWins _ true. ]].
 	^oWins.! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 20:57:34'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'FS 11/2/2020 13:52:45'!
 playerOWinsByLeftDiagonal
 
-	^ ((oPlayerPositions intersection: self toRightDiagonal) size) =3! !
+	^ ((oPlayerPositions intersection: self rightBoardDiagonal) size) =3! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 20:57:24'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'FS 11/2/2020 13:52:56'!
 playerOWinsByRightDiagonal
 
-	^ ((oPlayerPositions intersection: self toLeftDiagonal) size) =3! !
+	^ ((oPlayerPositions intersection: self leftBoardDiagonal) size) =3! !
 
 !TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 21:00:56'!
 playerOWinsByVerticalColumn
@@ -509,15 +524,15 @@ playerXWinsByHorizontalRow
 	boardRowIndexs do: [:aRowIndex | (self playerWinsByRowIndex: aRowIndex withPositions: xPlayerPositions ) ifTrue: [ xWins _ true. ]].
 	^xWins.! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 20:56:32'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'FS 11/2/2020 13:52:56'!
 playerXWinsByLeftDiagonal
 
-	^ ((xPlayerPositions intersection: self toLeftDiagonal) size) =3! !
+	^ ((xPlayerPositions intersection: self leftBoardDiagonal) size) =3! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 20:56:46'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'FS 11/2/2020 13:52:45'!
 playerXWinsByRightDiagonal
 
-	^ ((xPlayerPositions intersection: self toRightDiagonal) size) =3! !
+	^ ((xPlayerPositions intersection: self rightBoardDiagonal) size) =3! !
 
 !TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 21:01:42'!
 playerXWinsByVerticalColumn
@@ -528,20 +543,12 @@ playerXWinsByVerticalColumn
 	boardColumnIndexs do: [:aColumnIndex | (self playerWinsByColumnIndex: aColumnIndex withPositions: xPlayerPositions) ifTrue: [ xWins _ true. ]].
 	^xWins.! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 19:19:19'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'FS 11/2/2020 13:58:42'!
 validBoardPositionCheck: aBoardPosition
 
-	^ (self class isValidPosition: aBoardPosition) 
+	^ (self class assertValidBoardPosition: aBoardPosition) 
 		ifFalse: [ self signalInvalidBoardPosition. ]! !
 
-
-!TerniLapilli methodsFor: 'testing' stamp: 'HG 11/2/2020 10:56:04'!
-hasPlayerOWon
-	^self playerOWinsByHorizontalRow or: self playerOWinsByDiagonal or: self playerOWinsByVerticalColumn.! !
-
-!TerniLapilli methodsFor: 'testing' stamp: 'HG 11/2/2020 10:56:13'!
-hasPlayerXWon
-	^self playerXWinsByHorizontalRow or: self playerXWinsByDiagonal or: self playerXWinsByVerticalColumn.! !
 
 !TerniLapilli methodsFor: 'testing' stamp: 'HG 10/29/2020 18:33:26'!
 isAnOPlayerPosition: aBoardPosition 
@@ -555,17 +562,25 @@ isAnOccupiedPosition: aBoardPosition
 isAnXPlayerPosition: aBoardPosition 
 	^xPlayerPositions includes: aBoardPosition.! !
 
-!TerniLapilli methodsFor: 'testing' stamp: 'HG 10/29/2020 21:03:22'!
+!TerniLapilli methodsFor: 'testing' stamp: 'FS 11/2/2020 13:53:57'!
 isOver
-	^self hasPlayerOWon or: (self hasPlayerXWon).! !
+	^self playerOHasWon or: (self playerXHasWon).! !
 
-!TerniLapilli methodsFor: 'testing' stamp: 'HG 11/1/2020 19:49:06'!
+!TerniLapilli methodsFor: 'testing' stamp: 'FS 11/2/2020 14:12:59'!
 isPlayingO
-	^turnState isPlayingO.! !
+	^turnState isPlayingO and: self isOver not.! !
 
-!TerniLapilli methodsFor: 'testing' stamp: 'HG 11/1/2020 19:47:41'!
+!TerniLapilli methodsFor: 'testing' stamp: 'FS 11/2/2020 14:13:05'!
 isPlayingX
-	^turnState isPlayingX.! !
+	^turnState isPlayingX and: self isOver not.! !
+
+!TerniLapilli methodsFor: 'testing' stamp: 'FS 11/2/2020 13:53:44'!
+playerOHasWon
+	^self playerOWinsByHorizontalRow or: self playerOWinsByDiagonal or: self playerOWinsByVerticalColumn.! !
+
+!TerniLapilli methodsFor: 'testing' stamp: 'FS 11/2/2020 13:53:57'!
+playerXHasWon
+	^self playerXWinsByHorizontalRow or: self playerXWinsByDiagonal or: self playerXWinsByVerticalColumn.! !
 
 
 !TerniLapilli methodsFor: 'exceptions' stamp: 'FS 11/1/2020 22:55:22'!
@@ -587,15 +602,15 @@ signalInvalidMovement
 
 	^ self error: self class invalidMovementErrorDescription! !
 
-!TerniLapilli methodsFor: 'exceptions' stamp: 'HG 11/1/2020 19:41:17'!
+!TerniLapilli methodsFor: 'exceptions' stamp: 'FS 11/2/2020 13:55:08'!
 signalInvalidSourcePosition
 
-	^ self error: self class InvalidSourcePositionToMove! !
+	^ self error: self class invalidSourcePositionToMove! !
 
-!TerniLapilli methodsFor: 'exceptions' stamp: 'HG 11/1/2020 19:26:55'!
+!TerniLapilli methodsFor: 'exceptions' stamp: 'FS 11/2/2020 13:55:33'!
 signalInvalidTurn
 
-	^ self error: self class InvalidTurnErrorDescription! !
+	^ self error: self class invalidTurnErrorDescription! !
 
 !TerniLapilli methodsFor: 'exceptions' stamp: 'HG 11/1/2020 19:39:44'!
 signalMovingBeforeAllChipsOnBoard
@@ -759,31 +774,19 @@ getRow: aRowIndex
 	 1 to: 3 do:[ :aColumnIndex | indexedRow add: (aColumnIndex@aRowIndex )].
 	 ^indexedRow ! !
 
-!TerniLapilli methodsFor: 'accessing -- private' stamp: 'HG 10/29/2020 19:25:16'!
-toLeftDiagonal
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 11/2/2020 13:52:56'!
+leftBoardDiagonal
 	^{1@3},{2@2},{3@1}! !
 
-!TerniLapilli methodsFor: 'accessing -- private' stamp: 'HG 10/29/2020 19:25:28'!
-toRightDiagonal
+!TerniLapilli methodsFor: 'accessing -- private' stamp: 'FS 11/2/2020 13:52:45'!
+rightBoardDiagonal
 	^{1@1},{2@2},{3@3}! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TerniLapilli class' category: #TerniLapilliGame!
 TerniLapilli class
-	instanceVariableNames: 'validPositions firstRow secondRow thirdRow firstColumn secondColumn thirdColumn rightDiagonal leftDiagonal'!
-
-!TerniLapilli class methodsFor: 'error description' stamp: 'HG 10/31/2020 17:30:00'!
-InvalidDestinationPositionToMove
-	^'Is an invalid destination position to move'.! !
-
-!TerniLapilli class methodsFor: 'error description' stamp: 'HG 10/31/2020 17:22:33'!
-InvalidSourcePositionToMove
-	^'Is an invalid source position to move for that player..'! !
-
-!TerniLapilli class methodsFor: 'error description' stamp: 'HG 10/31/2020 16:47:42'!
-InvalidTurnErrorDescription
-	^'Invalid Turn to Play'.! !
+	instanceVariableNames: 'validPositions'!
 
 !TerniLapilli class methodsFor: 'error description' stamp: 'FS 11/1/2020 22:51:18'!
 allChipsAlreadyOnTheBoardErrorDescription
@@ -797,8 +800,8 @@ cantMoveBeforePuttingAllChipsOnBoardErrorDescription
 gameAlreadyOverErrorDescription
 	^'Game is already over'.! !
 
-!TerniLapilli class methodsFor: 'error description' stamp: 'HG 11/1/2020 21:07:38'!
-invalidActionWhenFinishGame
+!TerniLapilli class methodsFor: 'error description' stamp: 'FS 11/2/2020 13:56:55'!
+invalidActionWhenFinishedGame
 	^'You cant add or move when the game is already finished.'.! !
 
 !TerniLapilli class methodsFor: 'error description' stamp: 'FS 10/31/2020 18:56:59'!
@@ -808,6 +811,14 @@ invalidBoardPosition
 !TerniLapilli class methodsFor: 'error description' stamp: 'FS 10/31/2020 18:54:00'!
 invalidMovementErrorDescription
 	^'Invalid movement error'! !
+
+!TerniLapilli class methodsFor: 'error description' stamp: 'FS 11/2/2020 13:58:08'!
+invalidSourcePositionToMove
+	^'Position is not owned by that player'! !
+
+!TerniLapilli class methodsFor: 'error description' stamp: 'FS 11/2/2020 13:56:28'!
+invalidTurnErrorDescription
+	^'Player cannot play when isnt his turn'.! !
 
 !TerniLapilli class methodsFor: 'error description' stamp: 'HG 11/1/2020 19:15:48'!
 occupiedPositionErrorDescription
@@ -820,8 +831,8 @@ new
 	^(self basicNew) initialize! !
 
 
-!TerniLapilli class methodsFor: 'accessing' stamp: 'FS 10/31/2020 19:12:08'!
-isValidPosition: aBoardPosition
+!TerniLapilli class methodsFor: 'accessing' stamp: 'FS 11/2/2020 13:58:42'!
+assertValidBoardPosition: aBoardPosition
 	^validPositions includes: aBoardPosition ! !
 
 
