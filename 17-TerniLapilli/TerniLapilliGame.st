@@ -40,24 +40,6 @@ test03AssertPlayerXTurnIsAfterPlayerO
 	self assert: (aTerniLapilliGame isAnOPlayerPosition: 2@2).
 ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 13:53:57'!
-test05AssertPlayerOWinsWhenPutsLastChip
-	
-	| aTerniLapilliGame |
-	
-	aTerniLapilliGame _ TerniLapilli new.
-	aTerniLapilliGame putXAt: 1@1.
-	aTerniLapilliGame putOAt: 1@2.
-	aTerniLapilliGame putXAt: 3@1.
-	aTerniLapilliGame putOAt: 2@2.
-	aTerniLapilliGame putXAt: 3@3.
-	aTerniLapilliGame putOAt: 3@2.
-
-	self deny: aTerniLapilliGame playerXHasWon.
-	self assert: aTerniLapilliGame playerOHasWon.
-	self assert: aTerniLapilliGame isOver.
-! !
-
 !TerniLapilliTest methodsFor: 'test' stamp: 'FS 11/2/2020 14:16:50'!
 test05AssertPlayerWinsWhenPutsLastChipFormingAThreeLinedPattern
 	
