@@ -5,7 +5,7 @@ TestCase subclass: #TerniLapilliTest
 	poolDictionaries: ''
 	category: 'TerniLapilliGame'!
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/29/2020 21:04:01'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 10/29/2020 21:04:01'!
 test01AssertPlayerXStartsPlayingInNewGame
 	
 	| aTerniLapilliGame |
@@ -15,7 +15,7 @@ test01AssertPlayerXStartsPlayingInNewGame
 	self deny: aTerniLapilliGame isPlayingO.
 	self deny: aTerniLapilliGame isOver.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/29/2020 21:03:58'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 10/29/2020 21:03:58'!
 test02AssertPlayerOTurnIsAfterPlayerX
 	
 	| aTerniLapilliGame |
@@ -29,7 +29,7 @@ test02AssertPlayerOTurnIsAfterPlayerX
 	self deny: (aTerniLapilliGame isAnOPlayerPosition: 1@1).
 	self deny: aTerniLapilliGame isOver.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/29/2020 21:03:51'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 10/29/2020 21:03:51'!
 test03AssertPlayerXTurnIsAfterPlayerO
 	
 	| aTerniLapilliGame |
@@ -44,8 +44,8 @@ test03AssertPlayerXTurnIsAfterPlayerO
 	self assert: (aTerniLapilliGame isAnOPlayerPosition: 2@2).
 	self deny: aTerniLapilliGame isOver.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/29/2020 20:58:14'!
-test04
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:37:53'!
+test04AssertPlayerXWinsWhenPutsChip
 	
 	| aTerniLapilliGame |
 	
@@ -61,8 +61,8 @@ test04
 	self assert: aTerniLapilliGame isOver.
 ! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/29/2020 20:58:32'!
-test05
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:38:12'!
+test05AssertPlayerOWinsWhenPutsLastChip
 	
 	| aTerniLapilliGame |
 	
@@ -79,41 +79,8 @@ test05
 	self assert: aTerniLapilliGame isOver.
 ! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/29/2020 20:59:54'!
-test06
-	
-	| aTerniLapilliGame |
-	
-	aTerniLapilliGame _ TerniLapilli new.
-	aTerniLapilliGame putXAt: 1@1.
-	aTerniLapilliGame putOAt: 2@1.
-	aTerniLapilliGame putXAt: 1@2.
-	aTerniLapilliGame putOAt: 3@1.
-	aTerniLapilliGame putXAt: 1@3.
-	
-	self assert: aTerniLapilliGame hasPlayerXWon.
-	self deny: aTerniLapilliGame hasPlayerOWon.
-	self assert: aTerniLapilliGame isOver.! !
-
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/29/2020 21:00:48'!
-test07
-	
-	| aTerniLapilliGame |
-	
-	aTerniLapilliGame _ TerniLapilli new.
-	aTerniLapilliGame putXAt: 2@2.
-	aTerniLapilliGame putOAt: 1@1.
-	aTerniLapilliGame putXAt: 2@3.
-	aTerniLapilliGame putOAt: 1@2.
-	aTerniLapilliGame putXAt: 3@3.
-	aTerniLapilliGame putOAt: 1@3.
-	
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self assert: aTerniLapilliGame hasPlayerOWon.
-	self assert: aTerniLapilliGame isOver.! !
-
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/31/2020 17:20:07'!
-test08
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:42:42'!
+test06AssertPlayerXMovesAChipCorrectly
 	
 	| aTerniLapilliGame |
 	
@@ -138,8 +105,8 @@ test08
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/31/2020 17:39:35'!
-test09
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:43:25'!
+test07AssertPlayerXWinsAfterMovingAChipCorrectly
 	
 	| aTerniLapilliGame |
 	
@@ -161,8 +128,8 @@ test09
 	self assert: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/31/2020 16:47:01'!
-test10
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:45:32'!
+test08CanNotPutAChipAtInvalidTurn
 	
 	| aTerniLapilliGame |
 	
@@ -184,8 +151,8 @@ test10
 	self deny: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 11/1/2020 19:15:48'!
-test11
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:46:06'!
+test09CanNotPutAChipInOccupiedPosition
 	
 	| aTerniLapilliGame |
 	
@@ -206,8 +173,8 @@ test11
 	self deny: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/31/2020 17:06:33'!
-test12
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:46:25'!
+test10CanNotMoveAChipAtInvalidTurn
 	
 	| aTerniLapilliGame |
 	
@@ -234,8 +201,8 @@ test12
 	self deny: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/31/2020 17:21:56'!
-test13
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:48:56'!
+test11CanNotMoveAChipFromInvalidSourcePosition
 	
 	| aTerniLapilliGame |
 	
@@ -261,8 +228,8 @@ test13
 	self deny: aTerniLapilliGame isOver.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 11/1/2020 19:52:28'!
-test14
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:49:34'!
+test12CanNotMoveAChipToAnOccupiedPosition
 	
 	| aTerniLapilliGame |
 	
@@ -289,8 +256,8 @@ test14
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 10/31/2020 18:06:39'!
-test15
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:50:25'!
+test13CanNotMoveChipsBeforeAllChipsOnBoard
 	
 	| aTerniLapilliGame |
 	
@@ -313,8 +280,8 @@ test15
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'FS 10/31/2020 18:54:16'!
-test16
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:51:21'!
+test14CanNotMoveChipIfMovementIsTooLong
 	
 	| aTerniLapilliGame |
 	
@@ -343,8 +310,8 @@ test16
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'FS 10/31/2020 18:54:32'!
-test17
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:51:43'!
+test15CanNotMoveChipIfMovementIsFakeDiagonal
 	
 	| aTerniLapilliGame |
 	
@@ -373,8 +340,8 @@ test17
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'FS 10/31/2020 18:56:28'!
-test18
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:52:04'!
+test16CanNotPutChipsAtInvalidBoardPositions
 	
 	| aTerniLapilliGame |
 	
@@ -394,8 +361,8 @@ test18
 	
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 11/1/2020 22:16:16'!
-test19
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:52:25'!
+test17CanNotMoveChipsAfterGameIsOver
 	
 	| aTerniLapilliGame |
 	
@@ -418,32 +385,8 @@ test19
 		
 	self deny: (aTerniLapilliGame isAnXPlayerPosition: 2@1).! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'HG 11/1/2020 22:16:53'!
-test20
-	
-	| aTerniLapilliGame |
-	
-	aTerniLapilliGame _ TerniLapilli new.
-	aTerniLapilliGame putXAt: 2@2.
-	aTerniLapilliGame putOAt: 1@1.
-	aTerniLapilliGame putXAt: 2@3.
-	aTerniLapilliGame putOAt: 1@2.
-	aTerniLapilliGame putXAt: 3@3.
-	aTerniLapilliGame putOAt: 1@3.
-	
-	self assert: aTerniLapilliGame hasPlayerOWon.
-	self deny: aTerniLapilliGame hasPlayerXWon.
-	self assert: aTerniLapilliGame isOver.
-	
-	self 
-		should: [ aTerniLapilliGame movePlayerXPositionFrom: 2@2 to: 2@1.  ]
-		raise: Error
-		withMessageText: TerniLapilli gameAlreadyOverErrorDescription.
-		
-	self deny: (aTerniLapilliGame isAnXPlayerPosition: 2@1).! !
-
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'FS 11/1/2020 22:51:53'!
-test21
+!TerniLapilliTest methodsFor: 'test' stamp: 'HG 11/2/2020 10:52:44'!
+test18CanNotPutChipsAfterGameIsOver
 	
 	| aTerniLapilliGame |
 	
@@ -470,39 +413,48 @@ Object subclass: #TerniLapilli
 	poolDictionaries: ''
 	category: 'TerniLapilliGame'!
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 10/31/2020 18:04:57'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/2/2020 10:58:29'!
 allChipsOnBoard
-	^(xPlayerPositions size = 3) and: (oPlayerPositions size = 3).! !
+	^(self allChipsOnBoardFromPlayer: xPlayerPositions) 
+		and: (self allChipsOnBoardFromPlayer: oPlayerPositions).! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 20:43:45'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/2/2020 10:58:04'!
+allChipsOnBoardFromPlayer: aPlayerPositionList
+	^aPlayerPositionList size = 3! !
+
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/2/2020 11:00:10'!
 checkConditionsToMoveForPlayerOFrom: aSourceBoardPosition to: aDestinationBoardPosition
 	
 	(self isAnOPlayerPosition: aSourceBoardPosition)
 		ifFalse: [ self signalInvalidSourcePosition. ].
 		
-	(self isValidMoveFrom: aSourceBoardPosition to: aDestinationBoardPosition )
+	(self isValidPlayerMovementFrom: aSourceBoardPosition to: aDestinationBoardPosition )
 		ifFalse:[ self signalInvalidMovement. ]! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 20:37:56'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/2/2020 11:00:10'!
 checkConditionsToMoveForPlayerXFrom: aSourceBoardPosition to: aDestinationBoardPosition
 	
 	(self isAnXPlayerPosition: aSourceBoardPosition)
 		ifFalse: [ self signalInvalidSourcePosition. ].
 		
-	(self isValidMoveFrom: aSourceBoardPosition to: aDestinationBoardPosition )
+	(self isValidPlayerMovementFrom: aSourceBoardPosition to: aDestinationBoardPosition )
 		ifFalse:[ self signalInvalidMovement. ]! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 19:59:17'!
-isValidMoveFrom: aSourceBoardPosition to: aDestionationBoardPosition 
-	(aSourceBoardPosition = (2@2) or: (aDestionationBoardPosition = (2@2)) )  ifTrue:[
-								^aSourceBoardPosition eightNeighbors includes: aDestionationBoardPosition ]
-							ifFalse:[
-								^aSourceBoardPosition fourNeighbors includes: aDestionationBoardPosition ]
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/2/2020 11:00:42'!
+isCenterPosition: aSourceBoardPosition
+
+	^ aSourceBoardPosition = (2@2)! !
+
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/2/2020 11:01:53'!
+isValidPlayerMovementFrom: aSourceBoardPosition to: aDestinationBoardPosition 
+	((self isCenterPosition: aSourceBoardPosition) or: (self isCenterPosition: aDestinationBoardPosition)) 
+			ifTrue:[ ^aSourceBoardPosition eightNeighbors includes: aDestinationBoardPosition ].
+							
+	^aSourceBoardPosition fourNeighbors includes: aDestinationBoardPosition.
 					! !
 
-!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/1/2020 19:27:12'!
+!TerniLapilli methodsFor: 'testing -- private' stamp: 'HG 11/2/2020 11:05:25'!
 occupiedBoardPositionCheck: aBoardPosition
-
 	^ (self isAnOccupiedPosition: aBoardPosition)
 		ifTrue: [ self signalOccupiedPosition. ]! !
 
@@ -583,27 +535,21 @@ validBoardPositionCheck: aBoardPosition
 		ifFalse: [ self signalInvalidBoardPosition. ]! !
 
 
-!TerniLapilli methodsFor: 'testing' stamp: 'HG 10/29/2020 21:01:47'!
+!TerniLapilli methodsFor: 'testing' stamp: 'HG 11/2/2020 10:56:04'!
 hasPlayerOWon
-	^self playerOWinsByHorizontalRow
-		or: self playerOWinsByDiagonal
-		or: self playerOWinsByVerticalColumn.! !
+	^self playerOWinsByHorizontalRow or: self playerOWinsByDiagonal or: self playerOWinsByVerticalColumn.! !
 
-!TerniLapilli methodsFor: 'testing' stamp: 'HG 10/29/2020 19:32:23'!
+!TerniLapilli methodsFor: 'testing' stamp: 'HG 11/2/2020 10:56:13'!
 hasPlayerXWon
-	
-	^self playerXWinsByHorizontalRow
-		or: self playerXWinsByDiagonal
-		or: self playerXWinsByVerticalColumn.! !
+	^self playerXWinsByHorizontalRow or: self playerXWinsByDiagonal or: self playerXWinsByVerticalColumn.! !
 
 !TerniLapilli methodsFor: 'testing' stamp: 'HG 10/29/2020 18:33:26'!
 isAnOPlayerPosition: aBoardPosition 
 	^oPlayerPositions includes: aBoardPosition.! !
 
-!TerniLapilli methodsFor: 'testing' stamp: 'HG 10/31/2020 17:01:32'!
+!TerniLapilli methodsFor: 'testing' stamp: 'HG 11/2/2020 10:55:28'!
 isAnOccupiedPosition: aBoardPosition 
-	^((self isAnOPlayerPosition: aBoardPosition) 
-		or: (self isAnXPlayerPosition: aBoardPosition))! !
+	^(self isAnOPlayerPosition: aBoardPosition) or: (self isAnXPlayerPosition: aBoardPosition).! !
 
 !TerniLapilli methodsFor: 'testing' stamp: 'HG 10/29/2020 18:33:15'!
 isAnXPlayerPosition: aBoardPosition 
@@ -890,6 +836,23 @@ Object subclass: #TerniLapilliGameplay
 initializeWithGame: aTerniLapilliGame
 	game _ aTerniLapilliGame.! !
 
+
+!TerniLapilliGameplay methodsFor: 'game actions' stamp: 'HG 11/2/2020 10:54:47'!
+movePlayerOPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition 
+	self subclassResponsibility.! !
+
+!TerniLapilliGameplay methodsFor: 'game actions' stamp: 'HG 11/2/2020 10:54:49'!
+movePlayerXPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition 
+	self subclassResponsibility.! !
+
+!TerniLapilliGameplay methodsFor: 'game actions' stamp: 'HG 11/2/2020 10:54:34'!
+putOnOPlayerTurnAt: aBoardPosition
+	self subclassResponsibility.! !
+
+!TerniLapilliGameplay methodsFor: 'game actions' stamp: 'HG 11/2/2020 10:54:31'!
+putOnXPlayerTurnAt: aBoardPosition
+	self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TerniLapilliGameplay class' category: #TerniLapilliGame!
@@ -1043,6 +1006,15 @@ putOAt: aGameBoardPosition
 putXAt: aGameBoardPosition
 	self subclassResponsibility. ! !
 
+
+!TerniLapilliTurnState methodsFor: 'testing' stamp: 'HG 11/2/2020 11:06:01'!
+isPlayingO
+	self subclassResponsibility. ! !
+
+!TerniLapilliTurnState methodsFor: 'testing' stamp: 'HG 11/2/2020 11:06:02'!
+isPlayingX
+	self subclassResponsibility. ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TerniLapilliTurnState class' category: #TerniLapilliGame!
@@ -1111,7 +1083,7 @@ putXAt: aGameBoardPosition
 	game putOnXPlayerTurnAt: aGameBoardPosition.! !
 
 
-!XPlayerTurn methodsFor: 'testing' stamp: 'HG 11/1/2020 19:48:40'!
+!XPlayerTurn methodsFor: 'testing' stamp: 'HG 11/2/2020 11:05:46'!
 isPlayingO
 	^false.! !
 
