@@ -442,6 +442,26 @@ test20
 		
 	self deny: (aTerniLapilliGame isAnXPlayerPosition: 2@1).! !
 
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'FS 11/1/2020 22:51:53'!
+test21
+	
+	| aTerniLapilliGame |
+	
+	aTerniLapilliGame _ TerniLapilli new.
+	aTerniLapilliGame putXAt: 1@1.
+	aTerniLapilliGame putOAt: 3@3.
+	aTerniLapilliGame putXAt: 1@2.
+	aTerniLapilliGame putOAt: 3@2.
+	aTerniLapilliGame putXAt: 2@1.
+	aTerniLapilliGame putOAt: 2@3.
+	
+	self 
+		should: [ aTerniLapilliGame putXAt: 2@2  ]
+		raise: Error
+		withMessageText: TerniLapilli allChipsAlreadyOnTheBoardErrorDescription.
+		
+! !
+
 
 !classDefinition: #TerniLapilli category: #TerniLapilliGame!
 Object subclass: #TerniLapilli
@@ -601,6 +621,10 @@ isPlayingO
 isPlayingX
 	^turnState isPlayingX.! !
 
+
+!TerniLapilli methodsFor: 'exceptions' stamp: 'FS 11/1/2020 22:55:22'!
+signalAllChipsAlreadyOnBoard
+	^self error: self class allChipsAlreadyOnTheBoardErrorDescription ! !
 
 !TerniLapilli methodsFor: 'exceptions' stamp: 'HG 11/1/2020 22:12:14'!
 signalGameIsAlreadyOver
@@ -815,6 +839,10 @@ InvalidSourcePositionToMove
 InvalidTurnErrorDescription
 	^'Invalid Turn to Play'.! !
 
+!TerniLapilli class methodsFor: 'error description' stamp: 'FS 11/1/2020 22:51:18'!
+allChipsAlreadyOnTheBoardErrorDescription
+	^'Cant place any more chips, all chips already on board'! !
+
 !TerniLapilli class methodsFor: 'error description' stamp: 'HG 10/31/2020 18:01:02'!
 cantMoveBeforePuttingAllChipsOnBoardErrorDescription
 	^'You cant move a chip before put all chips on board'.! !
@@ -930,6 +958,14 @@ movePlayerOPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition
 !MovingStage methodsFor: 'game actions' stamp: 'HG 11/1/2020 20:33:13'!
 movePlayerXPositionFrom: aSourceBoardPosition to: aDestinationBoardPosition 
 	game moveAtMovingStagePlayerXFrom: aSourceBoardPosition to: aDestinationBoardPosition! !
+
+!MovingStage methodsFor: 'game actions' stamp: 'FS 11/1/2020 22:52:49'!
+putOnOPlayerTurnAt: aBoardPosition
+	game signalAllChipsAlreadyOnBoard.! !
+
+!MovingStage methodsFor: 'game actions' stamp: 'FS 11/1/2020 22:52:58'!
+putOnXPlayerTurnAt: aBoardPosition
+	game signalAllChipsAlreadyOnBoard..! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
