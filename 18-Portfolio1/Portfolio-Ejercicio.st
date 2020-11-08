@@ -5,8 +5,8 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'HG 11/6/2020 12:20:36'!
-test01
+!PortfolioTest methodsFor: 'testing -- creating' stamp: 'HG 11/8/2020 19:56:23'!
+test01PortfolioShouldBeEmptyWhenCreated
 	
 	| aPortfolio anAccount aTransaction |
 	aPortfolio _ Portfolio new.
@@ -18,8 +18,9 @@ test01
 	self deny: (aPortfolio hasRegistered: aTransaction). 
 	! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'HG 11/6/2020 12:21:40'!
-test02
+
+!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'HG 11/8/2020 19:56:17'!
+test02RegisterTransactionOfAdddedAccount
 	
 	| aPortfolio anAccount aTransaction |
 	aPortfolio _ Portfolio new.
@@ -33,8 +34,8 @@ test02
 	self assert: (aPortfolio hasRegistered: aTransaction). 
 	! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'HG 11/6/2020 12:47:42'!
-test03
+!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'HG 11/8/2020 19:56:09'!
+test03RegisterTransactionsOfMultipleAccounts
 	
 	| aPortfolio anAccount a100Deposit a100Withdraw a300Deposit 
 	aNonAgregateAccount aNonAgregateTransaction another100Withdraw another300Deposit |
@@ -69,8 +70,8 @@ test03
 	   
 	! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'HG 11/6/2020 12:52:30'!
-test04
+!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'HG 11/8/2020 19:56:01'!
+test04RegisterTransactionOfAddedPortfolio
 	
 	| aPortfolio anAccount aTransaction aPortfolioToAdd |
 	aPortfolio _ Portfolio new.
@@ -87,8 +88,9 @@ test04
 	self assert: (aPortfolio hasRegistered: aTransaction). 
 	! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'HG 11/6/2020 19:30:04'!
-test05
+
+!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'HG 11/8/2020 19:55:54'!
+test05CanNotAddAlreadyAddedAccount
 	
 	| aPortfolio anAccount a100Deposit  |
 	aPortfolio _ Portfolio new.
@@ -106,8 +108,8 @@ test05
 	self assert: (aPortfolio hasRegistered: a100Deposit). 
 	! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'HG 11/6/2020 19:30:01'!
-test06
+!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'HG 11/8/2020 19:57:50'!
+test06CanNotAddAccountAlreadyAddedInHierarchy
 	
 	| aPortfolio aChildPortfolio anAccount a100Deposit  |
 	aPortfolio _ Portfolio new.
@@ -128,8 +130,8 @@ test06
 	self assert: (aPortfolio hasRegistered: a100Deposit). 
 	! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'HG 11/6/2020 19:29:16'!
-test07
+!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'HG 11/8/2020 19:58:20'!
+test07CanNotAddRepeatedPortfolio
 	
 	| aPortfolio aChildPortfolio |
 	aPortfolio _ Portfolio new.
@@ -145,8 +147,9 @@ test07
 	self assert: aPortfolio transactions size = 0.
 	! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'HG 11/6/2020 19:54:57'!
-test08
+
+!PortfolioTest methodsFor: 'testing -- hierarchy checks' stamp: 'HG 11/8/2020 19:59:32'!
+test08CanNotAddPortfolioWithRepeatedAccountsInHierarchy
 	
 	| aParentPortfolio aPortfolioToAdd aChildPortfolio a100Deposit anAccount |
 	aParentPortfolio _ Portfolio new.
@@ -162,6 +165,33 @@ test08
 	
 	
 	self should: [ aChildPortfolio add: aPortfolioToAdd.  ]
+		raise: Error
+		withMessageText: Portfolio alreadyAddedAssetErrorDescription.
+				
+	self assert: aParentPortfolio balance equals: 100.
+	self assert: aParentPortfolio transactions size = 1.
+	self assert: (aParentPortfolio hasRegistered: a100Deposit).
+	! !
+
+!PortfolioTest methodsFor: 'testing -- hierarchy checks' stamp: 'HG 11/8/2020 20:00:29'!
+test09CanNotAddPortfolioWithRepeatedElementsInAddedAssetHierarchy
+	
+	| aParentPortfolio aChildPortfolio a100Deposit anAccount anotherChildPortfolio anotherParentPortfolio |
+	
+	aParentPortfolio _ Portfolio new.
+	anAccount _ ReceptiveAccount new.
+	a100Deposit _ Deposit register: 100 on: anAccount.
+	aParentPortfolio add: anAccount.
+	aChildPortfolio _ Portfolio new.
+	aParentPortfolio add: aChildPortfolio.
+	
+	anotherParentPortfolio _ Portfolio new.
+	anotherParentPortfolio add: anAccount.
+	anotherChildPortfolio _ Portfolio new.
+	anotherParentPortfolio add: anotherChildPortfolio.
+	
+	
+	self should: [ aChildPortfolio add: anotherChildPortfolio.  ]
 		raise: Error
 		withMessageText: Portfolio alreadyAddedAssetErrorDescription.
 				
@@ -377,10 +407,20 @@ Object subclass: #FinancialAsset
 balance
 	self subclassResponsibility. ! !
 
+
+!FinancialAsset methodsFor: 'transactions' stamp: 'HG 11/8/2020 18:38:04'!
+transactions
+	self subclassResponsibility. ! !
+
+
+!FinancialAsset methodsFor: 'testing' stamp: 'HG 11/8/2020 18:37:55'!
+hasRegistered: aTransaction
+	self subclassResponsibility. ! !
+
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
 FinancialAsset subclass: #Portfolio
-	instanceVariableNames: 'assets'
+	instanceVariableNames: 'assets hierarchyState portfoliosThatContainsMe'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
@@ -392,9 +432,9 @@ balance
 	^assets sum: [:aFinancialAsset | aFinancialAsset balance].! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'HG 11/7/2020 19:50:09'!
+!Portfolio methodsFor: 'transactions' stamp: 'HG 11/8/2020 18:39:34'!
 transactions
-	^self collectAssetPropertiesWith: [:anAsset | anAsset transactions ] over: assets.	
+	^self collectAssetPropertiesWith: [:anAsset | anAsset transactions ] in: assets.	
 	
 	
 	! !
@@ -406,20 +446,22 @@ hasRegistered: aTransaction
 	! !
 
 
-!Portfolio methodsFor: 'accounts operations' stamp: 'HG 11/7/2020 19:43:50'!
+!Portfolio methodsFor: 'accounts operations' stamp: 'HG 11/8/2020 19:43:37'!
 add: anAssetToAdd 
-
-	(self roots anySatisfy: 
-		[:aRootAsset | (aRootAsset allAssets intersection: (anAssetToAdd allAssets)) isEmpty not.]) 
-		ifTrue: [self signalCantAddAlreadyAddedAsset. ]. 
-		
+	
+	self roots do: [:aRootAsset | 
+		(self checkForRepeatedElementsBetween: aRootAsset andRootsHierarchiesOf: anAssetToAdd) 
+			ifFalse: [^self signalCantAddAlreadyAddedAsset]].
+			
 	assets add: anAssetToAdd.
 	anAssetToAdd addParentPortfolio: self.  ! !
 
 
-!Portfolio methodsFor: 'initialization' stamp: 'HG 11/7/2020 20:11:04'!
+!Portfolio methodsFor: 'initialization' stamp: 'HG 11/8/2020 18:29:02'!
 initialize
-	assets _ OrderedCollection new.! !
+	assets _ OrderedCollection new.
+	hierarchyState _ RootState for: self.
+	portfoliosThatContainsMe _ OrderedCollection new.! !
 
 
 !Portfolio methodsFor: 'exceptions' stamp: 'HG 11/6/2020 19:31:25'!
@@ -427,26 +469,54 @@ signalCantAddAlreadyAddedAsset
 	^self error: self class alreadyAddedAssetErrorDescription. ! !
 
 
-!Portfolio methodsFor: 'accessing' stamp: 'HG 11/7/2020 19:49:30'!
+!Portfolio methodsFor: 'accessing' stamp: 'HG 11/8/2020 18:39:34'!
 allAssets
 	
 	| containedAssets |
-	containedAssets _ self collectAssetPropertiesWith: [:anAsset | anAsset allAssets ] over: assets.
+	containedAssets _ self collectAssetPropertiesWith: [:anAsset | anAsset allAssets ] in: assets.
 	containedAssets add: self.
 	^containedAssets.! !
 
-!Portfolio methodsFor: 'accessing' stamp: 'HG 11/7/2020 20:19:36'!
+!Portfolio methodsFor: 'accessing' stamp: 'HG 11/8/2020 18:39:51'!
 roots
-	self subclassResponsibility. ! !
+	^hierarchyState roots.! !
 
 
-!Portfolio methodsFor: '-- private' stamp: 'HG 11/7/2020 20:15:03'!
-addParentPortfolio: aPortfolioWhoAddTheAsset
-	self subclassResponsibility.! !
+!Portfolio methodsFor: 'testing -- private' stamp: 'HG 11/8/2020 19:43:37'!
+checkForRepeatedElementsBetween: aRootAsset andRootsHierarchiesOf: anAssetToAdd
 
-!Portfolio methodsFor: '-- private' stamp: 'HG 11/7/2020 19:49:57'!
-collectAssetPropertiesWith: anAssetPropertyBlock over: anAssetListToCollectFrom
+	^(anAssetToAdd roots) 
+		anySatisfy: [:anAssetToAddRoot | self portfolioHierarchy: aRootAsset isDisjointWith: anAssetToAddRoot].! !
+
+!Portfolio methodsFor: 'testing -- private' stamp: 'HG 11/8/2020 19:32:50'!
+portfolioHierarchy: aRootAsset isDisjointWith: anAssetToAddRoot
+
+	^ ((anAssetToAddRoot allAssets) intersection: (aRootAsset allAssets)) isEmpty! !
+
+!Portfolio methodsFor: 'testing -- private' stamp: 'HG 11/8/2020 19:25:19'!
+shouldAddAssetInHierarchy: anAssetToAdd checkingAlreadyContentOf: aRootAsset
+
+	^anAssetToAdd roots anySatisfy: 
+		[:anAssetToAddRoot | ((anAssetToAddRoot allAssets) intersection: (aRootAsset allAssets)) isEmpty not].! !
+
+
+!Portfolio methodsFor: 'accesing -- private' stamp: 'HG 11/8/2020 18:39:34'!
+collectAssetPropertiesWith: anAssetPropertyBlock in: anAssetListToCollectFrom
 	^(anAssetListToCollectFrom collect: [:anAsset | anAssetPropertyBlock value: anAsset ]) flatten.! !
+
+!Portfolio methodsFor: 'accesing -- private' stamp: 'HG 11/8/2020 18:39:34'!
+lookUpRootsBeingContainedPortfolio
+	^self collectAssetPropertiesWith: [:anAsset | anAsset roots ] in: portfoliosThatContainsMe.! !
+
+!Portfolio methodsFor: 'accesing -- private' stamp: 'HG 11/8/2020 18:34:33'!
+lookUpRootsBeingRootPortfolio
+	^{self}.! !
+
+
+!Portfolio methodsFor: 'adding -- private' stamp: 'HG 11/8/2020 18:31:02'!
+addParentPortfolio: aPortfolioWhoAddMe
+	hierarchyState _ ContainedState for: self.
+	portfoliosThatContainsMe add: aPortfolioWhoAddMe. ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -457,54 +527,6 @@ Portfolio class
 !Portfolio class methodsFor: 'error description' stamp: 'HG 11/6/2020 19:29:34'!
 alreadyAddedAssetErrorDescription
 	^'You cant add an already added asset.'.! !
-
-
-!Portfolio class methodsFor: 'instance creation' stamp: 'HG 11/7/2020 20:10:13'!
-new
-	^RootPortfolio basicNew.! !
-
-
-!classDefinition: #ContainedPortfolio category: #'Portfolio-Ejercicio'!
-Portfolio subclass: #ContainedPortfolio
-	instanceVariableNames: 'portfoliosThatContainsMe'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Ejercicio'!
-
-!ContainedPortfolio methodsFor: 'initialization' stamp: 'HG 11/7/2020 20:12:12'!
-initialize
-	portfoliosThatContainsMe _ OrderedCollection new.! !
-
-
-!ContainedPortfolio methodsFor: 'portfolio operations --private' stamp: 'HG 11/7/2020 20:15:34'!
-addParentPortfolio: aPortfolioWhoAddTheAsset
-	portfoliosThatContainsMe add: aPortfolioWhoAddTheAsset. ! !
-
-
-!ContainedPortfolio methodsFor: 'as yet unclassified' stamp: 'HG 11/7/2020 20:19:28'!
-roots
-	^self collectAssetPropertiesWith: [:anAsset | anAsset roots ] over: portfoliosThatContainsMe.! !
-
-
-!classDefinition: #RootPortfolio category: #'Portfolio-Ejercicio'!
-Portfolio subclass: #RootPortfolio
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Ejercicio'!
-
-!RootPortfolio methodsFor: 'portfolio operations --private' stamp: 'HG 11/7/2020 20:21:56'!
-addParentPortfolio: aPortfolioWhoAddTheAsset
-	| originalAssets |
-	originalAssets _ assets.
-	self become: ContainedPortfolio new.
-	assets _ originalAssets.
-	self addParentPortfolio: aPortfolioWhoAddTheAsset.! !
-
-
-!RootPortfolio methodsFor: 'as yet unclassified' stamp: 'HG 11/7/2020 20:19:18'!
-roots
-	^{self}.! !
 
 
 !classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
@@ -558,8 +580,63 @@ hasRegistered: aTransaction
 allAssets
 	^{self} asOrderedCollection.! !
 
+!ReceptiveAccount methodsFor: 'accesing' stamp: 'HG 11/8/2020 19:05:25'!
+roots
+	^{self} asOrderedCollection.! !
+
 
 !ReceptiveAccount methodsFor: '-- private' stamp: 'HG 11/6/2020 20:21:43'!
 addParentPortfolio: aPortfolioWhoAddTheAsset
 
 	^nil.! !
+
+
+!classDefinition: #PortfolioHierarchyState category: #'Portfolio-Ejercicio'!
+Object subclass: #PortfolioHierarchyState
+	instanceVariableNames: 'portfolio'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!PortfolioHierarchyState methodsFor: 'initialization' stamp: 'HG 11/8/2020 18:30:06'!
+initializeFor: aPortfolio
+	portfolio _ aPortfolio. ! !
+
+
+!PortfolioHierarchyState methodsFor: '-- private hierarchy' stamp: 'HG 11/8/2020 18:31:50'!
+roots
+	self subclassResponsibility. ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PortfolioHierarchyState class' category: #'Portfolio-Ejercicio'!
+PortfolioHierarchyState class
+	instanceVariableNames: ''!
+
+!PortfolioHierarchyState class methodsFor: 'instance creation' stamp: 'HG 11/8/2020 18:29:49'!
+for: aPortfolio
+	^self new initializeFor: aPortfolio. ! !
+
+
+!classDefinition: #ContainedState category: #'Portfolio-Ejercicio'!
+PortfolioHierarchyState subclass: #ContainedState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!ContainedState methodsFor: '-- private hierarchy' stamp: 'HG 11/8/2020 18:33:37'!
+roots
+	^portfolio lookUpRootsBeingContainedPortfolio.! !
+
+
+!classDefinition: #RootState category: #'Portfolio-Ejercicio'!
+PortfolioHierarchyState subclass: #RootState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!RootState methodsFor: '-- private hierarchy' stamp: 'HG 11/8/2020 18:33:14'!
+roots
+	^portfolio lookUpRootsBeingRootPortfolio. ! !
