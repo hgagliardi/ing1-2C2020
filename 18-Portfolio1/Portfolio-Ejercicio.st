@@ -1,4 +1,4 @@
-!classDefinition: #PortfolioTest category: #'Portfolio-Ejercicio'!
+!classDefinition: #PortfolioTest category: 'Portfolio-Ejercicio'!
 TestCase subclass: #PortfolioTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -19,8 +19,8 @@ test01PortfolioShouldBeEmptyWhenCreated
 	! !
 
 
-!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'HG 11/8/2020 19:56:17'!
-test02RegisterTransactionOfAdddedAccount
+!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'Fs 11/9/2020 00:09:39'!
+test02PortfolioRegistersTransactionOfAdddedAccount
 	
 	| aPortfolio anAccount aTransaction |
 	aPortfolio _ Portfolio new.
@@ -30,20 +30,20 @@ test02RegisterTransactionOfAdddedAccount
 	aPortfolio add: anAccount.
 	
 	self assert: aPortfolio balance equals: 100.
-	self deny: aPortfolio transactions isEmpty.
+	self assert: aPortfolio transactions size = 1.
 	self assert: (aPortfolio hasRegistered: aTransaction). 
 	! !
 
-!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'HG 11/8/2020 19:56:09'!
-test03RegisterTransactionsOfMultipleAccounts
+!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'Fs 11/9/2020 00:47:26'!
+test03PortfolioRegistersTransactionsOfMultipleAddedAccounts
 	
 	| aPortfolio anAccount a100Deposit a100Withdraw a300Deposit 
-	aNonAgregateAccount aNonAgregateTransaction another100Withdraw another300Deposit |
+	aNotAddedAccount aNotAddedTransaction another100Withdraw another300Deposit |
 	
 	aPortfolio _ Portfolio new.
 	
-	aNonAgregateAccount _ ReceptiveAccount new.
-	aNonAgregateTransaction _ Deposit register: 100 on: aNonAgregateAccount.
+	aNotAddedAccount _ ReceptiveAccount new.
+	aNotAddedTransaction _ Deposit register: 100 on: aNotAddedAccount.
 	
 	anAccount _ ReceptiveAccount new.
 	a100Deposit _ Deposit register: 100 on: anAccount.
@@ -66,21 +66,21 @@ test03RegisterTransactionsOfMultipleAccounts
 	self assert: (aPortfolio hasRegistered: a300Deposit). 
 	self assert: (aPortfolio hasRegistered: another100Withdraw). 
 	self assert: (aPortfolio hasRegistered: another300Deposit). 
-	self deny: (aPortfolio hasRegistered: aNonAgregateTransaction).
+	self deny: (aPortfolio hasRegistered: aNotAddedTransaction).
 	   
 	! !
 
-!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'HG 11/8/2020 19:56:01'!
-test04RegisterTransactionOfAddedPortfolio
+!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'Fs 11/9/2020 00:49:24'!
+test04PortfolioRegistersTransactionOfAddedPortfolio
 	
 	| aPortfolio anAccount aTransaction aPortfolioToAdd |
-	aPortfolio _ Portfolio new.
-	
-	aPortfolioToAdd _ Portfolio new.
 	anAccount _ ReceptiveAccount new.
 	aTransaction _ Deposit register: 100 on: anAccount.
-	aPortfolioToAdd add: anAccount.
 	
+	aPortfolio _ Portfolio new.
+	aPortfolioToAdd _ Portfolio new.
+	
+	aPortfolioToAdd add: anAccount.
 	aPortfolio add: aPortfolioToAdd.
 		
 	self assert: aPortfolio balance equals: 100.
@@ -89,8 +89,8 @@ test04RegisterTransactionOfAddedPortfolio
 	! !
 
 
-!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'HG 11/8/2020 19:55:54'!
-test05CanNotAddAlreadyAddedAccount
+!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'Fs 11/9/2020 00:21:27'!
+test05CannotAddAlreadyAddedAccount
 	
 	| aPortfolio anAccount a100Deposit  |
 	aPortfolio _ Portfolio new.
@@ -108,8 +108,8 @@ test05CanNotAddAlreadyAddedAccount
 	self assert: (aPortfolio hasRegistered: a100Deposit). 
 	! !
 
-!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'HG 11/8/2020 19:57:50'!
-test06CanNotAddAccountAlreadyAddedInHierarchy
+!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'Fs 11/9/2020 00:30:30'!
+test06CannotAddAccountAlreadyInASubPortfolio
 	
 	| aPortfolio aChildPortfolio anAccount a100Deposit  |
 	aPortfolio _ Portfolio new.
@@ -130,8 +130,8 @@ test06CanNotAddAccountAlreadyAddedInHierarchy
 	self assert: (aPortfolio hasRegistered: a100Deposit). 
 	! !
 
-!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'HG 11/8/2020 19:58:20'!
-test07CanNotAddRepeatedPortfolio
+!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'Fs 11/9/2020 00:30:43'!
+test07CannotAddAlreadyAddedPortfolio
 	
 	| aPortfolio aChildPortfolio |
 	aPortfolio _ Portfolio new.
@@ -148,13 +148,14 @@ test07CanNotAddRepeatedPortfolio
 	! !
 
 
-!PortfolioTest methodsFor: 'testing -- hierarchy checks' stamp: 'HG 11/8/2020 19:59:32'!
-test08CanNotAddPortfolioWithRepeatedAccountsInHierarchy
+!PortfolioTest methodsFor: 'testing -- hierarchy checks' stamp: 'Fs 11/9/2020 00:45:10'!
+test08ContainedPortfolioCannotAddAnotherPortfolioContainingAssetThatExistsInRootPortfolio
 	
 	| aParentPortfolio aPortfolioToAdd aChildPortfolio a100Deposit anAccount |
-	aParentPortfolio _ Portfolio new.
 	anAccount _ ReceptiveAccount new.
 	a100Deposit _ Deposit register: 100 on: anAccount.
+	
+	aParentPortfolio _ Portfolio new.
 	aParentPortfolio add: anAccount.
 	
 	aChildPortfolio _ Portfolio new.
@@ -173,23 +174,24 @@ test08CanNotAddPortfolioWithRepeatedAccountsInHierarchy
 	self assert: (aParentPortfolio hasRegistered: a100Deposit).
 	! !
 
-!PortfolioTest methodsFor: 'testing -- hierarchy checks' stamp: 'HG 11/8/2020 20:00:29'!
-test09CanNotAddPortfolioWithRepeatedElementsInAddedAssetHierarchy
+!PortfolioTest methodsFor: 'testing -- hierarchy checks' stamp: 'Fs 11/9/2020 00:45:52'!
+test09ContainedPortfolioWithAssetInRootPortfolioCannotAddAnotherContainedPortofolioWithSameAssetWithinItsRootPortfolio
 	
 	| aParentPortfolio aChildPortfolio a100Deposit anAccount anotherChildPortfolio anotherParentPortfolio |
-	
-	aParentPortfolio _ Portfolio new.
 	anAccount _ ReceptiveAccount new.
 	a100Deposit _ Deposit register: 100 on: anAccount.
+	
+	aParentPortfolio _ Portfolio new.
 	aParentPortfolio add: anAccount.
+	
 	aChildPortfolio _ Portfolio new.
 	aParentPortfolio add: aChildPortfolio.
 	
 	anotherParentPortfolio _ Portfolio new.
 	anotherParentPortfolio add: anAccount.
+
 	anotherChildPortfolio _ Portfolio new.
 	anotherParentPortfolio add: anotherChildPortfolio.
-	
 	
 	self should: [ aChildPortfolio add: anotherChildPortfolio.  ]
 		raise: Error
@@ -201,7 +203,7 @@ test09CanNotAddPortfolioWithRepeatedElementsInAddedAssetHierarchy
 	! !
 
 
-!classDefinition: #ReceptiveAccountTest category: #'Portfolio-Ejercicio'!
+!classDefinition: #ReceptiveAccountTest category: 'Portfolio-Ejercicio'!
 TestCase subclass: #ReceptiveAccountTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -292,7 +294,7 @@ test07AccountKnowsItsTransactions
 ! !
 
 
-!classDefinition: #AccountTransaction category: #'Portfolio-Ejercicio'!
+!classDefinition: #AccountTransaction category: 'Portfolio-Ejercicio'!
 Object subclass: #AccountTransaction
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -311,7 +313,7 @@ addToBalance: aReceptiveAccount
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'AccountTransaction class' category: #'Portfolio-Ejercicio'!
+!classDefinition: 'AccountTransaction class' category: 'Portfolio-Ejercicio'!
 AccountTransaction class
 	instanceVariableNames: ''!
 
@@ -326,7 +328,7 @@ register: aValue on: account
 	^ transaction! !
 
 
-!classDefinition: #Deposit category: #'Portfolio-Ejercicio'!
+!classDefinition: #Deposit category: 'Portfolio-Ejercicio'!
 AccountTransaction subclass: #Deposit
 	instanceVariableNames: 'value'
 	classVariableNames: ''
@@ -351,7 +353,7 @@ addToBalance: aReceptiveAccount
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Deposit class' category: #'Portfolio-Ejercicio'!
+!classDefinition: 'Deposit class' category: 'Portfolio-Ejercicio'!
 Deposit class
 	instanceVariableNames: ''!
 
@@ -361,7 +363,7 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #Withdraw category: #'Portfolio-Ejercicio'!
+!classDefinition: #Withdraw category: 'Portfolio-Ejercicio'!
 AccountTransaction subclass: #Withdraw
 	instanceVariableNames: 'value'
 	classVariableNames: ''
@@ -386,7 +388,7 @@ value
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Withdraw class' category: #'Portfolio-Ejercicio'!
+!classDefinition: 'Withdraw class' category: 'Portfolio-Ejercicio'!
 Withdraw class
 	instanceVariableNames: ''!
 
@@ -396,7 +398,7 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #FinancialAsset category: #'Portfolio-Ejercicio'!
+!classDefinition: #FinancialAsset category: 'Portfolio-Ejercicio'!
 Object subclass: #FinancialAsset
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -418,7 +420,7 @@ hasRegistered: aTransaction
 	self subclassResponsibility. ! !
 
 
-!classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
+!classDefinition: #Portfolio category: 'Portfolio-Ejercicio'!
 FinancialAsset subclass: #Portfolio
 	instanceVariableNames: 'assets hierarchyState portfoliosThatContainsMe'
 	classVariableNames: ''
@@ -432,9 +434,9 @@ balance
 	^assets sum: [:aFinancialAsset | aFinancialAsset balance].! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'HG 11/8/2020 18:39:34'!
+!Portfolio methodsFor: 'transactions' stamp: 'Fs 11/9/2020 02:29:02'!
 transactions
-	^self collectAssetPropertiesWith: [:anAsset | anAsset transactions ] in: assets.	
+	^self flattenCollect: [:anAsset | anAsset transactions ] in: assets.	
 	
 	
 	! !
@@ -446,11 +448,11 @@ hasRegistered: aTransaction
 	! !
 
 
-!Portfolio methodsFor: 'accounts operations' stamp: 'HG 11/8/2020 19:43:37'!
+!Portfolio methodsFor: 'adding' stamp: 'Fs 11/9/2020 02:44:23'!
 add: anAssetToAdd 
 	
-	self roots do: [:aRootAsset | 
-		(self checkForRepeatedElementsBetween: aRootAsset andRootsHierarchiesOf: anAssetToAdd) 
+	self roots do: [:aRootPortfolioThatContainsMe | 
+		(aRootPortfolioThatContainsMe isDisjointWithPortfoliosThatContains: anAssetToAdd) 
 			ifFalse: [^self signalCantAddAlreadyAddedAsset]].
 			
 	assets add: anAssetToAdd.
@@ -469,58 +471,51 @@ signalCantAddAlreadyAddedAsset
 	^self error: self class alreadyAddedAssetErrorDescription. ! !
 
 
-!Portfolio methodsFor: 'accessing' stamp: 'HG 11/8/2020 18:39:34'!
+!Portfolio methodsFor: 'testing -- private' stamp: 'Fs 11/9/2020 01:32:43'!
+isDisjointWith: anotherAsset
+
+	^ ((anotherAsset allAssets) intersection: (self allAssets)) isEmpty! !
+
+!Portfolio methodsFor: 'testing -- private' stamp: 'Fs 11/9/2020 02:31:45'!
+isDisjointWithPortfoliosThatContains: anAsset 
+
+	^(anAsset roots) 
+		anySatisfy: [:anAssetRoot |   self isDisjointWith: anAssetRoot].! !
+
+
+!Portfolio methodsFor: 'accesing -- private' stamp: 'Fs 11/9/2020 02:29:02'!
 allAssets
-	
 	| containedAssets |
-	containedAssets _ self collectAssetPropertiesWith: [:anAsset | anAsset allAssets ] in: assets.
+	
+	containedAssets _ self flattenCollect: [:anAsset | anAsset allAssets ] in: assets.
 	containedAssets add: self.
 	^containedAssets.! !
 
-!Portfolio methodsFor: 'accessing' stamp: 'HG 11/8/2020 18:39:51'!
+!Portfolio methodsFor: 'accesing -- private' stamp: 'Fs 11/9/2020 02:29:46'!
+flattenCollect: anEvaluatingBlock in: aListToCollectFrom
+	^(aListToCollectFrom collect: [:anElement | anEvaluatingBlock value: anElement ]) flatten.! !
+
+!Portfolio methodsFor: 'accesing -- private' stamp: 'Fs 11/9/2020 02:29:02'!
+lookUpRootsWhenContainedPortfolio
+	^self flattenCollect: [:anAsset | anAsset roots ] in: portfoliosThatContainsMe.! !
+
+!Portfolio methodsFor: 'accesing -- private' stamp: 'Fs 11/9/2020 00:40:07'!
+lookUpRootsWhenRootPortfolio
+	^{self}.! !
+
+!Portfolio methodsFor: 'accesing -- private' stamp: 'HG 11/8/2020 18:39:51'!
 roots
 	^hierarchyState roots.! !
 
 
-!Portfolio methodsFor: 'testing -- private' stamp: 'HG 11/8/2020 19:43:37'!
-checkForRepeatedElementsBetween: aRootAsset andRootsHierarchiesOf: anAssetToAdd
-
-	^(anAssetToAdd roots) 
-		anySatisfy: [:anAssetToAddRoot | self portfolioHierarchy: aRootAsset isDisjointWith: anAssetToAddRoot].! !
-
-!Portfolio methodsFor: 'testing -- private' stamp: 'HG 11/8/2020 19:32:50'!
-portfolioHierarchy: aRootAsset isDisjointWith: anAssetToAddRoot
-
-	^ ((anAssetToAddRoot allAssets) intersection: (aRootAsset allAssets)) isEmpty! !
-
-!Portfolio methodsFor: 'testing -- private' stamp: 'HG 11/8/2020 19:25:19'!
-shouldAddAssetInHierarchy: anAssetToAdd checkingAlreadyContentOf: aRootAsset
-
-	^anAssetToAdd roots anySatisfy: 
-		[:anAssetToAddRoot | ((anAssetToAddRoot allAssets) intersection: (aRootAsset allAssets)) isEmpty not].! !
-
-
-!Portfolio methodsFor: 'accesing -- private' stamp: 'HG 11/8/2020 18:39:34'!
-collectAssetPropertiesWith: anAssetPropertyBlock in: anAssetListToCollectFrom
-	^(anAssetListToCollectFrom collect: [:anAsset | anAssetPropertyBlock value: anAsset ]) flatten.! !
-
-!Portfolio methodsFor: 'accesing -- private' stamp: 'HG 11/8/2020 18:39:34'!
-lookUpRootsBeingContainedPortfolio
-	^self collectAssetPropertiesWith: [:anAsset | anAsset roots ] in: portfoliosThatContainsMe.! !
-
-!Portfolio methodsFor: 'accesing -- private' stamp: 'HG 11/8/2020 18:34:33'!
-lookUpRootsBeingRootPortfolio
-	^{self}.! !
-
-
-!Portfolio methodsFor: 'adding -- private' stamp: 'HG 11/8/2020 18:31:02'!
-addParentPortfolio: aPortfolioWhoAddMe
+!Portfolio methodsFor: 'adding -- private' stamp: 'Fs 11/9/2020 01:54:01'!
+addParentPortfolio: aPortfolioThatAddsMe
 	hierarchyState _ ContainedState for: self.
-	portfoliosThatContainsMe add: aPortfolioWhoAddMe. ! !
+	portfoliosThatContainsMe add: aPortfolioThatAddsMe. ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
+!classDefinition: 'Portfolio class' category: 'Portfolio-Ejercicio'!
 Portfolio class
 	instanceVariableNames: ''!
 
@@ -529,7 +524,7 @@ alreadyAddedAssetErrorDescription
 	^'You cant add an already added asset.'.! !
 
 
-!classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
+!classDefinition: #ReceptiveAccount category: 'Portfolio-Ejercicio'!
 FinancialAsset subclass: #ReceptiveAccount
 	instanceVariableNames: 'transactions balanceCount'
 	classVariableNames: ''
@@ -555,11 +550,11 @@ transactions
 	^ transactions copy! !
 
 
-!ReceptiveAccount methodsFor: 'balance contributions --private' stamp: 'HG 11/6/2020 10:43:42'!
+!ReceptiveAccount methodsFor: 'balance --private' stamp: 'HG 11/6/2020 10:43:42'!
 contributeToBalanceAsDeposit: anAccountTransactionValue
 	balanceCount _ balanceCount + anAccountTransactionValue. ! !
 
-!ReceptiveAccount methodsFor: 'balance contributions --private' stamp: 'HG 11/6/2020 10:43:51'!
+!ReceptiveAccount methodsFor: 'balance --private' stamp: 'HG 11/6/2020 10:43:51'!
 contributeToBalanceAsWithdraw: anAccountTransactionValue
 	balanceCount _ balanceCount - anAccountTransactionValue. ! !
 
@@ -585,13 +580,12 @@ roots
 	^{self} asOrderedCollection.! !
 
 
-!ReceptiveAccount methodsFor: '-- private' stamp: 'HG 11/6/2020 20:21:43'!
+!ReceptiveAccount methodsFor: 'adding -- private' stamp: 'Fs 11/9/2020 01:53:41'!
 addParentPortfolio: aPortfolioWhoAddTheAsset
-
 	^nil.! !
 
 
-!classDefinition: #PortfolioHierarchyState category: #'Portfolio-Ejercicio'!
+!classDefinition: #PortfolioHierarchyState category: 'Portfolio-Ejercicio'!
 Object subclass: #PortfolioHierarchyState
 	instanceVariableNames: 'portfolio'
 	classVariableNames: ''
@@ -609,7 +603,7 @@ roots
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'PortfolioHierarchyState class' category: #'Portfolio-Ejercicio'!
+!classDefinition: 'PortfolioHierarchyState class' category: 'Portfolio-Ejercicio'!
 PortfolioHierarchyState class
 	instanceVariableNames: ''!
 
@@ -618,25 +612,25 @@ for: aPortfolio
 	^self new initializeFor: aPortfolio. ! !
 
 
-!classDefinition: #ContainedState category: #'Portfolio-Ejercicio'!
+!classDefinition: #ContainedState category: 'Portfolio-Ejercicio'!
 PortfolioHierarchyState subclass: #ContainedState
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!ContainedState methodsFor: '-- private hierarchy' stamp: 'HG 11/8/2020 18:33:37'!
+!ContainedState methodsFor: '-- private hierarchy' stamp: 'Fs 11/9/2020 00:40:17'!
 roots
-	^portfolio lookUpRootsBeingContainedPortfolio.! !
+	^portfolio lookUpRootsWhenContainedPortfolio.! !
 
 
-!classDefinition: #RootState category: #'Portfolio-Ejercicio'!
+!classDefinition: #RootState category: 'Portfolio-Ejercicio'!
 PortfolioHierarchyState subclass: #RootState
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!RootState methodsFor: '-- private hierarchy' stamp: 'HG 11/8/2020 18:33:14'!
+!RootState methodsFor: '-- private hierarchy' stamp: 'Fs 11/9/2020 00:40:07'!
 roots
-	^portfolio lookUpRootsBeingRootPortfolio. ! !
+	^portfolio lookUpRootsWhenRootPortfolio. ! !
