@@ -1,3 +1,31 @@
+!classDefinition: #AccountSummaryTest category: 'Portfolio-Solucion'!
+TestCase subclass: #AccountSummaryTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'HG 11/12/2020 19:28:14'!
+test01
+	
+	| account |
+	
+	account _ ReceptiveAccount new.
+	self assert: account summary last equals: 'Balance = 0'.
+	! !
+
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'HG 11/12/2020 19:29:09'!
+test02
+	
+	| account |
+	
+	account _ ReceptiveAccount new.
+	Deposit register: 500 on: account. 
+	
+	self assert: account summary first equals: 'Deposito por 500'.
+	self assert: account summary last equals: 'Balance = 500'.	! !
+
+
 !classDefinition: #PortfolioTest category: 'Portfolio-Solucion'!
 TestCase subclass: #PortfolioTest
 	instanceVariableNames: ''
@@ -634,7 +662,6 @@ isComposedBy: anAccount
 	^ self = anAccount or: [ accounts anySatisfy: [ :composedAccount | (composedAccount isComposedBy: anAccount) or: [ anAccount isComposedBy: composedAccount ]]]! !
 
 
-
 !Portfolio methodsFor: 'initialization' stamp: 'HAW 5/25/2019 12:03:18'!
 initialize
 
@@ -859,6 +886,17 @@ addParentPortfolio: aPortfolioWhoAddTheAsset
 addedTo: aPortfolio 
 	
 	! !
+
+
+!ReceptiveAccount methodsFor: 'reports' stamp: 'HG 11/12/2020 19:35:32'!
+summary
+	
+	| report |
+	
+	report _ OrderedCollection new.
+	self transactions do: [:aTransaction | (aTransaction isKindOf: Deposit) ifTrue: [ report add: ('Deposito por ', aTransaction value asString)] ].
+	report add: ('Balance = ', self balance asString).
+	^report.! !
 
 
 !classDefinition: #AccountTransaction category: 'Portfolio-Solucion'!
