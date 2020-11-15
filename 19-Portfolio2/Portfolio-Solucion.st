@@ -1,234 +1,224 @@
-!classDefinition: #AccountSummaryTest category: 'Portfolio-Solucion'!
+!classDefinition: #AccountSummaryTest category: #'Portfolio-Solucion'!
 TestCase subclass: #AccountSummaryTest
-	instanceVariableNames: ''
+	instanceVariableNames: 'oneTab twoTabs threeTabs'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'HG 11/12/2020 19:28:14'!
-test01
+!AccountSummaryTest methodsFor: 'account summary test' stamp: 'HG 11/14/2020 09:51:40'!
+test01EmptyReceptiveAccountReportsZeroBalanceSummary
 	
-	| account |
+	| account summary |
 	
 	account _ ReceptiveAccount new.
-	self assert: account summary last equals: 'Balance = 0'.
+	summary _ AccountSummary for: account.
+	
+	self assert: summary report last equals: 'Balance = 0'.
 	! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'HG 11/12/2020 19:29:09'!
-test02
+!AccountSummaryTest methodsFor: 'account summary test' stamp: 'HG 11/15/2020 17:54:28'!
+test02ReceptiveAccountReportsDepositSummary
 	
-	| account |
+	| account summary |
 	
 	account _ ReceptiveAccount new.
 	Deposit register: 500 on: account. 
+	summary _ AccountSummary for: account.
 	
-	self assert: account summary first equals: 'Deposito por 500'.
-	self assert: account summary last equals: 'Balance = 500'.	! !
+	self assert: summary report first equals: 'Deposito por 500'.
+	self assert: summary report last equals: 'Balance = 500'.	! !
+
+!AccountSummaryTest methodsFor: 'account summary test' stamp: 'HG 11/15/2020 17:55:00'!
+test03ReceptiveAccountReportsTransferOperations
+	
+	| srcAccount summary dstAccount |
+	
+	srcAccount _ ReceptiveAccount new.
+	Deposit register: 500 on: srcAccount. 
+	Withdraw register: 100 on: srcAccount. 
+	dstAccount _ ReceptiveAccount new.
+	
+	Transference from: dstAccount to: srcAccount  registerWithValue: 500.
+	Transference from: srcAccount to: dstAccount  registerWithValue: 500.
+	  
+	summary _ AccountSummary for: srcAccount.
+	
+	self assert: summary report first equals: 'Deposito por 500'.
+	self assert: summary report second equals: 'Extracción por 100'.
+	self assert: summary report third equals: 'Entrada por transferencia de 500'.
+	self assert: summary report fourth equals: 'Salida por transferencia de 500'.
+	self assert: summary report fifth equals: 'Balance = 400'.	! !
+
+!AccountSummaryTest methodsFor: 'account summary test' stamp: 'HG 11/15/2020 17:55:19'!
+test04PortfolioReportsTransferOperations
+	
+	| account portfolio summary dstAccount |
+	
+	account _ ReceptiveAccount new.
+	dstAccount _ ReceptiveAccount new.
+	Deposit register: 500 on: account. 
+	Withdraw register: 100 on: account. 
+	
+	Transference from: account to: dstAccount  registerWithValue: 500.
+	Transference from: dstAccount to: account  registerWithValue: 500.
+
+	portfolio _ Portfolio new.
+	portfolio add: account.
+	
+	summary _ AccountSummary for: portfolio.
+	
+	self assert: summary report first equals: 'Deposito por 500'.
+	self assert: summary report second equals: 'Extracción por 100'.
+	self assert: summary report third equals: 'Salida por transferencia de 500'.
+	self assert: summary report fourth equals: 'Entrada por transferencia de 500'.
+	self assert: summary report fifth equals: 'Balance = 400'.	! !
+
+
+!AccountSummaryTest methodsFor: 'transfer net test' stamp: 'HG 11/15/2020 17:56:11'!
+test05EmptyAccountReportsZeroTransferNet
+	
+	| srcAccount summary |
+	
+	srcAccount _ ReceptiveAccount new.
+	summary _ TransferNetSummary for: srcAccount.
+	
+	self assert: summary report equals: 0.! !
+
+!AccountSummaryTest methodsFor: 'transfer net test' stamp: 'HG 11/15/2020 18:01:06'!
+test06AccountReportsOneTransferenceValueAsTransferNetSummary
+	
+	| srcAccount summary dstAccount |
+	
+	srcAccount _ ReceptiveAccount new.
+	dstAccount _ ReceptiveAccount new.
+	
+	Transference from: srcAccount to: dstAccount  registerWithValue: 400.
+	Transference from: dstAccount to: srcAccount  registerWithValue: 500.
+	
+	summary _ TransferNetSummary for: srcAccount.
+	
+	self assert: summary report equals: 100.! !
+
+!AccountSummaryTest methodsFor: 'transfer net test' stamp: 'HG 11/15/2020 18:01:39'!
+test07AccountReportsMultipleTransferencesBalanceAsTransferNetSummary
+	
+	| srcAccount summary dstAccount |
+	
+	srcAccount _ ReceptiveAccount new.
+	dstAccount _ ReceptiveAccount new.
+	
+	Transference from: srcAccount to: dstAccount  registerWithValue: 400.
+	Transference from: srcAccount to: dstAccount  registerWithValue: 400.
+	Transference from: dstAccount to: srcAccount  registerWithValue: 500.
+	
+	summary _ TransferNetSummary for: srcAccount.
+	
+	self assert: summary report equals: -300.! !
+
+!AccountSummaryTest methodsFor: 'transfer net test' stamp: 'HG 11/15/2020 18:02:02'!
+test08PortfolioReportsTransferencesBalanceAsTransferNetSummary
+	
+	| srcAccount summary dstAccount portfolio |
+	
+	srcAccount _ ReceptiveAccount new.
+	dstAccount _ ReceptiveAccount new.
+	
+	Transference from: srcAccount to: dstAccount  registerWithValue: 400.
+	Transference from: srcAccount to: dstAccount  registerWithValue: 400.
+	Transference from: dstAccount to: srcAccount  registerWithValue: 500.
+	
+	portfolio _ Portfolio new.
+	portfolio add: srcAccount. 
+	
+	summary _ TransferNetSummary for: portfolio.
+	
+	self assert: summary report equals: -300.! !
+
+
+!AccountSummaryTest methodsFor: 'setup' stamp: 'HG 11/15/2020 17:39:02'!
+setUp
+
+	oneTab _ String tab.
+	twoTabs _ String tab, String tab.
+	threeTabs _ String tab, String tab, String tab.! !
+
+
+!AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'HG 11/15/2020 18:03:55'!
+test09EmptyPortfolioReportsItsNameAsPortfolioTree
+	
+	| portfolio summary portfolioName |
+	
+	portfolioName _ 'Portfolio vacío'.
+	portfolio _ Portfolio named: portfolioName.
+	summary _ PorfolioTreeSummary for: portfolio.
+	
+	self assert: summary report first equals: portfolioName.! !
+
+!AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'HG 11/15/2020 18:04:22'!
+test10PortfolioWithAccountReportsHierarchyCorrectly
+	
+	| portfolio summary portfolioName account accountName |
+	
+	portfolioName _ 'Portfolio principal'.
+	accountName _ 'Cuenta de prueba'.
+	account _ ReceptiveAccount named: accountName.
+	portfolio _ Portfolio named: portfolioName.
+	portfolio add: account.
+	
+	summary _ PorfolioTreeSummary for: portfolio.
+	
+	self assert: summary report first equals: portfolioName.	
+	self assert: summary report second equals: (oneTab,accountName).! !
+
+!AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'HG 11/15/2020 18:04:57'!
+test11MultipleLevelChildPortfolioReturnsHierarchyCorrectly
+	
+	| portfolio summary portfolioName account accountName childPortfolioName portfolioChild childAccount |
+	
+	portfolioName _ 'Portfolio principal'.
+	accountName _ 'Cuenta de prueba'.
+	childPortfolioName _ 'Portfolio hijo'.
+	account _ ReceptiveAccount named: accountName.
+	childAccount _ ReceptiveAccount named: accountName.
+	portfolio _ Portfolio named: portfolioName.
+	portfolioChild _ Portfolio named: childPortfolioName. 
+	portfolioChild add: childAccount.
+	portfolio add: account.
+	portfolio add: portfolioChild.
+	
+	summary _ PorfolioTreeSummary for: portfolio.
+	
+	self assert: summary report first equals: portfolioName.	
+	self assert: summary report second equals: (oneTab,accountName).
+	self assert: summary report third equals: (oneTab,childPortfolioName).
+	self assert: summary report fourth equals: (twoTabs,accountName).
+! !
+
+!AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'HG 11/15/2020 18:38:27'!
+test12ReceptiveAccountCantReportAPortfolioTreeSummary
+	
+	| account accountName summary |
+	accountName _ 'Cuenta de prueba'.
+	account _ ReceptiveAccount named: accountName.
+	
+	summary _ PorfolioTreeSummary for: account.
+	
+	self
+		should: [ summary report ]
+		raise: Error
+		withMessageText: ReceptiveAccount receptiveAccountCantReportPortfolioTreeErrorDescription.
+! !
 
 
-!classDefinition: #PortfolioTest category: 'Portfolio-Solucion'!
+!classDefinition: #PortfolioTest category: #'Portfolio-Solucion'!
 TestCase subclass: #PortfolioTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!PortfolioTest methodsFor: 'testing -- creating' stamp: 'HG 11/8/2020 19:56:23'!
-test01PortfolioShouldBeEmptyWhenCreated
-	
-	| aPortfolio anAccount aTransaction |
-	aPortfolio _ Portfolio new.
-	anAccount _ ReceptiveAccount new.
-	aTransaction _ Deposit register: 100 on: anAccount.
-	
-	self assert: aPortfolio balance equals: 0.
-	self assert: aPortfolio transactions isEmpty.
-	self deny: (aPortfolio hasRegistered: aTransaction). 
-	! !
 
 
-!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'Fs 11/9/2020 00:09:39'!
-test02PortfolioRegistersTransactionOfAdddedAccount
-	
-	| aPortfolio anAccount aTransaction |
-	aPortfolio _ Portfolio new.
-	anAccount _ ReceptiveAccount new.
-	aTransaction _ Deposit register: 100 on: anAccount.
-	
-	aPortfolio add: anAccount.
-	
-	self assert: aPortfolio balance equals: 100.
-	self assert: aPortfolio transactions size = 1.
-	self assert: (aPortfolio hasRegistered: aTransaction). 
-	! !
-
-!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'Fs 11/9/2020 00:47:26'!
-test03PortfolioRegistersTransactionsOfMultipleAddedAccounts
-	
-	| aPortfolio anAccount a100Deposit a100Withdraw a300Deposit 
-	aNotAddedAccount aNotAddedTransaction another100Withdraw another300Deposit |
-	
-	aPortfolio _ Portfolio new.
-	
-	aNotAddedAccount _ ReceptiveAccount new.
-	aNotAddedTransaction _ Deposit register: 100 on: aNotAddedAccount.
-	
-	anAccount _ ReceptiveAccount new.
-	a100Deposit _ Deposit register: 100 on: anAccount.
-	aPortfolio add: anAccount.
-	
-	anAccount _ ReceptiveAccount new.
-	a300Deposit _ Deposit register: 300 on: anAccount.
-	a100Withdraw _ Withdraw register: 100 on: anAccount.
-	aPortfolio add: anAccount.
-	
-	anAccount _ ReceptiveAccount new.
-	another300Deposit _ Deposit register: 300 on: anAccount.
-	another100Withdraw _ Withdraw register: 100 on: anAccount.
-	aPortfolio add: anAccount.
-	
-	self assert: aPortfolio balance equals: 500.
-	self assert: aPortfolio transactions size = 5.
-	self assert: (aPortfolio hasRegistered: a100Deposit). 
-	self assert: (aPortfolio hasRegistered: a100Withdraw). 
-	self assert: (aPortfolio hasRegistered: a300Deposit). 
-	self assert: (aPortfolio hasRegistered: another100Withdraw). 
-	self assert: (aPortfolio hasRegistered: another300Deposit). 
-	self deny: (aPortfolio hasRegistered: aNotAddedTransaction).
-	   
-	! !
-
-!PortfolioTest methodsFor: 'testing -- adding assets' stamp: 'Fs 11/9/2020 00:49:24'!
-test04PortfolioRegistersTransactionOfAddedPortfolio
-	
-	| aPortfolio anAccount aTransaction aPortfolioToAdd |
-	anAccount _ ReceptiveAccount new.
-	aTransaction _ Deposit register: 100 on: anAccount.
-	
-	aPortfolio _ Portfolio new.
-	aPortfolioToAdd _ Portfolio new.
-	
-	aPortfolioToAdd add: anAccount.
-	aPortfolio add: aPortfolioToAdd.
-		
-	self assert: aPortfolio balance equals: 100.
-	self assert: aPortfolio transactions size = 1.
-	self assert: (aPortfolio hasRegistered: aTransaction). 
-	! !
-
-
-!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'Fs 11/9/2020 00:21:27'!
-test05CannotAddAlreadyAddedAccount
-	
-	| aPortfolio anAccount a100Deposit  |
-	aPortfolio _ Portfolio new.
-	
-	anAccount _ ReceptiveAccount new.
-	a100Deposit _ Deposit register: 100 on: anAccount.
-	aPortfolio add: anAccount.
-	
-	self should: [ aPortfolio add: anAccount. ]
-		raise: Error
-		withMessageText: Portfolio alreadyAddedAssetErrorDescription.
-				
-	self assert: aPortfolio balance equals: 100.
-	self assert: aPortfolio transactions size = 1.
-	self assert: (aPortfolio hasRegistered: a100Deposit). 
-	! !
-
-!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'Fs 11/9/2020 00:30:30'!
-test06CannotAddAccountAlreadyInASubPortfolio
-	
-	| aPortfolio aChildPortfolio anAccount a100Deposit  |
-	aPortfolio _ Portfolio new.
-	
-	aChildPortfolio _ Portfolio new.
-	
-	anAccount _ ReceptiveAccount new.
-	a100Deposit _ Deposit register: 100 on: anAccount.
-	aChildPortfolio add: anAccount.
-	aPortfolio add: aChildPortfolio. 
-	
-	self should: [ aPortfolio add: anAccount. ]
-		raise: Error
-		withMessageText: Portfolio alreadyAddedAssetErrorDescription.
-				
-	self assert: aPortfolio balance equals: 100.
-	self assert: aPortfolio transactions size = 1.
-	self assert: (aPortfolio hasRegistered: a100Deposit). 
-	! !
-
-!PortfolioTest methodsFor: 'testing -- repeated elements' stamp: 'Fs 11/9/2020 00:30:43'!
-test07CannotAddAlreadyAddedPortfolio
-	
-	| aPortfolio aChildPortfolio |
-	aPortfolio _ Portfolio new.
-	aChildPortfolio _ Portfolio new.
-	
-	aPortfolio add: aChildPortfolio. 
-	
-	self should: [ aPortfolio add: aChildPortfolio.  ]
-		raise: Error
-		withMessageText: Portfolio alreadyAddedAssetErrorDescription.
-				
-	self assert: aPortfolio balance equals: 0.
-	self assert: aPortfolio transactions size = 0.
-	! !
-
-
-!PortfolioTest methodsFor: 'testing -- hierarchy checks' stamp: 'Fs 11/9/2020 00:45:10'!
-test08ContainedPortfolioCannotAddAnotherPortfolioContainingAssetThatExistsInRootPortfolio
-	
-	| aParentPortfolio aPortfolioToAdd aChildPortfolio a100Deposit anAccount |
-	anAccount _ ReceptiveAccount new.
-	a100Deposit _ Deposit register: 100 on: anAccount.
-	
-	aParentPortfolio _ Portfolio new.
-	aParentPortfolio add: anAccount.
-	
-	aChildPortfolio _ Portfolio new.
-	aParentPortfolio add: aChildPortfolio.
-	
-	aPortfolioToAdd _ Portfolio new.
-	aPortfolioToAdd add: anAccount.
-	
-	
-	self should: [ aChildPortfolio add: aPortfolioToAdd.  ]
-		raise: Error
-		withMessageText: Portfolio alreadyAddedAssetErrorDescription.
-				
-	self assert: aParentPortfolio balance equals: 100.
-	self assert: aParentPortfolio transactions size = 1.
-	self assert: (aParentPortfolio hasRegistered: a100Deposit).
-	! !
-
-!PortfolioTest methodsFor: 'testing -- hierarchy checks' stamp: 'Fs 11/9/2020 00:45:52'!
-test09ContainedPortfolioWithAssetInRootPortfolioCannotAddAnotherContainedPortofolioWithSameAssetWithinItsRootPortfolio
-	
-	| aParentPortfolio aChildPortfolio a100Deposit anAccount anotherChildPortfolio anotherParentPortfolio |
-	anAccount _ ReceptiveAccount new.
-	a100Deposit _ Deposit register: 100 on: anAccount.
-	
-	aParentPortfolio _ Portfolio new.
-	aParentPortfolio add: anAccount.
-	
-	aChildPortfolio _ Portfolio new.
-	aParentPortfolio add: aChildPortfolio.
-	
-	anotherParentPortfolio _ Portfolio new.
-	anotherParentPortfolio add: anAccount.
-
-	anotherChildPortfolio _ Portfolio new.
-	anotherParentPortfolio add: anotherChildPortfolio.
-	
-	self should: [ aChildPortfolio add: anotherChildPortfolio.  ]
-		raise: Error
-		withMessageText: Portfolio alreadyAddedAssetErrorDescription.
-				
-	self assert: aParentPortfolio balance equals: 100.
-	self assert: aParentPortfolio transactions size = 1.
-	self assert: (aParentPortfolio hasRegistered: a100Deposit).
-	! !
 
 
 !PortfolioTest methodsFor: 'tests' stamp: 'HAW 5/25/2019 11:16:26'!
@@ -440,7 +430,7 @@ test15PortfolioCanNotIncludeAnyOfTheComposedAccountOfPortfolioToAdd
 			self assert: portfolioToModify accountsIsEmpty ]! !
 
 
-!classDefinition: #ReceptiveAccountTest category: 'Portfolio-Solucion'!
+!classDefinition: #ReceptiveAccountTest category: #'Portfolio-Solucion'!
 TestCase subclass: #ReceptiveAccountTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -531,15 +521,15 @@ test07AccountKnowsItsTransactions
 ! !
 
 
-!classDefinition: #TransferenceTest category: 'Portfolio-Solucion'!
+!classDefinition: #TransferenceTest category: #'Portfolio-Solucion'!
 TestCase subclass: #TransferenceTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'Fs 11/9/2020 19:48:42'!
-test01
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/14/2020 09:51:41'!
+test01EmptyReceptiveAccountReportsZeroBalanceSummary
 	| destinationAccount sourceAccount |
 	sourceAccount _ ReceptiveAccount new.
 	Deposit register: 100 on: sourceAccount .
@@ -552,8 +542,8 @@ test01
 	self assert: destinationAccount balance equals: 60.
 	! !
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'Fs 11/9/2020 20:06:33'!
-test02
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/15/2020 17:54:28'!
+test02ReceptiveAccountReportsDepositSummary
 	| destinationAccount sourceAccount |
 	sourceAccount _ ReceptiveAccount new.
 	Deposit register: 100 on: sourceAccount .
@@ -565,8 +555,8 @@ test02
 		withMessageText: (Transference cannotTransferNegativeMoneyErrorDescription).
 	! !
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'Fs 11/9/2020 20:09:45'!
-test03
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/15/2020 17:55:00'!
+test03ReceptiveAccountReportsTransferOperations
 	| anAccount |
 	anAccount _ ReceptiveAccount new.
 	Deposit register: 100 on: anAccount .
@@ -575,8 +565,32 @@ test03
 		raise:Error
 		withMessageText: Transference cannotTransferFromAccountToSameAccount.! !
 
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/15/2020 17:55:19'!
+test04PortfolioReportsTransferOperations
+	| srcAccount dstAccount transference |
+	srcAccount _ ReceptiveAccount new.
+	dstAccount _ ReceptiveAccount new.
+	
+	transference _ Transference from: srcAccount to: dstAccount registerWithValue: 100. 
+	
+	self assert: srcAccount transactions includes: transference withdrawOperation.
+	self assert: dstAccount transactions includes: transference depositOperation.! !
+
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/15/2020 17:56:11'!
+test05EmptyAccountReportsZeroTransferNet
+
+	| srcAccount dstAccount transference |
+	srcAccount _ ReceptiveAccount new.
+	dstAccount _ ReceptiveAccount new.
+	
+	transference _ Transference from: srcAccount to: dstAccount registerWithValue: 100. 
+	
+	self assert: srcAccount transactions first transferenceFrom equals: transference.
+	self assert: dstAccount transactions first transferenceFrom equals: transference.
+	self assert: transference value equals: 100.! !
+
 
-!classDefinition: #Account category: 'Portfolio-Solucion'!
+!classDefinition: #Account category: #'Portfolio-Solucion'!
 Object subclass: #Account
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -617,9 +631,9 @@ addedTo: aPortfolio
 	self subclassResponsibility ! !
 
 
-!classDefinition: #Portfolio category: 'Portfolio-Solucion'!
+!classDefinition: #Portfolio category: #'Portfolio-Solucion'!
 Account subclass: #Portfolio
-	instanceVariableNames: 'accounts parents'
+	instanceVariableNames: 'accounts parents name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
@@ -668,53 +682,14 @@ initialize
 	accounts := OrderedCollection new.
 	parents := OrderedCollection new.! !
 
+!Portfolio methodsFor: 'initialization' stamp: 'HG 11/15/2020 16:27:06'!
+initializeWithName: aName 
+	name := aName.! !
+
 
 !Portfolio methodsFor: 'exceptions' stamp: 'HG 11/6/2020 19:31:25'!
 signalCantAddAlreadyAddedAsset
 	^self error: self class alreadyAddedAssetErrorDescription. ! !
-
-
-!Portfolio methodsFor: 'testing -- private' stamp: 'Fs 11/9/2020 01:32:43'!
-isDisjointWith: anotherAsset
-
-	^ ((anotherAsset allAssets) intersection: (self allAssets)) isEmpty! !
-
-!Portfolio methodsFor: 'testing -- private' stamp: 'Fs 11/9/2020 02:31:45'!
-isDisjointWithPortfoliosThatContains: anAsset 
-
-	^(anAsset roots) 
-		anySatisfy: [:anAssetRoot |   self isDisjointWith: anAssetRoot].! !
-
-
-!Portfolio methodsFor: 'accesing -- private' stamp: 'Fs 11/9/2020 02:29:02'!
-allAssets
-	| containedAssets |
-	
-	containedAssets _ self flattenCollect: [:anAsset | anAsset allAssets ] in: assets.
-	containedAssets add: self.
-	^containedAssets.! !
-
-!Portfolio methodsFor: 'accesing -- private' stamp: 'Fs 11/9/2020 02:29:46'!
-flattenCollect: anEvaluatingBlock in: aListToCollectFrom
-	^(aListToCollectFrom collect: [:anElement | anEvaluatingBlock value: anElement ]) flatten.! !
-
-!Portfolio methodsFor: 'accesing -- private' stamp: 'Fs 11/9/2020 02:29:02'!
-lookUpRootsWhenContainedPortfolio
-	^self flattenCollect: [:anAsset | anAsset roots ] in: portfoliosThatContainsMe.! !
-
-!Portfolio methodsFor: 'accesing -- private' stamp: 'Fs 11/9/2020 00:40:07'!
-lookUpRootsWhenRootPortfolio
-	^{self}.! !
-
-!Portfolio methodsFor: 'accesing -- private' stamp: 'HG 11/8/2020 18:39:51'!
-roots
-	^hierarchyState roots.! !
-
-
-!Portfolio methodsFor: 'adding -- private' stamp: 'Fs 11/9/2020 01:54:01'!
-addParentPortfolio: aPortfolioThatAddsMe
-	hierarchyState _ ContainedState for: self.
-	portfoliosThatContainsMe add: aPortfolioThatAddsMe. ! !
 
 
 !Portfolio methodsFor: 'accounts management' stamp: 'HAW 5/25/2019 11:49:20'!
@@ -776,9 +751,37 @@ signalCanNotAddAccount
 	
 	self error: self class canNotAddAccountErrorMessage! !
 
+
+!Portfolio methodsFor: 'summary -- private' stamp: 'HG 11/13/2020 17:15:15'!
+reportTransactionsTo: anAccountSummary 
+	^(accounts collect: [:anAccount | anAccount reportTransactionsTo: anAccountSummary. ]) flatten. ! !
+
+!Portfolio methodsFor: 'summary -- private' stamp: 'HG 11/15/2020 17:40:56'!
+reportTreeSummaryTo: aPorfolioTreeSummary 
+	^self reportTreeSummaryTo: aPorfolioTreeSummary withTab: ('' asString).
+	! !
+
+!Portfolio methodsFor: 'summary -- private' stamp: 'HG 11/15/2020 17:29:23'!
+reportTreeSummaryTo: aPorfolioTreeSummary withTab: aTabString
+	
+	| summary tab |
+	summary _ OrderedCollection new.
+	summary add: (aTabString, (name) asString).
+	tab _ String tab, aTabString.
+	summary addAll: 
+		((accounts collect: 
+			[:anAccount | anAccount reportTreeSummaryTo: aPorfolioTreeSummary withTab: tab. ]) flatten). 
+	^summary.
+	! !
+
+
+!Portfolio methodsFor: 'accesing' stamp: 'HG 11/15/2020 17:06:13'!
+name
+	^name.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Portfolio class' category: 'Portfolio-Solucion'!
+!classDefinition: 'Portfolio class' category: #'Portfolio-Solucion'!
 Portfolio class
 	instanceVariableNames: ''!
 
@@ -807,10 +810,16 @@ with: anAccount with: anotherAccount
 		add: anotherAccount;
 		yourself! !
 
+
+!Portfolio class methodsFor: 'instance creation' stamp: 'HG 11/15/2020 16:26:46'!
+named: aName 
+	^self new initializeWithName: aName.! !
+
+
 
-!classDefinition: #ReceptiveAccount category: 'Portfolio-Solucion'!
+!classDefinition: #ReceptiveAccount category: #'Portfolio-Solucion'!
 Account subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
+	instanceVariableNames: 'transactions name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
@@ -820,6 +829,10 @@ initialize
 
 	super initialize.
 	transactions := OrderedCollection new.! !
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'HG 11/15/2020 17:04:09'!
+initializeNamed: aName 
+	name := aName.! !
 
 
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'NR 11/9/2020 05:56:36'!
@@ -838,14 +851,6 @@ transactions
 
 	^ transactions copy! !
 
-
-!ReceptiveAccount methodsFor: 'balance --private' stamp: 'HG 11/6/2020 10:43:42'!
-contributeToBalanceAsDeposit: anAccountTransactionValue
-	balanceCount _ balanceCount + anAccountTransactionValue. ! !
-
-!ReceptiveAccount methodsFor: 'balance --private' stamp: 'HG 11/6/2020 10:43:51'!
-contributeToBalanceAsWithdraw: anAccountTransactionValue
-	balanceCount _ balanceCount - anAccountTransactionValue. ! !
 
 
 !ReceptiveAccount methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:24:46'!
@@ -868,13 +873,9 @@ isComposedBy: anAccount
 	^self = anAccount ! !
 
 
-!ReceptiveAccount methodsFor: 'accesing' stamp: 'HG 11/7/2020 19:43:50'!
-allAssets
-	^{self} asOrderedCollection.! !
-
-!ReceptiveAccount methodsFor: 'accesing' stamp: 'HG 11/8/2020 19:05:25'!
-roots
-	^{self} asOrderedCollection.! !
+!ReceptiveAccount methodsFor: 'accesing' stamp: 'HG 11/15/2020 17:06:20'!
+name
+	^name.! !
 
 
 !ReceptiveAccount methodsFor: 'adding -- private' stamp: 'Fs 11/9/2020 01:53:41'!
@@ -888,18 +889,43 @@ addedTo: aPortfolio
 	! !
 
 
-!ReceptiveAccount methodsFor: 'reports' stamp: 'HG 11/12/2020 19:35:32'!
-summary
-	
-	| report |
-	
-	report _ OrderedCollection new.
-	self transactions do: [:aTransaction | (aTransaction isKindOf: Deposit) ifTrue: [ report add: ('Deposito por ', aTransaction value asString)] ].
-	report add: ('Balance = ', self balance asString).
-	^report.! !
+
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'HG 11/13/2020 17:15:40'!
+reportTransactionsTo: anAccountSummary 
+	^transactions collect: [:aTransaction | aTransaction reportMeIn: anAccountSummary.].! !
+
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'HG 11/15/2020 18:28:34'!
+reportTreeSummaryTo: aPorfolioTreeSummary 
+	^self signalCantGeneratePortfolioTreeSummaryFromAccount.
+	! !
+
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'HG 11/15/2020 18:33:46'!
+reportTreeSummaryTo: aPorfolioTreeSummary withTab: aTab
+	^aTab, name.
+	! !
+
+
+!ReceptiveAccount methodsFor: 'exceptions' stamp: 'HG 11/15/2020 18:37:19'!
+signalCantGeneratePortfolioTreeSummaryFromAccount
+	^self error: self class receptiveAccountCantReportPortfolioTreeErrorDescription.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReceptiveAccount class' category: #'Portfolio-Solucion'!
+ReceptiveAccount class
+	instanceVariableNames: ''!
+
+!ReceptiveAccount class methodsFor: 'instance creation' stamp: 'HG 11/15/2020 17:03:55'!
+named: aName
+	^self new initializeNamed: aName ! !
+
+
+!ReceptiveAccount class methodsFor: 'error description' stamp: 'HG 11/15/2020 18:37:50'!
+receptiveAccountCantReportPortfolioTreeErrorDescription
+	^'A Receptive Account cant generate a PortfolioTree report.'.! !
 
 
-!classDefinition: #AccountTransaction category: 'Portfolio-Solucion'!
+!classDefinition: #AccountTransaction category: #'Portfolio-Solucion'!
 Object subclass: #AccountTransaction
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -912,19 +938,19 @@ value
 	self subclassResponsibility ! !
 
 
-!AccountTransaction methodsFor: 'operations' stamp: 'HG 11/6/2020 11:50:40'!
-addToBalance: aReceptiveAccount
-	self subclassResponsibility. ! !
-
-
 !AccountTransaction methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:39'!
 affectBalance: aBalance
 
 	self subclassResponsibility ! !
 
+
+!AccountTransaction methodsFor: 'summary' stamp: 'HG 11/13/2020 11:17:42'!
+reportMeIn: anAccountSummary
+	self subclassResponsibility. ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'AccountTransaction class' category: 'Portfolio-Solucion'!
+!classDefinition: 'AccountTransaction class' category: #'Portfolio-Solucion'!
 AccountTransaction class
 	instanceVariableNames: ''!
 
@@ -939,7 +965,7 @@ register: aValue on: account
 	^ transaction! !
 
 
-!classDefinition: #Deposit category: 'Portfolio-Solucion'!
+!classDefinition: #Deposit category: #'Portfolio-Solucion'!
 AccountTransaction subclass: #Deposit
 	instanceVariableNames: 'value'
 	classVariableNames: ''
@@ -958,19 +984,19 @@ value
 	^ value! !
 
 
-!Deposit methodsFor: 'operations' stamp: 'HG 11/2/2020 21:05:47'!
-addToBalance: aReceptiveAccount
-	^aReceptiveAccount contributeToBalanceAsDeposit: self value.! !
-
-
 !Deposit methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:02'!
 affectBalance: aBalance
 
 	^aBalance + value ! !
 
+
+!Deposit methodsFor: 'summary' stamp: 'HG 11/13/2020 19:11:37'!
+reportMeIn: aSummary
+	^aSummary reportAsDeposit: self.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Deposit class' category: 'Portfolio-Solucion'!
+!classDefinition: 'Deposit class' category: #'Portfolio-Solucion'!
 Deposit class
 	instanceVariableNames: ''!
 
@@ -980,7 +1006,93 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #Withdraw category: 'Portfolio-Solucion'!
+!classDefinition: #TransferTransaction category: #'Portfolio-Solucion'!
+AccountTransaction subclass: #TransferTransaction
+	instanceVariableNames: 'transference'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!TransferTransaction methodsFor: 'value' stamp: 'HG 11/12/2020 21:46:33'!
+value
+	^transference value.! !
+
+
+!TransferTransaction methodsFor: 'balance' stamp: 'HG 11/12/2020 21:45:46'!
+affectBalance: aBalance
+	self subclassResponsibility. ! !
+
+
+!TransferTransaction methodsFor: 'accesing' stamp: 'HG 11/12/2020 21:50:22'!
+transferenceFrom
+	^transference. ! !
+
+
+!TransferTransaction methodsFor: 'initialization' stamp: 'HG 11/12/2020 21:50:50'!
+initializeFor: aTransference 
+	transference := aTransference.! !
+
+
+!TransferTransaction methodsFor: 'summary' stamp: 'HG 11/13/2020 19:11:41'!
+reportMeIn: aSummary
+	self subclassResponsibility. ! !
+
+
+!classDefinition: #DepositOfTransference category: #'Portfolio-Solucion'!
+TransferTransaction subclass: #DepositOfTransference
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!DepositOfTransference methodsFor: 'balance' stamp: 'HG 11/12/2020 21:47:16'!
+affectBalance: aBalance
+	^aBalance + self value.! !
+
+
+!DepositOfTransference methodsFor: 'summary' stamp: 'HG 11/13/2020 19:11:47'!
+reportMeIn: aSummary
+	^aSummary reportAsDepositTransference: self.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'DepositOfTransference class' category: #'Portfolio-Solucion'!
+DepositOfTransference class
+	instanceVariableNames: ''!
+
+!DepositOfTransference class methodsFor: 'instance creation' stamp: 'HG 11/12/2020 21:48:51'!
+for: aTransference 
+	^self new initializeFor: aTransference ! !
+
+
+!classDefinition: #WithdrawOfTransference category: #'Portfolio-Solucion'!
+TransferTransaction subclass: #WithdrawOfTransference
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!WithdrawOfTransference methodsFor: 'balance' stamp: 'HG 11/12/2020 21:47:25'!
+affectBalance: aBalance
+	^aBalance - self value.! !
+
+
+!WithdrawOfTransference methodsFor: 'summary' stamp: 'HG 11/13/2020 19:11:51'!
+reportMeIn: aSummary
+	^aSummary reportAsWithdrawTransference: self.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'WithdrawOfTransference class' category: #'Portfolio-Solucion'!
+WithdrawOfTransference class
+	instanceVariableNames: ''!
+
+!WithdrawOfTransference class methodsFor: 'instance creation' stamp: 'HG 11/12/2020 21:49:18'!
+for: aTransference 
+	^self new initializeFor: aTransference ! !
+
+
+!classDefinition: #Withdraw category: #'Portfolio-Solucion'!
 AccountTransaction subclass: #Withdraw
 	instanceVariableNames: 'value'
 	classVariableNames: ''
@@ -991,11 +1103,6 @@ AccountTransaction subclass: #Withdraw
 initializeFor: aValue
 
 	value := aValue ! !
-
-
-!Withdraw methodsFor: 'operations' stamp: 'HG 11/6/2020 10:44:20'!
-addToBalance: aReceptiveAccount
-	^aReceptiveAccount contributeToBalanceAsWithdraw: self value.! !
 
 
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
@@ -1009,9 +1116,14 @@ affectBalance: aBalance
 
 	^aBalance - value! !
 
+
+!Withdraw methodsFor: 'summary' stamp: 'HG 11/13/2020 19:11:56'!
+reportMeIn: aSummary
+	^aSummary reportAsWithdraw: self.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Withdraw class' category: 'Portfolio-Solucion'!
+!classDefinition: 'Withdraw class' category: #'Portfolio-Solucion'!
 Withdraw class
 	instanceVariableNames: ''!
 
@@ -1021,25 +1133,163 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #Transference category: 'Portfolio-Solucion'!
-Object subclass: #Transference
-	instanceVariableNames: 'sourceAccount destinationAccount transferenceValue'
+!classDefinition: #Summary category: #'Portfolio-Solucion'!
+Object subclass: #Summary
+	instanceVariableNames: 'account'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!Transference methodsFor: 'initialization' stamp: 'Fs 11/9/2020 20:10:41'!
-initializeFrom: aSourceAccount to: aDestinationAccount withValue: aTransferenceValue 
-	aTransferenceValue <= 0 ifTrue:[self error: self class cannotTransferNegativeMoneyErrorDescription ].
-	aSourceAccount = aDestinationAccount ifTrue:[self error: self class cannotTransferFromAccountToSameAccount ].
-
-	Deposit register: aTransferenceValue on: aDestinationAccount.
-	Withdraw register: aTransferenceValue on: aSourceAccount.
-	 ! !
+!Summary methodsFor: 'initialization' stamp: 'HG 11/13/2020 18:34:31'!
+initializeFor: anAccount
+	account _ anAccount. ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Transference class' category: 'Portfolio-Solucion'!
+!classDefinition: 'Summary class' category: #'Portfolio-Solucion'!
+Summary class
+	instanceVariableNames: ''!
+
+!Summary class methodsFor: 'instance creation' stamp: 'HG 11/13/2020 18:34:09'!
+for: anAccount 
+	^self new initializeFor: anAccount ! !
+
+
+!classDefinition: #AccountSummary category: #'Portfolio-Solucion'!
+Summary subclass: #AccountSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!AccountSummary methodsFor: 'summary operations' stamp: 'HG 11/13/2020 17:11:38'!
+addBalanceToReport: report
+
+	^ report add: ('Balance = ', account balance asString)! !
+
+!AccountSummary methodsFor: 'summary operations' stamp: 'HG 11/13/2020 14:51:42'!
+report
+	
+	| report |
+	report _ self reportTransactions. 
+	self addBalanceToReport: report.
+	^report.! !
+
+!AccountSummary methodsFor: 'summary operations' stamp: 'HG 11/13/2020 17:11:38'!
+reportTransactions
+	^account reportTransactionsTo: self.	! !
+
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 11:29:48'!
+reportAsDeposit: aDepositToReport
+	^'Deposito por ', aDepositToReport value asString.! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 12:06:38'!
+reportAsDepositTransference: aDepositTransferenceToReport
+	^'Entrada por transferencia de ', aDepositTransferenceToReport value asString.! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 12:02:40'!
+reportAsWithdraw: aWithdrawToReport
+	^'Extracción por ', aWithdrawToReport value asString.! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 12:06:21'!
+reportAsWithdrawTransference: aWithdrawTransferenceToReport
+	^'Salida por transferencia de ', aWithdrawTransferenceToReport value asString.! !
+
+
+!classDefinition: #PorfolioTreeSummary category: #'Portfolio-Solucion'!
+Summary subclass: #PorfolioTreeSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!PorfolioTreeSummary methodsFor: 'summary' stamp: 'HG 11/15/2020 17:40:11'!
+report
+
+	^account reportTreeSummaryTo: self.! !
+
+
+!classDefinition: #TransferNetSummary category: #'Portfolio-Solucion'!
+Summary subclass: #TransferNetSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!TransferNetSummary methodsFor: 'summary' stamp: 'HG 11/13/2020 19:16:21'!
+report
+	| transfersNetReported |
+	transfersNetReported _ account reportTransactionsTo: self.
+	^ transfersNetReported 
+		inject: 0 
+		into: [:subTotal :next | subTotal + next]! !
+
+
+!TransferNetSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 18:55:23'!
+reportAsDeposit: aDepositToReport
+	^0.! !
+
+!TransferNetSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 18:59:33'!
+reportAsDepositTransference: aDepositTransferenceToReport
+	^aDepositTransferenceToReport value.! !
+
+!TransferNetSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 18:55:36'!
+reportAsWithdraw: aWithdrawToReport
+	^0.! !
+
+!TransferNetSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 18:59:39'!
+reportAsWithdrawTransference: aWithdrawTransferenceToReport
+	^aWithdrawTransferenceToReport value negated.! !
+
+
+!classDefinition: #Transference category: #'Portfolio-Solucion'!
+Object subclass: #Transference
+	instanceVariableNames: 'deposit withdraw value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!Transference methodsFor: 'assertions' stamp: 'HG 11/12/2020 21:54:37'!
+assertAnAccount: aDestinationAccount isDifferentTo: aSourceAccount
+
+	^ aSourceAccount = aDestinationAccount 
+		ifTrue:[self error: self class cannotTransferFromAccountToSameAccount ]! !
+
+!Transference methodsFor: 'assertions' stamp: 'HG 11/12/2020 21:53:25'!
+assertPositiveTransferenceValue: aTransferenceValue
+
+	^ aTransferenceValue <= 0 
+		ifTrue:[self error: self class cannotTransferNegativeMoneyErrorDescription ]! !
+
+
+!Transference methodsFor: 'initialization' stamp: 'HG 11/12/2020 21:54:37'!
+initializeFrom: aSourceAccount to: aDestinationAccount withValue: aTransferenceValue 
+	
+	self assertPositiveTransferenceValue: aTransferenceValue.
+	self assertAnAccount: aDestinationAccount isDifferentTo: aSourceAccount.
+
+	deposit _ DepositOfTransference register: self on: aDestinationAccount.
+	withdraw _ WithdrawOfTransference register: self on: aSourceAccount.
+	value _ aTransferenceValue. 
+	 ! !
+
+
+!Transference methodsFor: 'accessing' stamp: 'HG 11/12/2020 21:34:31'!
+depositOperation
+	^deposit.! !
+
+!Transference methodsFor: 'accessing' stamp: 'HG 11/12/2020 21:51:31'!
+value
+	^value. ! !
+
+!Transference methodsFor: 'accessing' stamp: 'HG 11/12/2020 21:35:53'!
+withdrawOperation
+	^withdraw.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Transference class' category: #'Portfolio-Solucion'!
 Transference class
 	instanceVariableNames: ''!
 
