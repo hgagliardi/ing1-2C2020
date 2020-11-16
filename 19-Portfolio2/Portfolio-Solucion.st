@@ -811,42 +811,42 @@ signalCanNotAddAccount
 	self error: self class canNotAddAccountErrorMessage! !
 
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 02:58:12'!
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:23:18'!
 reportDetailedTreeSummaryTo: aPorfolioTreeSummary 
-	^self reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab:  ''   .
+	^self reportDetailedTreeSummaryTo: aPorfolioTreeSummary fromHeight: 0   .
 	! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:00:21'!
-reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab: aTabString
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:26:45'!
+reportDetailedTreeSummaryTo: aPorfolioTreeSummary fromHeight: aTreeHeight
 	
-	|  tab |
-	aPorfolioTreeSummary reportName: name withIndentation: aTabString.
-	tab _ String tab, aTabString.
+	|  currentHeight |
+	aPorfolioTreeSummary reportName: name fromHeight: aTreeHeight.
+	currentHeight _ aTreeHeight +1.
 	
 	accounts do: 
-			[:anAccount | anAccount reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab: tab. ] . 
+			[:anAccount | anAccount reportDetailedTreeSummaryTo: aPorfolioTreeSummary fromHeight: currentHeight. ] . 
 	
-	aPorfolioTreeSummary reportBalance: self balance withIndentation: tab.
+	aPorfolioTreeSummary reportBalance: self balance fromHeight: currentHeight.
 	! !
 
 !Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:56:16'!
 reportTransactionsTo: anAccountSummary 
 	accounts do: [:anAccount | anAccount reportTransactionsTo: anAccountSummary. ] . ! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:56:27'!
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:23:11'!
 reportTreeSummaryTo: aPorfolioTreeSummary 
-	self reportTreeSummaryTo: aPorfolioTreeSummary withTab:  ''   .
+	self reportTreeSummaryTo: aPorfolioTreeSummary fromHeight:  0   .
 	! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:54:36'!
-reportTreeSummaryTo: aPorfolioTreeSummary withTab: aTabString
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:18:57'!
+reportTreeSummaryTo: aPorfolioTreeSummary fromHeight: aTreeHeight
 	
-	| tab |
-	aPorfolioTreeSummary reportName: (name) asString withIndentation: aTabString. 
-	tab _ String tab, aTabString.
+	| currentHeight |
+	aPorfolioTreeSummary reportName: (name) asString fromHeight: aTreeHeight. 
+	currentHeight _ aTreeHeight +1.
 	
 	accounts do: 
-			[:anAccount | anAccount reportTreeSummaryTo: aPorfolioTreeSummary withTab: tab. ] . 
+			[:anAccount | anAccount reportTreeSummaryTo: aPorfolioTreeSummary fromHeight: currentHeight. ] . 
 	.
 	! !
 
@@ -968,15 +968,15 @@ reportDetailedTreeSummaryTo: aPorfolioTreeSummary
 	^self signalCantGeneratePortfolioTreeSummaryFromAccount.
 	! !
 
-!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:09:21'!
-reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab: aTabString
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:26:54'!
+reportDetailedTreeSummaryTo: aPorfolioTreeSummary fromHeight: aTreeHeight
 	
-	|   tab |
-	aPorfolioTreeSummary reportName: name withIndentation: aTabString.
+	|   currentTreeHeight |
+	aPorfolioTreeSummary reportName: name fromHeight: aTreeHeight.
 	
-	tab _ String tab, aTabString.
+	currentTreeHeight _   aTreeHeight + 1.
 	
-	aPorfolioTreeSummary addReportOf: self withIndentation: tab.
+	aPorfolioTreeSummary addReportOf: self fromHeight: currentTreeHeight.
 
 	
 	! !
@@ -990,9 +990,10 @@ reportTreeSummaryTo: aPorfolioTreeSummary
 	^self signalCantGeneratePortfolioTreeSummaryFromAccount.
 	! !
 
-!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:55:57'!
-reportTreeSummaryTo: aPorfolioTreeSummary withTab: aTab
-	aPorfolioTreeSummary reportName: name withIndentation: aTab.
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:18:57'!
+reportTreeSummaryTo: aPorfolioTreeSummary fromHeight: aTreeHeight
+	
+	aPorfolioTreeSummary reportName: name fromHeight: aTreeHeight.
 	! !
 
 
@@ -1310,9 +1311,22 @@ initializeFor: anAccount
 reportClean
 	generatedReport  _ OrderedCollection new.! !
 
-!TextSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:59:50'!
-reportName: anAccountName withIndentation: aTabString
+!TextSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:29:11'!
+reportName: anAccountName fromHeight: aTreeHeight
+	| aTabString |
+	aTabString _ self calculateIndentationForHeight: aTreeHeight.
+	
 	generatedReport add: (aTabString , anAccountName).! !
+
+
+!TextSummary methodsFor: 'indentation -- private' stamp: 'Fs 11/16/2020 05:31:15'!
+calculateIndentationForHeight: aTreeHeight
+	| indentation |
+	indentation _ '' .
+	aTreeHeight timesRepeat: [indentation _(String tab, indentation)].
+	^indentation
+	
+	! !
 
 
 !classDefinition: #AccountSummary category: 'Portfolio-Solucion'!
@@ -1382,16 +1396,20 @@ report
 	^generatedReport ! !
 
 
-!DetailedTreeSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:05:49'!
-addReportOf: aReceptiveAccount withIndentation: aStringTab
-	| aReceptiveAccountReport |
+!DetailedTreeSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:27:20'!
+addReportOf: aReceptiveAccount fromHeight: aTreeHeight
+	| aReceptiveAccountReport aStringTab |
 	aReceptiveAccountReport _  (AccountSummary for: aReceptiveAccount) report.
 	
+	aStringTab _ self calculateIndentationForHeight: aTreeHeight .
 	aReceptiveAccountReport do: [ :aReportLine |   generatedReport add: (aStringTab, aReportLine)].
 ! !
 
-!DetailedTreeSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:59:19'!
-reportBalance: aBalanceToReport withIndentation: aStringTab
+!DetailedTreeSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:27:47'!
+reportBalance: aBalanceToReport fromHeight: aTreeHeight
+	
+	| aStringTab |
+	aStringTab _ self calculateIndentationForHeight: aTreeHeight .
 	generatedReport add: (aStringTab, 'Balance = ', aBalanceToReport asString).! !
 
 
