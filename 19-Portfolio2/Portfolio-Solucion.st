@@ -5,7 +5,7 @@ TestCase subclass: #AccountSummaryTest
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!AccountSummaryTest methodsFor: 'account summary test' stamp: 'HG 11/14/2020 09:51:40'!
+!AccountSummaryTest methodsFor: 'account summary test' stamp: 'Fs 11/16/2020 14:45:35'!
 test01EmptyReceptiveAccountReportsZeroBalanceSummary
 	
 	| account summary |
@@ -13,10 +13,10 @@ test01EmptyReceptiveAccountReportsZeroBalanceSummary
 	account _ ReceptiveAccount new.
 	summary _ AccountSummary for: account.
 	
-	self assert: summary report last equals: 'Balance = 0'.
+	self assert: summary report last equals: (self balaceStringFor: 0)
 	! !
 
-!AccountSummaryTest methodsFor: 'account summary test' stamp: 'Fs 11/16/2020 03:03:15'!
+!AccountSummaryTest methodsFor: 'account summary test' stamp: 'Fs 11/16/2020 14:45:24'!
 test02ReceptiveAccountReportsDepositSummary
 	
 	| account summary |
@@ -25,10 +25,10 @@ test02ReceptiveAccountReportsDepositSummary
 	Deposit register: 500 on: account. 
 	summary _ AccountSummary for: account.
 	
-	self assert: summary report first equals: 'Depósito por 500'.
-	self assert: summary report last equals: 'Balance = 500'.	! !
+	self assert: summary report first equals: (self depositStringFor: 500).
+	self assert: summary report last equals: (self balaceStringFor: 500)! !
 
-!AccountSummaryTest methodsFor: 'account summary test' stamp: 'Fs 11/16/2020 03:03:25'!
+!AccountSummaryTest methodsFor: 'account summary test' stamp: 'Fs 11/16/2020 14:44:53'!
 test03ReceptiveAccountReportsTransferOperations
 	
 	| srcAccount summary dstAccount |
@@ -43,13 +43,13 @@ test03ReceptiveAccountReportsTransferOperations
 	  
 	summary _ AccountSummary for: srcAccount.
 	
-	self assert: summary report first equals: 'Depósito por 500'.
-	self assert: summary report second equals: 'Extracción por 100'.
-	self assert: summary report third equals: 'Entrada por transferencia de 500'.
-	self assert: summary report fourth equals: 'Salida por transferencia de 500'.
-	self assert: summary report fifth equals: 'Balance = 400'.	! !
+	self assert: summary report first equals: (self depositStringFor: 500).
+	self assert: summary report second equals: (self withdrawStringFor: 100).
+	self assert: summary report third equals: (self incomeTransferStringFor: 500).
+	self assert: summary report fourth equals: (self exitTransferStringFor: 500).
+	self assert: summary report fifth equals: (self balaceStringFor: 400).! !
 
-!AccountSummaryTest methodsFor: 'account summary test' stamp: 'Fs 11/16/2020 03:03:30'!
+!AccountSummaryTest methodsFor: 'account summary test' stamp: 'Fs 11/16/2020 14:43:47'!
 test04PortfolioReportsTransferOperations
 	
 	| account portfolio summary dstAccount |
@@ -67,11 +67,11 @@ test04PortfolioReportsTransferOperations
 	
 	summary _ AccountSummary for: portfolio.
 	
-	self assert: summary report first equals: 'Depósito por 500'.
-	self assert: summary report second equals: 'Extracción por 100'.
-	self assert: summary report third equals: 'Salida por transferencia de 500'.
-	self assert: summary report fourth equals: 'Entrada por transferencia de 500'.
-	self assert: summary report fifth equals: 'Balance = 400'.	! !
+	self assert: summary report first equals: (self depositStringFor: 500).
+	self assert: summary report second equals: (self withdrawStringFor: 100).
+	self assert: summary report third equals: (self exitTransferStringFor: 500).
+	self assert: summary report fourth equals: (self incomeTransferStringFor: 500).
+	self assert: summary report fifth equals: (self balaceStringFor: 400)	! !
 
 
 !AccountSummaryTest methodsFor: 'transfer net test' stamp: 'HG 11/15/2020 17:56:11'!
@@ -135,12 +135,13 @@ test08PortfolioReportsTransferencesBalanceAsTransferNetSummary
 	self assert: summary report equals: -300.! !
 
 
-!AccountSummaryTest methodsFor: 'setup' stamp: 'Fs 11/16/2020 03:32:36'!
+!AccountSummaryTest methodsFor: 'setup' stamp: 'Fs 11/16/2020 14:30:13'!
 setUp
 
 	oneTab _ String tab.
 	twoTabs _ oneTab, String tab.
-	threeTabs _ twoTabs, String tab.! !
+	threeTabs _ twoTabs, String tab.
+! !
 
 
 !AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'HG 11/15/2020 18:03:55'!
@@ -209,7 +210,7 @@ test12ReceptiveAccountCantReportAPortfolioTreeSummary
 		withMessageText: ReceptiveAccount receptiveAccountCantReportPortfolioTreeErrorDescription.
 ! !
 
-!AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'Fs 11/16/2020 04:24:58'!
+!AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'Fs 11/16/2020 14:41:53'!
 test13DetailedTreeReportsCorrectlyOnDiversePortfolio
 	
 	| anAccount anAccountName anotherAccount anotherAccountName childPortfolioName portfolio portfolioChild portfolioName  summary actualSummaryReport expectedReport |
@@ -237,24 +238,22 @@ test13DetailedTreeReportsCorrectlyOnDiversePortfolio
 	
 	expectedReport _ OrderedCollection new.
 	expectedReport add: portfolioName ;
-					add: (oneTab,anAccountName);
-						add: (twoTabs, 'Depósito por 1000');
-						add: (twoTabs, 'Extracción por 200');
-						add: (twoTabs, 'Entrada por transferencia de 50');
-						add: (twoTabs, 'Salida por transferencia de 20');
-						add: (twoTabs, 'Balance = 830');
-					add: (oneTab,childPortfolioName);
-						add: (twoTabs,anotherAccountName );
-							add: (threeTabs, 'Salida por transferencia de 50');
-							add: (threeTabs, 'Entrada por transferencia de 20');
-							add: (threeTabs, 'Balance = -30');
-						add: (twoTabs, 'Balance = -30');
-					add: (oneTab, 'Balance = 800').
+				add: (oneTab,anAccountName);
+				add: (twoTabs, (self depositStringFor: 1000) );
+				add: (twoTabs, (self withdrawStringFor: 200));
+				add: (twoTabs, (self incomeTransferStringFor: 50));
+				add: (twoTabs, (self exitTransferStringFor: 20));
+				add: (twoTabs, (self balaceStringFor: 830));
+				add: (oneTab,childPortfolioName);
+				add: (twoTabs,anotherAccountName );
+				add: (threeTabs, (self exitTransferStringFor: 50));
+				add: (threeTabs, (self incomeTransferStringFor: 20));
+				add: (threeTabs, (self balaceStringFor: -30));
+				add: (twoTabs, (self balaceStringFor: -30));
+				add: (oneTab, (self balaceStringFor: 800)).
 	actualSummaryReport _ summary report.
 	
 	self assert: expectedReport equals: actualSummaryReport.
-
-
 ! !
 
 !AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'Fs 11/16/2020 03:30:00'!
@@ -271,6 +270,27 @@ test14ReceptiveAccountCantReportADetailedTreeSummary
 		raise: Error
 		withMessageText: ReceptiveAccount receptiveAccountCantReportPortfolioTreeErrorDescription.
 ! !
+
+
+!AccountSummaryTest methodsFor: 'summary strings -- private' stamp: 'Fs 11/16/2020 14:36:41'!
+balaceStringFor: aValue
+	^'Balance = ' , (aValue asString).! !
+
+!AccountSummaryTest methodsFor: 'summary strings -- private' stamp: 'Fs 11/16/2020 14:39:07'!
+depositStringFor: aValue
+	^'Depósito por ' , (aValue asString).! !
+
+!AccountSummaryTest methodsFor: 'summary strings -- private' stamp: 'Fs 11/16/2020 14:40:06'!
+exitTransferStringFor: aValue
+	^'Salida por transferencia de ', (aValue asString).! !
+
+!AccountSummaryTest methodsFor: 'summary strings -- private' stamp: 'Fs 11/16/2020 14:40:09'!
+incomeTransferStringFor: aValue
+	^'Entrada por transferencia de ', (aValue asString).! !
+
+!AccountSummaryTest methodsFor: 'summary strings -- private' stamp: 'Fs 11/16/2020 14:38:25'!
+withdrawStringFor: aValue
+	^'Extracción por ', (aValue asString).! !
 
 
 !classDefinition: #PortfolioTest category: 'Portfolio-Solucion'!
@@ -587,7 +607,7 @@ TestCase subclass: #TransferenceTest
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/14/2020 09:51:41'!
+!TransferenceTest methodsFor: 'tests' stamp: 'HG 11/14/2020 09:51:41'!
 test01EmptyReceptiveAccountReportsZeroBalanceSummary
 	| destinationAccount sourceAccount |
 	sourceAccount _ ReceptiveAccount new.
@@ -601,7 +621,7 @@ test01EmptyReceptiveAccountReportsZeroBalanceSummary
 	self assert: destinationAccount balance equals: 60.
 	! !
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/15/2020 17:54:28'!
+!TransferenceTest methodsFor: 'tests' stamp: 'HG 11/15/2020 17:54:28'!
 test02ReceptiveAccountReportsDepositSummary
 	| destinationAccount sourceAccount |
 	sourceAccount _ ReceptiveAccount new.
@@ -614,7 +634,7 @@ test02ReceptiveAccountReportsDepositSummary
 		withMessageText: (Transference cannotTransferNegativeMoneyErrorDescription).
 	! !
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/15/2020 17:55:00'!
+!TransferenceTest methodsFor: 'tests' stamp: 'HG 11/15/2020 17:55:00'!
 test03ReceptiveAccountReportsTransferOperations
 	| anAccount |
 	anAccount _ ReceptiveAccount new.
@@ -624,7 +644,7 @@ test03ReceptiveAccountReportsTransferOperations
 		raise:Error
 		withMessageText: Transference cannotTransferFromAccountToSameAccount.! !
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/15/2020 17:55:19'!
+!TransferenceTest methodsFor: 'tests' stamp: 'HG 11/15/2020 17:55:19'!
 test04PortfolioReportsTransferOperations
 	| srcAccount dstAccount transference |
 	srcAccount _ ReceptiveAccount new.
@@ -635,7 +655,7 @@ test04PortfolioReportsTransferOperations
 	self assert: srcAccount transactions includes: transference withdrawOperation.
 	self assert: dstAccount transactions includes: transference depositOperation.! !
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'HG 11/15/2020 17:56:11'!
+!TransferenceTest methodsFor: 'tests' stamp: 'HG 11/15/2020 17:56:11'!
 test05EmptyAccountReportsZeroTransferNet
 
 	| srcAccount dstAccount transference |
@@ -811,22 +831,28 @@ signalCanNotAddAccount
 	self error: self class canNotAddAccountErrorMessage! !
 
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:23:18'!
-reportDetailedTreeSummaryTo: aPorfolioTreeSummary 
-	^self reportDetailedTreeSummaryTo: aPorfolioTreeSummary fromHeight: 0   .
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 14:07:15'!
+reportDetailedTreeSummaryTo: aDetailedTreeSummary 
+	^self reportDetailedTreeSummaryTo: aDetailedTreeSummary fromHeight: 0   .
 	! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:26:45'!
-reportDetailedTreeSummaryTo: aPorfolioTreeSummary fromHeight: aTreeHeight
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 14:49:04'!
+reportDetailedTreeSummaryTo: aDetailedTreeSummary fromHeight: aTreeHeight
+
+	| nextHeight reportingBlock |
+	nextHeight _ aTreeHeight +1.
+	reportingBlock _ [:anAccount | anAccount reportDetailedTreeSummaryTo: aDetailedTreeSummary fromHeight: nextHeight. 	].
 	
-	|  currentHeight |
-	aPorfolioTreeSummary reportName: name fromHeight: aTreeHeight.
-	currentHeight _ aTreeHeight +1.
+	self reportMyNameTo:  aDetailedTreeSummary fromHeight: aTreeHeight   andWithAccountsDo: reportingBlock.
+	aDetailedTreeSummary reportBalance: self balance fromHeight: nextHeight.
+	! !
+
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 14:07:07'!
+reportMyNameTo: aTextSummary fromHeight: aTreeHeight andWithAccountsDo: aBlockToDoOnAccounts
 	
-	accounts do: 
-			[:anAccount | anAccount reportDetailedTreeSummaryTo: aPorfolioTreeSummary fromHeight: currentHeight. ] . 
-	
-	aPorfolioTreeSummary reportBalance: self balance fromHeight: currentHeight.
+	aTextSummary reportName: name fromHeight: aTreeHeight. 
+	accounts do: 		aBlockToDoOnAccounts . 
+	.
 	! !
 
 !Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:56:16'!
@@ -838,15 +864,14 @@ reportTreeSummaryTo: aPorfolioTreeSummary
 	self reportTreeSummaryTo: aPorfolioTreeSummary fromHeight:  0   .
 	! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:18:57'!
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 14:10:27'!
 reportTreeSummaryTo: aPorfolioTreeSummary fromHeight: aTreeHeight
 	
-	| currentHeight |
-	aPorfolioTreeSummary reportName: (name) asString fromHeight: aTreeHeight. 
-	currentHeight _ aTreeHeight +1.
+	|  reportingBlock |
+	reportingBlock _ [:anAccount | anAccount reportTreeSummaryTo: aPorfolioTreeSummary fromHeight: aTreeHeight +1. ] .
 	
-	accounts do: 
-			[:anAccount | anAccount reportTreeSummaryTo: aPorfolioTreeSummary fromHeight: currentHeight. ] . 
+	self reportMyNameTo: aPorfolioTreeSummary fromHeight: aTreeHeight andWithAccountsDo: reportingBlock
+ 
 	.
 	! !
 
@@ -968,15 +993,15 @@ reportDetailedTreeSummaryTo: aPorfolioTreeSummary
 	^self signalCantGeneratePortfolioTreeSummaryFromAccount.
 	! !
 
-!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:26:54'!
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 14:48:19'!
 reportDetailedTreeSummaryTo: aPorfolioTreeSummary fromHeight: aTreeHeight
 	
-	|   currentTreeHeight |
+	|   nextTreeHeight |
+	
 	aPorfolioTreeSummary reportName: name fromHeight: aTreeHeight.
 	
-	currentTreeHeight _   aTreeHeight + 1.
-	
-	aPorfolioTreeSummary addReportOf: self fromHeight: currentTreeHeight.
+	nextTreeHeight _   aTreeHeight + 1.
+	aPorfolioTreeSummary addReportOf: self fromHeight: nextTreeHeight.
 
 	
 	! !
@@ -1263,33 +1288,27 @@ BalanceSummary subclass: #TransferNetSummary
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!TransferNetSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 05:10:32'!
+!TransferNetSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 14:14:37'!
 report
-	self reportClean.
 	
 	account reportTransactionsTo: self.
 	^ calculatedBalance 
 	! !
 
-!TransferNetSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 05:10:32'!
-reportClean
 
-	^ calculatedBalance _ 0! !
-
-
-!TransferNetSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:45:27'!
+!TransferNetSummary methodsFor: 'balance reporting -- private' stamp: 'Fs 11/16/2020 04:45:27'!
 reportAsDeposit: aDepositToReport
 ! !
 
-!TransferNetSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:45:49'!
+!TransferNetSummary methodsFor: 'balance reporting -- private' stamp: 'Fs 11/16/2020 04:45:49'!
 reportAsDepositTransference: aDepositTransferenceToReport
 	calculatedBalance _ calculatedBalance +aDepositTransferenceToReport value.! !
 
-!TransferNetSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:45:32'!
+!TransferNetSummary methodsFor: 'balance reporting -- private' stamp: 'Fs 11/16/2020 04:45:32'!
 reportAsWithdraw: aWithdrawToReport
 	 ! !
 
-!TransferNetSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:45:41'!
+!TransferNetSummary methodsFor: 'balance reporting -- private' stamp: 'Fs 11/16/2020 04:45:41'!
 reportAsWithdrawTransference: aWithdrawTransferenceToReport
 	calculatedBalance _ calculatedBalance + aWithdrawTransferenceToReport value negated.! !
 
@@ -1301,17 +1320,13 @@ Summary subclass: #TextSummary
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-
-!TextSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:39:53'!
+!TextSummary methodsFor: 'initialization' stamp: 'Fs 11/16/2020 04:39:53'!
 initializeFor: anAccount
 	account _ anAccount .
 	generatedReport _ OrderedCollection new.! !
 
-!TextSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:06:48'!
-reportClean
-	generatedReport  _ OrderedCollection new.! !
 
-!TextSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:29:11'!
+!TextSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 05:29:11'!
 reportName: anAccountName fromHeight: aTreeHeight
 	| aTabString |
 	aTabString _ self calculateIndentationForHeight: aTreeHeight.
@@ -1336,46 +1351,36 @@ TextSummary subclass: #AccountSummary
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!AccountSummary methodsFor: 'summary operations' stamp: 'Fs 11/16/2020 05:06:48'!
+!AccountSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 14:14:47'!
 report
-	self reportClean.
 	 
 	self reportTransactions. 
 	self addBalanceToReport.
 	^generatedReport .! !
 
 
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:41:25'!
+!AccountSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 04:41:25'!
 addBalanceToReport
 
 	 generatedReport add: ('Balance = ', account balance asString)! !
 
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:42:25'!
-indentedReportWithTab: aStringTab
-	|indentedAccountReport |
-	
-	self report.	
-	indentedAccountReport _ OrderedCollection new.
-	generatedReport do: [ :aReportLine |   indentedAccountReport add: (aStringTab, aReportLine)].
-	^indentedAccountReport! !
-
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:38:09'!
+!AccountSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 04:38:09'!
 reportAsDeposit: aDepositToReport
 	generatedReport add: 'Depósito por ', aDepositToReport value asString.! !
 
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:38:11'!
+!AccountSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 04:38:11'!
 reportAsDepositTransference: aDepositTransferenceToReport
 	generatedReport add:'Entrada por transferencia de ', aDepositTransferenceToReport value asString.! !
 
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:38:13'!
+!AccountSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 04:38:13'!
 reportAsWithdraw: aWithdrawToReport
 	generatedReport add:'Extracción por ', aWithdrawToReport value asString.! !
 
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:38:16'!
+!AccountSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 04:38:16'!
 reportAsWithdrawTransference: aWithdrawTransferenceToReport
 	generatedReport add: 'Salida por transferencia de ', aWithdrawTransferenceToReport value asString.! !
 
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:27:52'!
+!AccountSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 04:27:52'!
 reportTransactions
 	account reportTransactionsTo: self.	
 	 ! !
@@ -1388,15 +1393,13 @@ TextSummary subclass: #DetailedTreeSummary
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!DetailedTreeSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 05:06:48'!
+!DetailedTreeSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 14:25:00'!
 report
-	self reportClean.
-
 	account reportDetailedTreeSummaryTo: self.
 	^generatedReport ! !
 
 
-!DetailedTreeSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:27:20'!
+!DetailedTreeSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 05:27:20'!
 addReportOf: aReceptiveAccount fromHeight: aTreeHeight
 	| aReceptiveAccountReport aStringTab |
 	aReceptiveAccountReport _  (AccountSummary for: aReceptiveAccount) report.
@@ -1405,7 +1408,7 @@ addReportOf: aReceptiveAccount fromHeight: aTreeHeight
 	aReceptiveAccountReport do: [ :aReportLine |   generatedReport add: (aStringTab, aReportLine)].
 ! !
 
-!DetailedTreeSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:27:47'!
+!DetailedTreeSummary methodsFor: 'text reporting -- private' stamp: 'Fs 11/16/2020 05:27:47'!
 reportBalance: aBalanceToReport fromHeight: aTreeHeight
 	
 	| aStringTab |
@@ -1420,9 +1423,8 @@ TextSummary subclass: #PorfolioTreeSummary
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!PorfolioTreeSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 05:06:48'!
+!PorfolioTreeSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 14:14:56'!
 report
-	self reportClean.
 
 	account reportTreeSummaryTo: self.
 	^generatedReport ! !
