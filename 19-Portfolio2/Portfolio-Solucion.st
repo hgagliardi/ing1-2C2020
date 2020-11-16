@@ -209,7 +209,7 @@ test12ReceptiveAccountCantReportAPortfolioTreeSummary
 		withMessageText: ReceptiveAccount receptiveAccountCantReportPortfolioTreeErrorDescription.
 ! !
 
-!AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'Fs 11/16/2020 03:31:21'!
+!AccountSummaryTest methodsFor: 'portfolio tree test' stamp: 'Fs 11/16/2020 04:24:58'!
 test13DetailedTreeReportsCorrectlyOnDiversePortfolio
 	
 	| anAccount anAccountName anotherAccount anotherAccountName childPortfolioName portfolio portfolioChild portfolioName  summary actualSummaryReport expectedReport |
@@ -236,19 +236,19 @@ test13DetailedTreeReportsCorrectlyOnDiversePortfolio
 	summary _ DetailedTreeSummary for: portfolio.
 	
 	expectedReport _ OrderedCollection new.
-	expectedReport    				add: portfolioName ;
+	expectedReport add: portfolioName ;
 					add: (oneTab,anAccountName);
-					add: (twoTabs, 'Depósito por 1000');
-					add: (twoTabs, 'Extracción por 200');
-					add: (twoTabs, 'Entrada por transferencia de 50');
-					add: (twoTabs, 'Salida por transferencia de 20');
-					add: (twoTabs, 'Balance = 830');
+						add: (twoTabs, 'Depósito por 1000');
+						add: (twoTabs, 'Extracción por 200');
+						add: (twoTabs, 'Entrada por transferencia de 50');
+						add: (twoTabs, 'Salida por transferencia de 20');
+						add: (twoTabs, 'Balance = 830');
 					add: (oneTab,childPortfolioName);
-					add: (twoTabs,anotherAccountName );
-					add: (threeTabs, 'Salida por transferencia de 50');
-					add: (threeTabs, 'Entrada por transferencia de 20');
-					add: (threeTabs, 'Balance = -30');
-					add: (twoTabs, 'Balance = -30');
+						add: (twoTabs,anotherAccountName );
+							add: (threeTabs, 'Salida por transferencia de 50');
+							add: (threeTabs, 'Entrada por transferencia de 20');
+							add: (threeTabs, 'Balance = -30');
+						add: (twoTabs, 'Balance = -30');
 					add: (oneTab, 'Balance = 800').
 	actualSummaryReport _ summary report.
 	
@@ -816,40 +816,38 @@ reportDetailedTreeSummaryTo: aPorfolioTreeSummary
 	^self reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab:  ''   .
 	! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 03:07:41'!
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:00:21'!
 reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab: aTabString
 	
-	| summary tab |
-	summary _ OrderedCollection new.
-	summary add: (aTabString, (name) asString).
+	|  tab |
+	aPorfolioTreeSummary reportName: name withIndentation: aTabString.
 	tab _ String tab, aTabString.
-	summary addAll: 
-		((accounts collect: 
-			[:anAccount | anAccount reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab: tab. ]) flatten). 
-	summary add: (tab, 'Balance = ', self balance asString).
-	^summary.
+	
+	accounts do: 
+			[:anAccount | anAccount reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab: tab. ] . 
+	
+	aPorfolioTreeSummary reportBalance: self balance withIndentation: tab.
 	! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'HG 11/13/2020 17:15:15'!
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:56:16'!
 reportTransactionsTo: anAccountSummary 
-	^(accounts collect: [:anAccount | anAccount reportTransactionsTo: anAccountSummary. ]) flatten. ! !
+	accounts do: [:anAccount | anAccount reportTransactionsTo: anAccountSummary. ] . ! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 02:18:02'!
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:56:27'!
 reportTreeSummaryTo: aPorfolioTreeSummary 
-	^self reportTreeSummaryTo: aPorfolioTreeSummary withTab:  ''   .
+	self reportTreeSummaryTo: aPorfolioTreeSummary withTab:  ''   .
 	! !
 
-!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 02:57:30'!
+!Portfolio methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:54:36'!
 reportTreeSummaryTo: aPorfolioTreeSummary withTab: aTabString
 	
-	| summary tab |
-	summary _ OrderedCollection new.
-	summary add: (aTabString, (name) asString).
+	| tab |
+	aPorfolioTreeSummary reportName: (name) asString withIndentation: aTabString. 
 	tab _ String tab, aTabString.
-	summary addAll: 
-		((accounts collect: 
-			[:anAccount | anAccount reportTreeSummaryTo: aPorfolioTreeSummary withTab: tab. ]) flatten). 
-	^summary.
+	
+	accounts do: 
+			[:anAccount | anAccount reportTreeSummaryTo: aPorfolioTreeSummary withTab: tab. ] . 
+	.
 	! !
 
 
@@ -970,35 +968,31 @@ reportDetailedTreeSummaryTo: aPorfolioTreeSummary
 	^self signalCantGeneratePortfolioTreeSummaryFromAccount.
 	! !
 
-!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:21:05'!
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:09:21'!
 reportDetailedTreeSummaryTo: aPorfolioTreeSummary withTab: aTabString
 	
-	| accountSummary  tab indentedAccountReport |
-	accountSummary _ OrderedCollection new.
-	accountSummary add: (aTabString, (name) asString).
+	|   tab |
+	aPorfolioTreeSummary reportName: name withIndentation: aTabString.
 	
 	tab _ String tab, aTabString.
 	
-	indentedAccountReport _ (AccountSummary for:self ) indentedReportWithTab: tab.
-	accountSummary addAll: indentedAccountReport.
-	
-	^accountSummary
+	aPorfolioTreeSummary addReportOf: self withIndentation: tab.
 
 	
 	! !
 
-!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 02:48:03'!
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:31:17'!
 reportTransactionsTo: anAccountSummary 
-	^transactions collect: [:aTransaction | aTransaction reportMeFor: anAccountSummary.].! !
+	transactions do: [:aTransaction | aTransaction reportMeIn: anAccountSummary.].! !
 
 !ReceptiveAccount methodsFor: 'summary -- private' stamp: 'HG 11/15/2020 18:28:34'!
 reportTreeSummaryTo: aPorfolioTreeSummary 
 	^self signalCantGeneratePortfolioTreeSummaryFromAccount.
 	! !
 
-!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'HG 11/15/2020 18:33:46'!
+!ReceptiveAccount methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:55:57'!
 reportTreeSummaryTo: aPorfolioTreeSummary withTab: aTab
-	^aTab, name.
+	aPorfolioTreeSummary reportName: name withIndentation: aTab.
 	! !
 
 
@@ -1041,8 +1035,8 @@ affectBalance: aBalance
 	self subclassResponsibility ! !
 
 
-!AccountTransaction methodsFor: 'summary' stamp: 'Fs 11/16/2020 02:48:03'!
-reportMeFor: anAccountSummary
+!AccountTransaction methodsFor: 'summary' stamp: 'Fs 11/16/2020 04:31:17'!
+reportMeIn: anAccountSummary
 	self subclassResponsibility. ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1087,8 +1081,8 @@ affectBalance: aBalance
 	^aBalance + value ! !
 
 
-!Deposit methodsFor: 'summary' stamp: 'Fs 11/16/2020 02:48:03'!
-reportMeFor: aSummary
+!Deposit methodsFor: 'summary' stamp: 'Fs 11/16/2020 04:31:17'!
+reportMeIn: aSummary
 	^aSummary reportAsDeposit: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1130,8 +1124,8 @@ initializeFor: aTransference
 	transference := aTransference.! !
 
 
-!TransferTransaction methodsFor: 'summary' stamp: 'Fs 11/16/2020 02:48:03'!
-reportMeFor: aSummary
+!TransferTransaction methodsFor: 'summary' stamp: 'Fs 11/16/2020 04:31:17'!
+reportMeIn: aSummary
 	self subclassResponsibility. ! !
 
 
@@ -1147,8 +1141,8 @@ affectBalance: aBalance
 	^aBalance + self value.! !
 
 
-!DepositOfTransference methodsFor: 'summary' stamp: 'Fs 11/16/2020 02:48:03'!
-reportMeFor: aSummary
+!DepositOfTransference methodsFor: 'summary' stamp: 'Fs 11/16/2020 04:31:17'!
+reportMeIn: aSummary
 	^aSummary reportAsDepositTransference: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1174,8 +1168,8 @@ affectBalance: aBalance
 	^aBalance - self value.! !
 
 
-!WithdrawOfTransference methodsFor: 'summary' stamp: 'Fs 11/16/2020 02:48:03'!
-reportMeFor: aSummary
+!WithdrawOfTransference methodsFor: 'summary' stamp: 'Fs 11/16/2020 04:31:17'!
+reportMeIn: aSummary
 	^aSummary reportAsWithdrawTransference: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1214,8 +1208,8 @@ affectBalance: aBalance
 	^aBalance - value! !
 
 
-!Withdraw methodsFor: 'summary' stamp: 'Fs 11/16/2020 02:48:03'!
-reportMeFor: aSummary
+!Withdraw methodsFor: 'summary' stamp: 'Fs 11/16/2020 04:31:17'!
+reportMeIn: aSummary
 	^aSummary reportAsWithdraw: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1237,10 +1231,6 @@ Object subclass: #Summary
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!Summary methodsFor: 'initialization' stamp: 'HG 11/13/2020 18:34:31'!
-initializeFor: anAccount
-	account _ anAccount. ! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Summary class' category: 'Portfolio-Solucion'!
@@ -1252,114 +1242,172 @@ for: anAccount
 	^self new initializeFor: anAccount ! !
 
 
-!classDefinition: #AccountSummary category: 'Portfolio-Solucion'!
-Summary subclass: #AccountSummary
-	instanceVariableNames: ''
+!classDefinition: #BalanceSummary category: 'Portfolio-Solucion'!
+Summary subclass: #BalanceSummary
+	instanceVariableNames: 'calculatedBalance'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!AccountSummary methodsFor: 'summary operations' stamp: 'HG 11/13/2020 14:51:42'!
-report
-	
-	| report |
-	report _ self reportTransactions. 
-	self addBalanceToReport: report.
-	^report.! !
-
-
-!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 17:11:38'!
-addBalanceToReport: report
-
-	^ report add: ('Balance = ', account balance asString)! !
-
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:20:32'!
-indentedReportWithTab: aStringTab
-	|accountReport indentedAccountReport |
-	
-	accountReport _ self report.	
-	indentedAccountReport _ OrderedCollection new.
-	accountReport do: [ :aReportLine |   indentedAccountReport add: (aStringTab, aReportLine)].
-	^indentedAccountReport! !
-
-!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 03:02:57'!
-reportAsDeposit: aDepositToReport
-	^'Depósito por ', aDepositToReport value asString.! !
-
-!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 12:06:38'!
-reportAsDepositTransference: aDepositTransferenceToReport
-	^'Entrada por transferencia de ', aDepositTransferenceToReport value asString.! !
-
-!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 12:02:40'!
-reportAsWithdraw: aWithdrawToReport
-	^'Extracción por ', aWithdrawToReport value asString.! !
-
-!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 12:06:21'!
-reportAsWithdrawTransference: aWithdrawTransferenceToReport
-	^'Salida por transferencia de ', aWithdrawTransferenceToReport value asString.! !
-
-!AccountSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 17:11:38'!
-reportTransactions
-	^account reportTransactionsTo: self.	! !
-
-
-!classDefinition: #DetailedTreeSummary category: 'Portfolio-Solucion'!
-Summary subclass: #DetailedTreeSummary
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Solucion'!
-
-!DetailedTreeSummary methodsFor: 'as yet unclassified' stamp: 'Fs 11/16/2020 02:17:24'!
-report
-
-	^account reportDetailedTreeSummaryTo: self.! !
-
-
-!classDefinition: #PorfolioTreeSummary category: 'Portfolio-Solucion'!
-Summary subclass: #PorfolioTreeSummary
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Solucion'!
-
-!PorfolioTreeSummary methodsFor: 'summary' stamp: 'HG 11/15/2020 17:40:11'!
-report
-
-	^account reportTreeSummaryTo: self.! !
+!BalanceSummary methodsFor: 'initialization' stamp: 'Fs 11/16/2020 04:39:29'!
+initializeFor: anAccount
+	account _ anAccount.
+	calculatedBalance _ 0! !
 
 
 !classDefinition: #TransferNetSummary category: 'Portfolio-Solucion'!
-Summary subclass: #TransferNetSummary
+BalanceSummary subclass: #TransferNetSummary
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!TransferNetSummary methodsFor: 'summary' stamp: 'HG 11/13/2020 19:16:21'!
+!TransferNetSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 05:10:32'!
 report
-	| transfersNetReported |
-	transfersNetReported _ account reportTransactionsTo: self.
-	^ transfersNetReported 
-		inject: 0 
-		into: [:subTotal :next | subTotal + next]! !
+	self reportClean.
+	
+	account reportTransactionsTo: self.
+	^ calculatedBalance 
+	! !
+
+!TransferNetSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 05:10:32'!
+reportClean
+
+	^ calculatedBalance _ 0! !
 
 
-!TransferNetSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 18:55:23'!
+!TransferNetSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:45:27'!
 reportAsDeposit: aDepositToReport
-	^0.! !
+! !
 
-!TransferNetSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 18:59:33'!
+!TransferNetSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:45:49'!
 reportAsDepositTransference: aDepositTransferenceToReport
-	^aDepositTransferenceToReport value.! !
+	calculatedBalance _ calculatedBalance +aDepositTransferenceToReport value.! !
 
-!TransferNetSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 18:55:36'!
+!TransferNetSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:45:32'!
 reportAsWithdraw: aWithdrawToReport
-	^0.! !
+	 ! !
 
-!TransferNetSummary methodsFor: '-- private operations' stamp: 'HG 11/13/2020 18:59:39'!
+!TransferNetSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:45:41'!
 reportAsWithdrawTransference: aWithdrawTransferenceToReport
-	^aWithdrawTransferenceToReport value negated.! !
+	calculatedBalance _ calculatedBalance + aWithdrawTransferenceToReport value negated.! !
+
+
+!classDefinition: #TextSummary category: 'Portfolio-Solucion'!
+Summary subclass: #TextSummary
+	instanceVariableNames: 'generatedReport'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+
+!TextSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:39:53'!
+initializeFor: anAccount
+	account _ anAccount .
+	generatedReport _ OrderedCollection new.! !
+
+!TextSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:06:48'!
+reportClean
+	generatedReport  _ OrderedCollection new.! !
+
+!TextSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:59:50'!
+reportName: anAccountName withIndentation: aTabString
+	generatedReport add: (aTabString , anAccountName).! !
+
+
+!classDefinition: #AccountSummary category: 'Portfolio-Solucion'!
+TextSummary subclass: #AccountSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!AccountSummary methodsFor: 'summary operations' stamp: 'Fs 11/16/2020 05:06:48'!
+report
+	self reportClean.
+	 
+	self reportTransactions. 
+	self addBalanceToReport.
+	^generatedReport .! !
+
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:41:25'!
+addBalanceToReport
+
+	 generatedReport add: ('Balance = ', account balance asString)! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:42:25'!
+indentedReportWithTab: aStringTab
+	|indentedAccountReport |
+	
+	self report.	
+	indentedAccountReport _ OrderedCollection new.
+	generatedReport do: [ :aReportLine |   indentedAccountReport add: (aStringTab, aReportLine)].
+	^indentedAccountReport! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:38:09'!
+reportAsDeposit: aDepositToReport
+	generatedReport add: 'Depósito por ', aDepositToReport value asString.! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:38:11'!
+reportAsDepositTransference: aDepositTransferenceToReport
+	generatedReport add:'Entrada por transferencia de ', aDepositTransferenceToReport value asString.! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:38:13'!
+reportAsWithdraw: aWithdrawToReport
+	generatedReport add:'Extracción por ', aWithdrawToReport value asString.! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:38:16'!
+reportAsWithdrawTransference: aWithdrawTransferenceToReport
+	generatedReport add: 'Salida por transferencia de ', aWithdrawTransferenceToReport value asString.! !
+
+!AccountSummary methodsFor: '-- private operations' stamp: 'Fs 11/16/2020 04:27:52'!
+reportTransactions
+	account reportTransactionsTo: self.	
+	 ! !
+
+
+!classDefinition: #DetailedTreeSummary category: 'Portfolio-Solucion'!
+TextSummary subclass: #DetailedTreeSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!DetailedTreeSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 05:06:48'!
+report
+	self reportClean.
+
+	account reportDetailedTreeSummaryTo: self.
+	^generatedReport ! !
+
+
+!DetailedTreeSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 05:05:49'!
+addReportOf: aReceptiveAccount withIndentation: aStringTab
+	| aReceptiveAccountReport |
+	aReceptiveAccountReport _  (AccountSummary for: aReceptiveAccount) report.
+	
+	aReceptiveAccountReport do: [ :aReportLine |   generatedReport add: (aStringTab, aReportLine)].
+! !
+
+!DetailedTreeSummary methodsFor: 'summary -- private' stamp: 'Fs 11/16/2020 04:59:19'!
+reportBalance: aBalanceToReport withIndentation: aStringTab
+	generatedReport add: (aStringTab, 'Balance = ', aBalanceToReport asString).! !
+
+
+!classDefinition: #PorfolioTreeSummary category: 'Portfolio-Solucion'!
+TextSummary subclass: #PorfolioTreeSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!PorfolioTreeSummary methodsFor: 'summary' stamp: 'Fs 11/16/2020 05:06:48'!
+report
+	self reportClean.
+
+	account reportTreeSummaryTo: self.
+	^generatedReport ! !
 
 
 !classDefinition: #Transference category: 'Portfolio-Solucion'!
