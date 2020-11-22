@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: 'TusLibros'!
+!classDefinition: #CartTest category: #TusLibros!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'support'
 	classVariableNames: ''
@@ -91,13 +91,38 @@ test08CartRemembersTheNumberOfAddedItems
 	cart add: 2 of: support itemSellByTheStore.
 	self assert: (cart occurrencesOf: support itemSellByTheStore) = 2! !
 
+!CartTest methodsFor: 'tests' stamp: 'HG 11/22/2020 12:52:23'!
+test09CartCanNotBeInitializedWithNonPositivePriceInCatalog
+	
+	self 
+		should: [Cart acceptingItemsOf: TestSupport new nonPositivePriceCatalog.]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cart new nonPositivePriceInCatalogErrorMessage. ]
+	
+	! !
+
+!CartTest methodsFor: 'tests' stamp: 'HG 11/22/2020 12:53:16'!
+test10CannotAddNonIntegerNumberOfItems
+
+	| cart |
+	
+	cart := support createCart.
+	
+	self 
+		should: [cart add: 1.5 of: support itemSellByTheStore ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart fractionQuantityErrorMessage.
+			self assert: cart isEmpty ]! !
+
 
 !CartTest methodsFor: 'setUp' stamp: 'FS 11/21/2020 22:32:36'!
 setUp
 	support _ TestSupport new.! !
 
 
-!classDefinition: #CashierTest category: 'TusLibros'!
+!classDefinition: #CashierTest category: #TusLibros!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'support'
 	classVariableNames: ''
@@ -134,13 +159,13 @@ test02CheckOutCartWithOneItemChargesCorrectAmount
 		
 	! !
 
-!CashierTest methodsFor: 'as yet unclassified' stamp: 'FS 11/21/2020 22:54:57'!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'HG 11/22/2020 11:36:38'!
 test03CheckOutCartWithOneItemWithMultipleOcurrencesChargesCorrectAmount
 
 	| cart cashier chargedAmount quantityOfItem |
 	cart _ support createCart.
 	quantityOfItem _ 13.
-	cart add: quantityOfItem of:support itemSellByTheStore .
+	cart add: quantityOfItem of: support itemSellByTheStore .
 	
 	cashier _ Cashier new.
 	chargedAmount _ cashier checkOutWithCart: cart usingCard: '0000'.
@@ -170,13 +195,28 @@ test04CheckOutCartWithMultipleItemsChargesCorrectAmount
 		
 	! !
 
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'HG 11/22/2020 12:56:10'!
+test05
+	| cart cashier |
+	cart _ support createCart.
+	cashier _ Cashier new.
+	
+	self 
+		should: [cashier checkOutWithCart: cart usingCard: '0000'.]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText = cashier checkoutEmptyCartErrorMessage. ]! !
+
 
-!classDefinition: #Cart category: 'TusLibros'!
+!classDefinition: #Cart category: #TusLibros!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
+
+!Cart methodsFor: 'error messages' stamp: 'HG 11/22/2020 12:48:01'!
+fractionQuantityErrorMessage
+	^'Can not add a non integer quantity'.! !
 
 !Cart methodsFor: 'error messages' stamp: 'HernanWilkinson 6/17/2013 17:45'!
 invalidItemErrorMessage
@@ -188,21 +228,28 @@ invalidQuantityErrorMessage
 	
 	^'Invalid number of items'! !
 
+!Cart methodsFor: 'error messages' stamp: 'HG 11/22/2020 12:01:51'!
+nonPositivePriceInCatalogErrorMessage
+	
+	^'A Catalog can not be initalized with non positive prices'! !
+
 
 !Cart methodsFor: 'assertions' stamp: 'HG 11/21/2020 22:19:49'!
 assertIsValidItem: anItem
 
 	(catalog includesKey: anItem) ifFalse: [ self error: self invalidItemErrorMessage ]! !
 
-!Cart methodsFor: 'assertions' stamp: 'HernanWilkinson 6/17/2013 17:51'!
+!Cart methodsFor: 'assertions' stamp: 'HG 11/22/2020 12:48:44'!
 assertIsValidQuantity: aQuantity
 
-	aQuantity strictlyPositive ifFalse: [ self error: self invalidQuantityErrorMessage ]! !
+	aQuantity strictlyPositive ifFalse: [ self error: self invalidQuantityErrorMessage ].
+	aQuantity isFloat ifTrue: [ self error: self fractionQuantityErrorMessage ].! !
 
 
-!Cart methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 17:48'!
+!Cart methodsFor: 'initialization' stamp: 'HG 11/22/2020 12:20:54'!
 initializeAcceptingItemsOf: aCatalog
 
+	aCatalog do: [:aCatalogPrice | aCatalogPrice < 0 ifTrue: [self error: self nonPositivePriceInCatalogErrorMessage ]].
 	catalog := aCatalog.
 	items := OrderedCollection new.! !
 
@@ -244,7 +291,7 @@ add: aQuantity of: anItem
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: 'TusLibros'!
+!classDefinition: 'Cart class' category: #TusLibros!
 Cart class
 	instanceVariableNames: ''!
 
@@ -254,7 +301,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #Cashier category: 'TusLibros'!
+!classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -266,21 +313,24 @@ checkoutEmptyCartErrorMessage
 	^'Can not checkout with empty cart'.! !
 
 
-!Cashier methodsFor: 'checkout' stamp: 'FS 11/21/2020 23:25:04'!
+!Cashier methodsFor: 'checkout' stamp: 'HG 11/22/2020 11:37:46'!
 checkOutWithCart: aCart usingCard: aCardNumber
 
 	| priceList |
 	(aCart isEmpty) ifTrue: [^self error: self checkoutEmptyCartErrorMessage.].
+	
 	priceList _ aCart priceList.
 				
-	^(priceList keys) inject:0 
-				   into:[ :totalAmount :anItem |					(aCart includes: anItem)		 
-										ifTrue:[ totalAmount + ( (priceList at: anItem) * (aCart occurrencesOf:  anItem))]
-					 ].
+	^(priceList keys) 
+		inject: 0 
+		into: [ :totalAmount :anItem |
+				(aCart includes: anItem) 
+				ifTrue: [ totalAmount + ( (priceList at: anItem) * (aCart occurrencesOf:  anItem))]
+			].
 	 ! !
 
 
-!classDefinition: #TestSupport category: 'TusLibros'!
+!classDefinition: #TestSupport category: #TusLibros!
 Object subclass: #TestSupport
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -326,3 +376,13 @@ itemSellByTheStore
 itemSellByTheStorePrice
 	
 	^100! !
+
+!TestSupport methodsFor: 'as yet unclassified' stamp: 'HG 11/22/2020 11:59:44'!
+negativePrice
+	
+	^100 negated.! !
+
+!TestSupport methodsFor: 'as yet unclassified' stamp: 'HG 11/22/2020 11:59:32'!
+nonPositivePriceCatalog
+	
+	^ Dictionary newFromPairs: (Array with: self itemSellByTheStore with: self negativePrice).! !
