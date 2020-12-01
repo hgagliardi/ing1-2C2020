@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: 'TusLibros'!
+!classDefinition: #CartTest category: #TusLibros!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
@@ -98,7 +98,7 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!classDefinition: #CashierTest category: 'TusLibros'!
+!classDefinition: #CashierTest category: #TusLibros!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'testObjectsFactory debitBehavior'
 	classVariableNames: ''
@@ -246,7 +246,7 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #InternalRestInterfaceTest category: 'TusLibros'!
+!classDefinition: #InternalRestInterfaceTest category: #TusLibros!
 TestCase subclass: #InternalRestInterfaceTest
 	instanceVariableNames: 'interfaceObjectsFactory storeObjectsFactory'
 	classVariableNames: ''
@@ -356,8 +356,24 @@ test03
 	self assert: (interface hasRegisteredCart: anotherCartId).
 	self deny: (cartId = anotherCartId).! !
 
+
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'HG 12/1/2020 00:54:48'!
+test08
+	
+	| interface cartId |
+	
+	interface _ interfaceObjectsFactory defaultInterface .
+	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
+	
+	self should: [interface checkoutCart: cartId 
+							  withCreditCardNumber: storeObjectsFactory notExpiredCreditCard
+							  withCreditCardExpiredAt: (GregorianMonthOfYear current next)
+							  withOwnerName: 'Nombre de dueño'.]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [:anError | anError messageText = InternalRestInterface emptyCartErrorMessage.].! !
+
 
-!classDefinition: #Cart category: 'TusLibros'!
+!classDefinition: #Cart category: #TusLibros!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -431,7 +447,7 @@ add: aQuantity of: anItem
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: 'TusLibros'!
+!classDefinition: 'Cart class' category: #TusLibros!
 Cart class
 	instanceVariableNames: ''!
 
@@ -441,7 +457,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #Cashier category: 'TusLibros'!
+!classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total'
 	classVariableNames: ''
@@ -492,7 +508,7 @@ initializeToCheckout: aCart charging: aCreditCard throught: aMerchantProcessor r
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: 'TusLibros'!
+!classDefinition: 'Cashier class' category: #TusLibros!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -532,7 +548,7 @@ creditCardHasNoCreditErrorMessage
 	^'Credit card has no credit'! !
 
 
-!classDefinition: #CreditCard category: 'TusLibros'!
+!classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
 	instanceVariableNames: 'expiration'
 	classVariableNames: ''
@@ -552,7 +568,7 @@ initializeExpiringOn: aMonth
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: 'TusLibros'!
+!classDefinition: 'CreditCard class' category: #TusLibros!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -562,7 +578,7 @@ expiringOn: aMonth
 	^self new initializeExpiringOn: aMonth! !
 
 
-!classDefinition: #InterfaceTestObjectsFactory category: 'TusLibros'!
+!classDefinition: #InterfaceTestObjectsFactory category: #TusLibros!
 Object subclass: #InterfaceTestObjectsFactory
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -609,7 +625,7 @@ validUserPassword
 	^  '123' ! !
 
 
-!classDefinition: #InternalRestInterface category: 'TusLibros'!
+!classDefinition: #InternalRestInterface category: #TusLibros!
 Object subclass: #InternalRestInterface
 	instanceVariableNames: 'validUsers createdCarts lastId catalog'
 	classVariableNames: ''
@@ -681,9 +697,26 @@ listCart: aCartId
 	
 	^aCartToList.! !
 
+!InternalRestInterface methodsFor: 'accessing' stamp: 'HG 12/1/2020 00:40:54'!
+listPurchasesOf: anUsername withPassword: aPassword 
+	^OrderedCollection new.! !
+
+
+!InternalRestInterface methodsFor: 'checkout' stamp: 'HG 12/1/2020 00:47:04'!
+assertIsNotEmpty: cart
+
+	^ cart isEmpty ifTrue: [self error: self class emptyCartErrorMessage]! !
+
+!InternalRestInterface methodsFor: 'checkout' stamp: 'HG 12/1/2020 00:56:28'!
+checkoutCart: aCartId withCreditCardNumber: aCreditCardNumber withCreditCardExpiredAt: anExpirationDate withOwnerName: aName 
+	| cart |
+	cart _ self CAMBIARgetCartOrFail: aCartId.
+	self assertIsNotEmpty: cart.
+	! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'InternalRestInterface class' category: 'TusLibros'!
+!classDefinition: 'InternalRestInterface class' category: #TusLibros!
 InternalRestInterface class
 	instanceVariableNames: ''!
 
@@ -691,6 +724,10 @@ InternalRestInterface class
 withValidUsers: aValidUsersList withCatalog: aCatalog 
 	^self new initializeWithValidUsers: aValidUsersList withCatalog: aCatalog.! !
 
+
+!InternalRestInterface class methodsFor: 'error description' stamp: 'HG 12/1/2020 00:45:13'!
+emptyCartErrorMessage
+	^'Carrito vacío para checkout'.! !
 
 !InternalRestInterface class methodsFor: 'error description' stamp: 'HG 11/30/2020 20:37:49'!
 invalidCartErrorMessage
@@ -705,7 +742,7 @@ invalidUserErrorMessage
 	^'Usuario inválido'.! !
 
 
-!classDefinition: #Sale category: 'TusLibros'!
+!classDefinition: #Sale category: #TusLibros!
 Object subclass: #Sale
 	instanceVariableNames: 'total'
 	classVariableNames: ''
@@ -725,7 +762,7 @@ initializeTotal: aTotal
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Sale class' category: 'TusLibros'!
+!classDefinition: 'Sale class' category: #TusLibros!
 Sale class
 	instanceVariableNames: ''!
 
@@ -736,7 +773,7 @@ of: aTotal
 	^self new initializeTotal: aTotal ! !
 
 
-!classDefinition: #StoreTestObjectsFactory category: 'TusLibros'!
+!classDefinition: #StoreTestObjectsFactory category: #TusLibros!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
