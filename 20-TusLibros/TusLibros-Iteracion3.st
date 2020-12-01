@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros!
+!classDefinition: #CartTest category: 'TusLibros'!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
@@ -98,7 +98,7 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!classDefinition: #CashierTest category: #TusLibros!
+!classDefinition: #CashierTest category: 'TusLibros'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'testObjectsFactory debitBehavior'
 	classVariableNames: ''
@@ -246,26 +246,27 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #InternalRestInterfaceTest category: #TusLibros!
+!classDefinition: #InternalRestInterfaceTest category: 'TusLibros'!
 TestCase subclass: #InternalRestInterfaceTest
-	instanceVariableNames: 'interfaceObjectsFactory storeObjectsFactory'
+	instanceVariableNames: 'interfaceObjectsFactory storeObjectsFactory debitBehavior'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!InternalRestInterfaceTest methodsFor: 'setUp' stamp: 'FS 12/1/2020 00:09:35'!
+!InternalRestInterfaceTest methodsFor: 'setUp' stamp: 'FS 12/1/2020 17:43:28'!
 setUp
 
 	interfaceObjectsFactory := InterfaceTestObjectsFactory new.
-	storeObjectsFactory := StoreTestObjectsFactory new.! !
+	storeObjectsFactory := StoreTestObjectsFactory new.
+	debitBehavior := [ :anAmount :aCreditCard | ]! !
 
 
-!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 12/1/2020 01:52:57'!
+!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 12/1/2020 17:44:01'!
 test04CannotAdItemsToNotExistingCart
 	
 	| interface cartToAddID |
 	
-	interface _ interfaceObjectsFactory defaultInterface .
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self.
 	cartToAddID _ 5.
 	
 	self should: [interface addToCart: cartToAddID anItem: storeObjectsFactory itemSellByTheStore withQuantity: 1. ]
@@ -276,35 +277,35 @@ test04CannotAdItemsToNotExistingCart
 							].
 	! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 12/1/2020 01:53:04'!
+!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 12/1/2020 17:44:01'!
 test05CannotListNotExistingCart
 	
 	| interface |
 	
-	interface _ interfaceObjectsFactory defaultInterface .
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self.
 	
 	self should: [interface listCart: 5. ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [:anError | self assert: anError messageText = InternalRestInterface invalidCartErrorMessage.
 								self deny: (interface hasRegisteredCart: 5)]! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'HG 12/1/2020 14:45:43'!
+!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 12/1/2020 17:44:01'!
 test06CartHasNoItemsWhenCreated
 	
 	| interface cartId |
 	
-	interface _ interfaceObjectsFactory defaultInterface.
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self.
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	
 	self assert: (interface listCart: cartId) isEmpty.! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'HG 12/1/2020 14:45:53'!
+!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 12/1/2020 17:44:01'!
 test07CartRemembersItemsAddedToIt
 	
 	| interface cartId validBook cartContent aQuantityToAdd |
 	
 	validBook _ storeObjectsFactory itemSellByTheStore.
-	interface _ interfaceObjectsFactory defaultInterface.
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self.
 	
 	aQuantityToAdd _ 3.
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
@@ -315,11 +316,12 @@ test07CartRemembersItemsAddedToIt
 	self assert: (cartContent occurrencesOf: validBook) equals: aQuantityToAdd.! !
 
 
-!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'HG 12/1/2020 14:45:24'!
+!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'FS 12/1/2020 17:44:01'!
 test01CannotCreateCartForUnregisteredUser
 	
 	| interface |
-	interface _ interfaceObjectsFactory defaultInterface.
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self
+.
 	
 	self should: [ interface createCartForUser: interfaceObjectsFactory invalidUser withPassword: '000'. ]
 			raise: Error
@@ -327,13 +329,13 @@ test01CannotCreateCartForUnregisteredUser
 									self assert: anError messageText =  InternalRestInterface invalidUserErrorMessage.
 									  ].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'HG 12/1/2020 14:44:39'!
+!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'FS 12/1/2020 17:44:01'!
 test02CannotCreateCartWithIncorrectPassword
 	
 	| interface validUser |
 	
-	interface _ interfaceObjectsFactory defaultInterface.
-	validUser _ interfaceObjectsFactory defaultUsers keys first.
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
+	validUser _ interfaceObjectsFactory validUser .
 	
 	self should: [ interface createCartForUser: validUser withPassword: interfaceObjectsFactory invalidPassword . ]
 			raise: Error
@@ -341,75 +343,65 @@ test02CannotCreateCartWithIncorrectPassword
 									self assert: anError messageText =  InternalRestInterface invalidPasswordErrorMessage.
 									  ].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'HG 12/1/2020 14:47:24'!
+!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'FS 12/1/2020 17:44:01'!
 test03InterfaceRemembersCartsAndCartIDsDontCollide
 	
-	| interface anotherCartId cartId twoUsersDataBase anotherValidUser anotherValidUserPassword validUser validUserPassword |
+	| interface anotherCartId cartId  |
+						
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	
-	validUser _ interfaceObjectsFactory validUser.
-	validUserPassword _ interfaceObjectsFactory validUserPassword.
-	anotherValidUser _ 'Usuario 2'.
-	anotherValidUserPassword _ '456'.
-	
-	twoUsersDataBase _ Dictionary new
-							 at: validUser put: validUserPassword;
-							 at: anotherValidUser put: anotherValidUserPassword;
-							 yourself.
-											
-	interface _ InternalRestInterface withValidUsers: twoUsersDataBase withCatalog: storeObjectsFactory defaultCatalog using: interfaceObjectsFactory clock.
-	
-	cartId _ interface createCartForUser:  validUser withPassword: validUserPassword.
-	anotherCartId _ interface createCartForUser:  anotherValidUser withPassword: anotherValidUserPassword.
+	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
+	anotherCartId _  interfaceObjectsFactory createCartForAnotherValidUserIn: interface.
 	
 	self assert: (interface hasRegisteredCart: cartId).
 	self assert: (interface hasRegisteredCart: anotherCartId).
 	self deny: (cartId = anotherCartId).! !
 
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 02:24:23'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 17:44:01'!
 test08CannotCheckoutNotCreatedCart
 	
 	| interface |
 	'TODO: Creo que falta chequear que NO se hicieron ventas, o sea que el salesBook esta empty,
 		como lo hicieron ellos en el cashier (y asi probar que no se uso el merchant processor)'.
 		
-	interface _ interfaceObjectsFactory defaultInterface.
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	
 	self should: [self checkout: 'invalidCartId' using: interface]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [:anError | self assert: anError messageText = InternalRestInterface invalidCartErrorMessage .].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 02:24:28'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 17:44:01'!
 test09CannotCheckoutEmptyCart
 	
 	| interface cartId |
 	'TODO: Creo que falta chequear que NO se hicieron ventas, o sea que el salesBook esta empty,
 		como lo hicieron ellos en el cashier   (y asi probar que no se uso el merchant processor)'.
 		
-	interface _ interfaceObjectsFactory defaultInterface .
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	
 	self should: [self checkout: cartId using: interface.]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [:anError | self assert: anError messageText = InternalRestInterface emptyCartErrorMessage.].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 01:56:32'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 17:44:01'!
 test10ClientStartsWithNoPurchases
 	
 	| interface |
 	
-	interface _ interfaceObjectsFactory defaultInterface .
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	
 	self assert: (interface listPurchasesOf: interfaceObjectsFactory validUser 
 					  withPassword: interfaceObjectsFactory validUserPassword) 
 			 		  isEmpty  ! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 02:03:52'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 17:44:01'!
 test11CannotListPurchasesOfUnregisteredUser
 	
 	| interface |
 	
-	interface _ interfaceObjectsFactory defaultInterface .
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	
 	self should:[ interface listPurchasesOf: interfaceObjectsFactory invalidUser 
 					  withPassword: '123']
@@ -417,12 +409,12 @@ test11CannotListPurchasesOfUnregisteredUser
 		withExceptionDo:[:anError | self assert: anError messageText = InternalRestInterface invalidUserErrorMessage ]
 			 		  ! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 02:04:08'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 17:44:01'!
 test12CannotListPurchasesWithInvalidPassword
 	
 	| interface |
 	
-	interface _ interfaceObjectsFactory defaultInterface .
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	
 	self should:[ interface listPurchasesOf: interfaceObjectsFactory validUser 
 					  withPassword: interfaceObjectsFactory invalidPassword]
@@ -430,27 +422,17 @@ test12CannotListPurchasesWithInvalidPassword
 		withExceptionDo:[:anError | self assert: anError messageText = InternalRestInterface invalidPasswordErrorMessage ]
 			 		  ! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'HG 12/1/2020 14:47:28'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 17:44:01'!
 test13TransactionIdsDontCollide
 
-	| cartId interface aQuantityToAdd validBook transactionId anotherTransactionId anotherCartId anotherValidUser anotherValidUserPassword twoUsersDataBase validUser validUserPassword |
+	| cartId interface aQuantityToAdd validBook transactionId anotherTransactionId anotherCartId |
  	
-	validBook _ storeObjectsFactory itemSellByTheStore.
-	validUser _ interfaceObjectsFactory validUser.
-	validUserPassword _ interfaceObjectsFactory validUserPassword.
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	
-	anotherValidUser _ 'Usuario 2'.
-	anotherValidUserPassword _ '456'.
+	cartId  _ interfaceObjectsFactory createCartForValidUserIn: interface .
+	anotherCartId  _ interfaceObjectsFactory createCartForAnotherValidUserIn: interface .
 	
-	twoUsersDataBase _ Dictionary new
-							 at: validUser put: validUserPassword;
-							 at: anotherValidUser put: anotherValidUserPassword;
-							 yourself.
-											
-	interface _ InternalRestInterface withValidUsers: twoUsersDataBase withCatalog: storeObjectsFactory defaultCatalog using: interfaceObjectsFactory clock.
-	cartId _ interface createCartForUser:  validUser withPassword: validUserPassword.
-	anotherCartId _ interface createCartForUser:  anotherValidUser withPassword: anotherValidUserPassword.
-	
+	validBook _ storeObjectsFactory itemSellByTheStore .
 	aQuantityToAdd _ 3.
 	interface addToCart: cartId anItem: validBook withQuantity: aQuantityToAdd. 
 	interface addToCart: anotherCartId anItem: validBook withQuantity: aQuantityToAdd. 
@@ -460,9 +442,24 @@ test13TransactionIdsDontCollide
 	
 	self deny: transactionId = anotherTransactionId.! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 02:25:09'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 18:13:10'!
 test14ListPurchasesCorrectlyAfterCheckout
-	'TODO: Ademas de chequear que la lista de purchases se modifica con el checkout que hiciste, creo que tambien hay que chequear que se hicieron las ventas con el salesBook, como hicieron en cashier ellos (para demostrar que se contacto al merchant processor'.! !
+	| cartId interface userPurchases itemToBuy |
+	'TODO: Ademas de chequear que la lista de purchases se modifica con el checkout que hiciste, creo que tambien hay que chequear que se hicieron las ventas con el salesBook, como hicieron en cashier ellos (para demostrar que se contacto al merchant processor'.
+	
+	interface _  interfaceObjectsFactory defaultInterfaceThrough: self .
+	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
+	itemToBuy _ storeObjectsFactory itemSellByTheStore.
+	interface addToCart: cartId anItem: itemToBuy withQuantity: 3.
+	
+	self checkout: cartId using: interface.
+	
+	userPurchases _ interface listPurchasesOf: interfaceObjectsFactory validUser 
+						  withPassword: interfaceObjectsFactory validUserPassword .
+						
+	self assert: (userPurchases occurrencesOf: itemToBuy) = 3.
+	'TODO: Falta hacer la jugada para que ademas de alguna forma tenga la cantidad de guita que compro el user'.
+	! !
 
 
 !InternalRestInterfaceTest methodsFor: 'checkout support' stamp: 'HG 12/1/2020 14:55:20'!
@@ -474,13 +471,13 @@ checkout: cartId using: interface
 							  withOwnerName: interfaceObjectsFactory ownersName! !
 
 
-!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'HG 12/1/2020 14:48:48'!
-test15
+!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/1/2020 17:44:01'!
+test15CannotListCartAfterSessionExpired
 
 	| interface cartId clock |
 	
 	clock _ interfaceObjectsFactory clock.
-	interface _ interfaceObjectsFactory defaultInterface. 
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	
 	clock moveForward: 30 minutes.
@@ -490,13 +487,13 @@ test15
 		  withExceptionDo: [:anError | self assert: anError messageText = StoreSession sessionExpiredMessageError ]. 
 					! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'HG 12/1/2020 14:57:12'!
-test16
+!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/1/2020 17:44:01'!
+test16CannotAddToCartAfterSessionExpired
 
 	| interface cartId clock |
 	
 	clock _ interfaceObjectsFactory clock.
-	interface _ interfaceObjectsFactory defaultInterface. 
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	
 	clock moveForward: 30 minutes.
@@ -506,13 +503,13 @@ test16
 		  withExceptionDo: [:anError | self assert: anError messageText = StoreSession sessionExpiredMessageError.]. 
 					! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'HG 12/1/2020 14:58:34'!
-test17
+!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/1/2020 17:44:01'!
+test17CannotCheckoutCartAfterSessionExpired
 
 	| interface cartId clock |
 	
 	clock _ interfaceObjectsFactory clock.
-	interface _ interfaceObjectsFactory defaultInterface. 
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	interface addToCart: cartId anItem: storeObjectsFactory itemSellByTheStore withQuantity: 1.
 	clock moveForward: 30 minutes.
@@ -525,29 +522,29 @@ test17
 														 withPassword: interfaceObjectsFactory validUserPassword) isEmpty]. 
 					! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'HG 12/1/2020 15:10:30'!
-test18
+!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/1/2020 17:44:01'!
+test18AddingToCartRefreshesSession
 
-	| interface cartId clock product |
+	| interface cartId clock |
 	
-	product _ storeObjectsFactory itemSellByTheStore.
 	clock _ interfaceObjectsFactory clock.
-	interface _ interfaceObjectsFactory defaultInterface. 
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
+	
 	clock moveForward: 20 minutes.
 	interface listCart: cartId.
 	clock moveForward: 20 minutes.
 	
 	self shouldntFail: [interface listCart:cartId.].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'HG 12/1/2020 15:11:47'!
-test19
+!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/1/2020 17:44:01'!
+test19ListingCartRefreshesSession
 
 	| interface cartId clock product cartContents |
 	
 	product _ storeObjectsFactory itemSellByTheStore.
 	clock _ interfaceObjectsFactory clock.
-	interface _ interfaceObjectsFactory defaultInterface. 
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	clock moveForward: 20 minutes.
 	interface addToCart: cartId anItem: product withQuantity: 1.
@@ -556,14 +553,13 @@ test19
 	self shouldntFail: [cartContents _ interface listCart: cartId].
 	self assert: (cartContents occurrencesOf: product) equals: 1.! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'HG 12/1/2020 15:15:33'!
-test20
+!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/1/2020 17:44:01'!
+test20CheckingOutACartKillsSession
 
-	| interface cartId clock product |
+	| interface cartId product |
 	
 	product _ storeObjectsFactory itemSellByTheStore.
-	clock _ interfaceObjectsFactory clock.
-	interface _ interfaceObjectsFactory defaultInterface. 
+	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	
 	interface addToCart: cartId anItem: product withQuantity: 1.
@@ -573,8 +569,13 @@ test20
 		 raise: Error - MessageNotUnderstood
 		 withExceptionDo: [:anError | self assert: anError messageText = StoreSession sessionExpiredMessageError].! !
 
+
+!InternalRestInterfaceTest methodsFor: 'merchant processor protocol' stamp: 'FS 12/1/2020 17:40:06'!
+debit: anAmount from: aCreditCard
+	^debitBehavior value: anAmount value: aCreditCard! !
+
 
-!classDefinition: #Cart category: #TusLibros!
+!classDefinition: #Cart category: 'TusLibros'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -609,6 +610,10 @@ initializeAcceptingItemsOf: aCatalog
 	catalog := aCatalog.
 	items := OrderedCollection new.! !
 
+
+!Cart methodsFor: 'queries' stamp: 'FS 12/1/2020 18:02:03'!
+items
+	^items copy! !
 
 !Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
 occurrencesOf: anItem
@@ -648,7 +653,7 @@ add: aQuantity of: anItem
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros!
+!classDefinition: 'Cart class' category: 'TusLibros'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -658,7 +663,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #Cashier category: #TusLibros!
+!classDefinition: #Cashier category: 'TusLibros'!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total'
 	classVariableNames: ''
@@ -709,7 +714,7 @@ initializeToCheckout: aCart charging: aCreditCard throught: aMerchantProcessor r
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros!
+!classDefinition: 'Cashier class' category: 'TusLibros'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -749,7 +754,7 @@ creditCardHasNoCreditErrorMessage
 	^'Credit card has no credit'! !
 
 
-!classDefinition: #Clock category: #TusLibros!
+!classDefinition: #Clock category: 'TusLibros'!
 Object subclass: #Clock
 	instanceVariableNames: 'startingAt offset'
 	classVariableNames: ''
@@ -779,7 +784,7 @@ startingTime
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Clock class' category: #TusLibros!
+!classDefinition: 'Clock class' category: 'TusLibros'!
 Clock class
 	instanceVariableNames: ''!
 
@@ -788,17 +793,17 @@ startingAt: aDateAndTime
 	^self new initializeStartingAt: aDateAndTime ! !
 
 
-!classDefinition: #CreditCard category: #TusLibros!
+!classDefinition: #CreditCard category: 'TusLibros'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'expiration'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 18:39'!
+!CreditCard methodsFor: 'testing' stamp: 'FS 12/1/2020 17:32:32'!
 isExpiredOn: aDate 
 	
-	^expiration start < (Month month: aDate monthIndex year: aDate yearNumber) start ! !
+	^expiration  < (GregorianMonthOfYear yearNumber: (aDate yearNumber ) monthNumber: (aDate monthIndex ))! !
 
 
 !CreditCard methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:38'!
@@ -808,7 +813,7 @@ initializeExpiringOn: aMonth
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros!
+!classDefinition: 'CreditCard class' category: 'TusLibros'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -818,12 +823,17 @@ expiringOn: aMonth
 	^self new initializeExpiringOn: aMonth! !
 
 
-!classDefinition: #InterfaceTestObjectsFactory category: #TusLibros!
+!classDefinition: #InterfaceTestObjectsFactory category: 'TusLibros'!
 Object subclass: #InterfaceTestObjectsFactory
 	instanceVariableNames: 'clock'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
+
+!InterfaceTestObjectsFactory methodsFor: 'cart' stamp: 'FS 12/1/2020 16:09:04'!
+createCartForAnotherValidUserIn: aRestInterface
+
+	^aRestInterface createCartForUser: self anotherValidUser withPassword: self anotherValidUserPassword.! !
 
 !InterfaceTestObjectsFactory methodsFor: 'cart' stamp: 'FS 12/1/2020 00:05:23'!
 createCartForValidUserIn: aRestInterface
@@ -831,17 +841,27 @@ createCartForValidUserIn: aRestInterface
 	^aRestInterface createCartForUser: self validUser withPassword: self validUserPassword.! !
 
 
-!InterfaceTestObjectsFactory methodsFor: 'users' stamp: 'HG 12/1/2020 14:44:56'!
-defaultInterface
+!InterfaceTestObjectsFactory methodsFor: 'users' stamp: 'FS 12/1/2020 16:08:13'!
+anotherValidUser 
+	^  'Usuario2' ! !
+
+!InterfaceTestObjectsFactory methodsFor: 'users' stamp: 'FS 12/1/2020 16:08:25'!
+anotherValidUserPassword
+	^  '456' ! !
+
+!InterfaceTestObjectsFactory methodsFor: 'users' stamp: 'FS 12/1/2020 17:44:54'!
+defaultInterfaceThrough: aMerchantProcessor
 	^InternalRestInterface 
 		withValidUsers: self defaultUsers 
 		withCatalog: StoreTestObjectsFactory new defaultCatalog
-		using: clock.! !
+		using: clock
+		through: aMerchantProcessor .! !
 
-!InterfaceTestObjectsFactory methodsFor: 'users' stamp: 'FS 12/1/2020 01:21:26'!
+!InterfaceTestObjectsFactory methodsFor: 'users' stamp: 'FS 12/1/2020 16:08:04'!
 defaultUsers
 	^ Dictionary new 
-		at: self validUser put: self validUserPassword;  yourself.! !
+		at: self validUser put: self validUserPassword;
+		at: self anotherValidUser put: self anotherValidUserPassword;  yourself.! !
 
 !InterfaceTestObjectsFactory methodsFor: 'users' stamp: 'FS 12/1/2020 02:01:25'!
 invalidPassword
@@ -883,28 +903,28 @@ initialize
 	clock _ Clock startingAt: DateAndTime now.! !
 
 
-!classDefinition: #InternalRestInterface category: #TusLibros!
+!classDefinition: #InternalRestInterface category: 'TusLibros'!
 Object subclass: #InternalRestInterface
-	instanceVariableNames: 'validUsers createdCarts lastCartId catalog lastTransactionId clock cartTimeUpdates'
+	instanceVariableNames: 'validUsers cartsContents lastCartId catalog lastTransactionId clock cartsLastUsed cartsOwners merchantProcessor purchasesByUser lastpurchasetotal'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!InternalRestInterface methodsFor: 'initialization' stamp: 'HG 12/1/2020 14:19:28'!
-initializeWithValidUsers: aValidUsersList withCatalog: aCatalog
+!InternalRestInterface methodsFor: 'initialization' stamp: 'FS 12/1/2020 17:52:36'!
+initializeWithValidUsers: aValidUsersList withCatalog: aCatalog withClock: aClock through: aMerchantProcessor
 	validUsers := aValidUsersList.
+	
 	lastCartId _ 1.
 	lastTransactionId _ 0.
-	createdCarts _ Dictionary new.
-	catalog _ aCatalog.! !
+	
+	cartsContents _ Dictionary new.
+	cartsLastUsed _ Dictionary new.
+	cartsOwners _ Dictionary new.
+	
+	purchasesByUser _ Dictionary newFrom: aValidUsersList.
+	aValidUsersList keysDo: [:anUser | purchasesByUser at: anUser put: Bag new].
 
-!InternalRestInterface methodsFor: 'initialization' stamp: 'HG 12/1/2020 14:34:51'!
-initializeWithValidUsers: aValidUsersList withCatalog: aCatalog withClock: aClock
-	validUsers := aValidUsersList.
-	lastCartId _ 1.
-	lastTransactionId _ 0.
-	createdCarts _ Dictionary new.
-	cartTimeUpdates _ Dictionary new.
+	merchantProcessor _ aMerchantProcessor .
 	catalog _ aCatalog.
 	clock _ aClock.! !
 
@@ -921,7 +941,7 @@ authenticateUser: anUserId withPassword: anUserPassword
 								ifFalse: [ self error: self class invalidPasswordErrorMessage. ]! !
 
 
-!InternalRestInterface methodsFor: 'cart creation' stamp: 'HG 12/1/2020 14:28:26'!
+!InternalRestInterface methodsFor: 'cart creation' stamp: 'FS 12/1/2020 17:20:18'!
 createCartForUser: anUserId withPassword: anUserPassword
 	
 	| newCartId cart |
@@ -930,8 +950,9 @@ createCartForUser: anUserId withPassword: anUserPassword
 	newCartId _ self generateCartId.
 	cart _ Cart acceptingItemsOf: catalog.
 	
-	createdCarts at: newCartId put: cart. 
-	cartTimeUpdates at: newCartId put: clock now.
+	cartsContents at: newCartId put: cart. 
+	cartsLastUsed at: newCartId put: clock now.
+	cartsOwners at:newCartId put: anUserId.
 	
 	^newCartId.! !
 
@@ -941,9 +962,19 @@ generateCartId
 	^lastCartId asString.! !
 
 
-!InternalRestInterface methodsFor: 'testing' stamp: 'HG 11/30/2020 21:22:23'!
+!InternalRestInterface methodsFor: 'testing' stamp: 'FS 12/1/2020 17:03:18'!
 hasRegisteredCart: aCartId 
-	^createdCarts includesKey: aCartId.! !
+	^cartsContents includesKey: aCartId.! !
+
+
+!InternalRestInterface methodsFor: 'session' stamp: 'FS 12/1/2020 17:03:45'!
+resetSessionOf: aCartId
+
+	^ cartsLastUsed at: aCartId put: clock now! !
+
+!InternalRestInterface methodsFor: 'session' stamp: 'FS 12/1/2020 17:03:55'!
+userOwnerOf: aCartId
+	^cartsOwners at: aCartId! !
 
 
 !InternalRestInterface methodsFor: 'adding' stamp: 'HG 12/1/2020 15:05:14'!
@@ -956,30 +987,25 @@ addToCart: aCartId anItem: anItem withQuantity: aQuantity
 	
 	aCartToAdd add: aQuantity of: anItem.! !
 
-!InternalRestInterface methodsFor: 'adding' stamp: 'HG 12/1/2020 15:05:14'!
-resetSessionOf: aCartId
 
-	^ cartTimeUpdates at: aCartId put: clock now! !
-
-
-!InternalRestInterface methodsFor: 'accessing' stamp: 'HG 12/1/2020 15:19:33'!
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 17:03:45'!
 assertSessionNotExpiredOf: aCartId
 	
 	| cartLastUpdate errorClosure |
 	
 	errorClosure _ [^self error: StoreSession sessionExpiredMessageError].
 	
-	cartLastUpdate _ cartTimeUpdates at: aCartId ifAbsent: errorClosure.
+	cartLastUpdate _ cartsLastUsed at: aCartId ifAbsent: errorClosure.
 	( clock now - cartLastUpdate < 30 minutes )
 		ifFalse: errorClosure.! !
 
-!InternalRestInterface methodsFor: 'accessing' stamp: 'HG 12/1/2020 09:42:07'!
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 17:03:18'!
 cartWithId: aCartId
 
-	^ createdCarts at: aCartId 
+	^ cartsContents at: aCartId 
 		ifAbsent: [self error: self class invalidCartErrorMessage]! !
 
-!InternalRestInterface methodsFor: 'accessing' stamp: 'HG 12/1/2020 15:10:52'!
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 18:02:30'!
 listCart: aCartId 
 	
 	| aCartToList |
@@ -987,13 +1013,14 @@ listCart: aCartId
 	aCartToList _ self cartWithId: aCartId.
 	self assertSessionNotExpiredOf: aCartId.
 	self resetSessionOf: aCartId.
-	^aCartToList.! !
+	
+	^aCartToList items.! !
 
-!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 02:03:25'!
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 18:06:05'!
 listPurchasesOf: anUsername withPassword: aPassword 
 
 	self authenticateUser: anUsername withPassword: aPassword.
-	^OrderedCollection new.! !
+	^purchasesByUser at: anUsername! !
 
 
 !InternalRestInterface methodsFor: 'checkout' stamp: 'HG 12/1/2020 00:47:04'!
@@ -1001,16 +1028,32 @@ assertIsNotEmpty: cart
 
 	^ cart isEmpty ifTrue: [self error: self class emptyCartErrorMessage]! !
 
-!InternalRestInterface methodsFor: 'checkout' stamp: 'HG 12/1/2020 14:54:53'!
+!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/1/2020 18:05:45'!
 checkoutCart: aCartId withCreditCardNumber: aCreditCardNumber withCreditCardExpiredAt: anExpirationDate withOwnerName: aName 
-	| cart newTransactionId |
+	| cart  userCreditCard userCheckingOut cashierToCheckout currentTime salesBook total |
 	cart _ self cartWithId: aCartId.
+	
 	self assertIsNotEmpty: cart.
 	self assertSessionNotExpiredOf: aCartId.
-
 	
-	newTransactionId _ self generateTransactionId.
-	^newTransactionId. 
+	userCheckingOut _ self userOwnerOf: aCartId.
+	
+	userCreditCard _ CreditCard expiringOn: anExpirationDate .
+	currentTime _ clock now.
+	salesBook _ OrderedCollection new.
+	cashierToCheckout _ Cashier toCheckout: cart charging: userCreditCard 
+					throught: merchantProcessor 
+					on: currentTime 
+					registeringOn: salesBook.
+					
+	total _ cashierToCheckout checkOut.
+	
+	(purchasesByUser at: userCheckingOut ) addAll: (self listCart: aCartId).
+	lastpurchasetotal _ total.
+	 
+	cartsLastUsed removeKey: aCartId.
+	
+	^ self generateTransactionId.
 	! !
 
 !InternalRestInterface methodsFor: 'checkout' stamp: 'HG 12/1/2020 10:03:59'!
@@ -1020,13 +1063,13 @@ generateTransactionId
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'InternalRestInterface class' category: #TusLibros!
+!classDefinition: 'InternalRestInterface class' category: 'TusLibros'!
 InternalRestInterface class
 	instanceVariableNames: ''!
 
-!InternalRestInterface class methodsFor: 'instance creation' stamp: 'HG 12/1/2020 14:21:08'!
-withValidUsers: aValidUsersList withCatalog: aCatalog using: aClock
-	^self new initializeWithValidUsers: aValidUsersList withCatalog: aCatalog withClock: aClock.! !
+!InternalRestInterface class methodsFor: 'instance creation' stamp: 'FS 12/1/2020 17:45:21'!
+withValidUsers: aValidUsersList withCatalog: aCatalog using: aClock through: aMerchantProcessor
+	^self new initializeWithValidUsers: aValidUsersList withCatalog: aCatalog withClock: aClock through:aMerchantProcessor .! !
 
 
 !InternalRestInterface class methodsFor: 'error description' stamp: 'HG 12/1/2020 00:45:13'!
@@ -1046,7 +1089,7 @@ invalidUserErrorMessage
 	^'Usuario inválido'.! !
 
 
-!classDefinition: #Sale category: #TusLibros!
+!classDefinition: #Sale category: 'TusLibros'!
 Object subclass: #Sale
 	instanceVariableNames: 'total'
 	classVariableNames: ''
@@ -1066,7 +1109,7 @@ initializeTotal: aTotal
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Sale class' category: #TusLibros!
+!classDefinition: 'Sale class' category: 'TusLibros'!
 Sale class
 	instanceVariableNames: ''!
 
@@ -1077,7 +1120,7 @@ of: aTotal
 	^self new initializeTotal: aTotal ! !
 
 
-!classDefinition: #StoreSession category: #TusLibros!
+!classDefinition: #StoreSession category: 'TusLibros'!
 Object subclass: #StoreSession
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -1086,7 +1129,7 @@ Object subclass: #StoreSession
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'StoreSession class' category: #TusLibros!
+!classDefinition: 'StoreSession class' category: 'TusLibros'!
 StoreSession class
 	instanceVariableNames: ''!
 
@@ -1095,7 +1138,7 @@ sessionExpiredMessageError
 	^'Session Expired'.! !
 
 
-!classDefinition: #StoreTestObjectsFactory category: #TusLibros!
+!classDefinition: #StoreTestObjectsFactory category: 'TusLibros'!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
