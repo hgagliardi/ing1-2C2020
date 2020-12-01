@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros!
+!classDefinition: #CartTest category: 'TusLibros'!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
@@ -98,7 +98,7 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!classDefinition: #CashierTest category: #TusLibros!
+!classDefinition: #CashierTest category: 'TusLibros'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'testObjectsFactory debitBehavior'
 	classVariableNames: ''
@@ -246,9 +246,9 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #InternalRestInterfaceTest category: #TusLibros!
+!classDefinition: #InternalRestInterfaceTest category: 'TusLibros'!
 TestCase subclass: #InternalRestInterfaceTest
-	instanceVariableNames: 'testObjectsFactory validateBehaviour invalidUserId invalidPassword'
+	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -259,63 +259,66 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'HG 11/30/2020 21:19:45'!
+!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 11/30/2020 23:18:16'!
 test04
 	
-	| interface |
+	| interface cartToAddID |
 	
-	interface _ InternalRestInterface withValidUsers: testObjectsFactory validUsers withCatalog: testObjectsFactory defaultCatalog.
+	interface _ testObjectsFactory defaultInterface .
+	cartToAddID _ 5.
 	
-	self should: [interface addToCart: 5 aBookISBN: testObjectsFactory itemSellByTheStore withQuantity: 1. ]
+	self should: [interface addToCart: cartToAddID aBookISBN: testObjectsFactory itemSellByTheStore withQuantity: 1. ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [:anError | 
-								anError messageText = InternalRestInterface invalidCartErrorMessage.
-								self deny: (interface hasRegisteredCart: 5)
+							anError messageText = InternalRestInterface invalidCartErrorMessage.
+							self deny: (interface hasRegisteredCart: cartToAddID)
 							].
 	! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'HG 11/30/2020 21:19:45'!
+!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 11/30/2020 23:14:54'!
 test05
 	
 	| interface |
 	
-	interface _ InternalRestInterface withValidUsers: testObjectsFactory validUsers withCatalog: testObjectsFactory defaultCatalog.
+	interface _ testObjectsFactory defaultInterface .
 	
 	self should: [interface listCart: 5. ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [:anError | anError messageText = InternalRestInterface invalidCartErrorMessage].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'HG 11/30/2020 21:19:45'!
+!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 11/30/2020 23:14:58'!
 test06
 	
 	| interface cartId |
 	
-	interface _ InternalRestInterface withValidUsers: testObjectsFactory validUsers withCatalog: testObjectsFactory defaultCatalog.
+	interface _ testObjectsFactory defaultInterface .
 	cartId _ testObjectsFactory createCartForValidUserIn: interface.
 	
 	self assert: (interface listCart: cartId) isEmpty.! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'HG 11/30/2020 21:19:45'!
+!InternalRestInterfaceTest methodsFor: 'testing - add/list cart' stamp: 'FS 11/30/2020 23:19:37'!
 test07
 	
-	| interface cartId validBook cartContent |
+	| interface cartId validBook cartContent aQuantityToAdd |
 	
 	validBook _ testObjectsFactory itemSellByTheStore.
 	 
-	interface _ InternalRestInterface withValidUsers: testObjectsFactory validUsers withCatalog: testObjectsFactory defaultCatalog.
+	interface _ testObjectsFactory defaultInterface .
+	
+	aQuantityToAdd _ 3.
 	cartId _ testObjectsFactory createCartForValidUserIn: interface.
-	interface addToCart: cartId aBookISBN: validBook withQuantity: 3. 
+	interface addToCart: cartId aBookISBN: validBook withQuantity: aQuantityToAdd. 
 	
 	cartContent _ interface listCart: cartId.
 	
-	self assert: (cartContent occurrencesOf: validBook) equals: 3.! !
+	self assert: (cartContent occurrencesOf: validBook) equals: aQuantityToAdd.! !
 
 
-!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'HG 11/30/2020 21:19:45'!
+!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'FS 11/30/2020 23:14:35'!
 test01
 	
 	| interface |
-	interface _ InternalRestInterface withValidUsers: testObjectsFactory validUsers withCatalog: testObjectsFactory defaultCatalog.
+	interface _ testObjectsFactory defaultInterface .
 	
 	self should: [ interface createCartForUser: testObjectsFactory invalidUser withPassword: '000'. ]
 			raise: Error
@@ -323,12 +326,13 @@ test01
 									self assert: anError messageText =  InternalRestInterface invalidUserErrorMessage.
 									self deny: (interface userHasCreatedCart: invalidUserId). ].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'HG 11/30/2020 21:19:45'!
+!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'FS 11/30/2020 23:14:40'!
 test02
 	
 	| interface validUser |
 	
-	interface _ InternalRestInterface withValidUsers: testObjectsFactory validUsers withCatalog: testObjectsFactory defaultCatalog.
+	interface _ testObjectsFactory defaultInterface .
+	
 	validUser _ testObjectsFactory validUsers keys first.
 	
 	self should: [ interface createCartForUser: validUser withPassword: 'invalidPassword'. ]
@@ -337,12 +341,12 @@ test02
 									self assert: anError messageText =  InternalRestInterface invalidPasswordErrorMessage.
 									self deny: (interface userHasCreatedCart: validUser). ].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'HG 11/30/2020 21:19:45'!
+!InternalRestInterfaceTest methodsFor: 'testing - createCart' stamp: 'FS 11/30/2020 23:14:43'!
 test03
 	
 	| interface anotherCartId cartId |
 	
-	interface _ InternalRestInterface withValidUsers: testObjectsFactory validUsers withCatalog: testObjectsFactory defaultCatalog.
+	interface _ testObjectsFactory defaultInterface .
 	
 	cartId _ testObjectsFactory createCartForValidUserIn: interface.
 	anotherCartId _ testObjectsFactory createCartForAnotherValidUserIn: interface.
@@ -352,7 +356,7 @@ test03
 	self deny: (cartId = anotherCartId).! !
 
 
-!classDefinition: #Cart category: #TusLibros!
+!classDefinition: #Cart category: 'TusLibros'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -426,7 +430,7 @@ add: aQuantity of: anItem
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros!
+!classDefinition: 'Cart class' category: 'TusLibros'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -436,7 +440,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #Cashier category: #TusLibros!
+!classDefinition: #Cashier category: 'TusLibros'!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total'
 	classVariableNames: ''
@@ -487,7 +491,7 @@ initializeToCheckout: aCart charging: aCreditCard throught: aMerchantProcessor r
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros!
+!classDefinition: 'Cashier class' category: 'TusLibros'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -527,7 +531,7 @@ creditCardHasNoCreditErrorMessage
 	^'Credit card has no credit'! !
 
 
-!classDefinition: #CreditCard category: #TusLibros!
+!classDefinition: #CreditCard category: 'TusLibros'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'expiration'
 	classVariableNames: ''
@@ -547,7 +551,7 @@ initializeExpiringOn: aMonth
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros!
+!classDefinition: 'CreditCard class' category: 'TusLibros'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -557,7 +561,7 @@ expiringOn: aMonth
 	^self new initializeExpiringOn: aMonth! !
 
 
-!classDefinition: #InternalRestInterface category: #TusLibros!
+!classDefinition: #InternalRestInterface category: 'TusLibros'!
 Object subclass: #InternalRestInterface
 	instanceVariableNames: 'validUsers cartOwner createdCarts lastId catalog'
 	classVariableNames: ''
@@ -572,18 +576,19 @@ initializeWithValidUsers: aValidUsersList withCatalog: aCatalog
 	catalog _ aCatalog.! !
 
 
-!InternalRestInterface methodsFor: 'authentication' stamp: 'HG 11/30/2020 19:21:31'!
+!InternalRestInterface methodsFor: 'authentication' stamp: 'FS 11/30/2020 23:20:20'!
 authenticateUser: anUserId withPassword: anUserPassword
 
 	| validUserPassword |
 	
 	validUserPassword _ validUsers at: anUserId 
 								ifAbsent: [self error: self class invalidUserErrorMessage.]. 
+								
 	(validUserPassword = anUserPassword) 
-		ifFalse: [ self error: self class invalidPasswordErrorMessage. ]! !
+								ifFalse: [ self error: self class invalidPasswordErrorMessage. ]! !
 
 
-!InternalRestInterface methodsFor: 'as yet unclassified' stamp: 'HG 11/30/2020 21:22:03'!
+!InternalRestInterface methodsFor: 'cart creation' stamp: 'FS 11/30/2020 23:26:45'!
 createCartForUser: anUserId withPassword: anUserPassword
 	
 	| newCartId cart |
@@ -592,10 +597,11 @@ createCartForUser: anUserId withPassword: anUserPassword
 	
 	newCartId _ self generateCartId.
 	cart _ Cart acceptingItemsOf: catalog.
+	
 	createdCarts at: newCartId put: cart. 
 	^newCartId.! !
 
-!InternalRestInterface methodsFor: 'as yet unclassified' stamp: 'HG 11/30/2020 19:38:30'!
+!InternalRestInterface methodsFor: 'cart creation' stamp: 'HG 11/30/2020 19:38:30'!
 generateCartId
 	lastId _ lastId + 1.
 	^lastId.! !
@@ -634,7 +640,7 @@ listCart: aCartId
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'InternalRestInterface class' category: #TusLibros!
+!classDefinition: 'InternalRestInterface class' category: 'TusLibros'!
 InternalRestInterface class
 	instanceVariableNames: ''!
 
@@ -656,7 +662,7 @@ invalidUserErrorMessage
 	^'Usuario inválido'.! !
 
 
-!classDefinition: #Sale category: #TusLibros!
+!classDefinition: #Sale category: 'TusLibros'!
 Object subclass: #Sale
 	instanceVariableNames: 'total'
 	classVariableNames: ''
@@ -676,7 +682,7 @@ initializeTotal: aTotal
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Sale class' category: #TusLibros!
+!classDefinition: 'Sale class' category: 'TusLibros'!
 Sale class
 	instanceVariableNames: ''!
 
@@ -687,7 +693,7 @@ of: aTotal
 	^self new initializeTotal: aTotal ! !
 
 
-!classDefinition: #StoreTestObjectsFactory category: #TusLibros!
+!classDefinition: #StoreTestObjectsFactory category: 'TusLibros'!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
@@ -714,30 +720,6 @@ itemSellByTheStorePrice
 createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
-
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HG 11/30/2020 21:06:49'!
-createCartForAnotherValidUserIn: aRestInterface
-	
-	| passwords usernames validPassword validUser |
-	usernames _ self validUsers keys.
-	passwords _ self validUsers values.
-	
-	validUser _ usernames first.
-	validPassword _ passwords first.
-
-	^aRestInterface createCartForUser: validUser withPassword: validPassword.! !
-
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HG 11/30/2020 21:06:57'!
-createCartForValidUserIn: aRestInterface
-	
-	| passwords usernames validPassword validUser |
-	usernames _ self validUsers keys.
-	passwords _ self validUsers values.
-	
-	validUser _ usernames second.
-	validPassword _ passwords second.
-
-	^aRestInterface createCartForUser: validUser withPassword: validPassword.! !
 
 !StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HernanWilkinson 6/17/2013 18:08'!
 defaultCatalog
@@ -770,12 +752,42 @@ today
 	^ today! !
 
 
+!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'FS 11/30/2020 23:08:59'!
+anotherValidUser 
+	^  'Usuario2' ! !
+
+!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'FS 11/30/2020 23:10:07'!
+anotherValidUserPassword
+	^  '456' ! !
+
+!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'FS 11/30/2020 23:11:20'!
+createCartForAnotherValidUserIn: aRestInterface
+
+	^aRestInterface createCartForUser: self anotherValidUser withPassword: self anotherValidUserPassword.! !
+
+!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'FS 11/30/2020 23:10:56'!
+createCartForValidUserIn: aRestInterface
+
+	^aRestInterface createCartForUser: self validUser withPassword: self validUserPassword.! !
+
+!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'FS 11/30/2020 23:14:17'!
+defaultInterface
+	^InternalRestInterface withValidUsers: self validUsers withCatalog: self defaultCatalog.! !
+
 !StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'HG 11/30/2020 19:01:31'!
 invalidUser
 	
 	^ 'invalidUser'! !
 
-!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'HG 11/30/2020 19:32:39'!
+!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'FS 11/30/2020 23:08:51'!
+validUser 
+	^  'Usuario1' ! !
+
+!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'FS 11/30/2020 23:09:57'!
+validUserPassword
+	^  '123' ! !
+
+!StoreTestObjectsFactory methodsFor: 'user interface support' stamp: 'FS 11/30/2020 23:09:47'!
 validUsers
 	^ Dictionary new 
-		at: 'Usuario1' put: '12345'; at: 'Usuario 2' put:'67890'; yourself.! !
+		at: self validUser put: self validUserPassword; at: self anotherValidUser put: self anotherValidUserPassword; yourself.! !
