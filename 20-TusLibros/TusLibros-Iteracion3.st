@@ -442,9 +442,9 @@ test13TransactionIdsDontCollide
 	
 	self deny: transactionId = anotherTransactionId.! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 22:29:27'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 22:32:16'!
 test14ListPurchasesCorrectlyAfterCheckout
-	| cartId interface userPurchases itemToBuy quantityToBuy |
+	| cartId interface userPurchases itemToBuy quantityToBuy receiptForFirstPurchase |
 	
 	interface _  interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
@@ -457,10 +457,10 @@ test14ListPurchasesCorrectlyAfterCheckout
 	
 	userPurchases _ interface listPurchasesOf: interfaceObjectsFactory validUser 
 						  withPassword: interfaceObjectsFactory validUserPassword .
+	receiptForFirstPurchase _  userPurchases first.
 	
-	 
-	self assert: userPurchases first amount equals: quantityToBuy * storeObjectsFactory itemSellByTheStorePrice .
-	self assert: (userPurchases first itemsSold occurrencesOf: itemToBuy) equals: quantityToBuy.
+	self assert: receiptForFirstPurchase amount equals: quantityToBuy * storeObjectsFactory itemSellByTheStorePrice .
+	self assert: (receiptForFirstPurchase itemsSold occurrencesOf: itemToBuy) equals: quantityToBuy.
 ! !
 
 
