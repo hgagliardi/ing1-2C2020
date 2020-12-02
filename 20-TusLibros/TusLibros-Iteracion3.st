@@ -1226,7 +1226,7 @@ userOwnerOf: aCartId
 	^(sessions at: aCartId) owner! !
 
 
-!InternalRestInterface methodsFor: 'cart adding' stamp: 'FS 12/2/2020 19:21:32'!
+!InternalRestInterface methodsFor: 'adding' stamp: 'FS 12/2/2020 19:21:32'!
 addToCart: aCartId anItem: anItem withQuantity: aQuantity 
 	
 	| aCartToAdd |
@@ -1254,7 +1254,7 @@ salesBook
 	^salesBook copy! !
 
 
-!InternalRestInterface methodsFor: 'listing' stamp: 'FS 12/2/2020 19:21:42'!
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/2/2020 19:21:42'!
 listCart: aCartId 
 	
 	| aCartToList |
@@ -1263,7 +1263,7 @@ listCart: aCartId
 	
 	^aCartToList contents.! !
 
-!InternalRestInterface methodsFor: 'listing' stamp: 'FS 12/2/2020 19:35:36'!
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/2/2020 19:35:36'!
 listPurchasesOf: anUsername withPassword: aPassword 
 
 	self authenticateUser: anUsername withPassword: aPassword.
@@ -1271,32 +1271,26 @@ listPurchasesOf: anUsername withPassword: aPassword
 	^usersHistory at: anUsername! !
 
 
-!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/2/2020 19:21:38'!
-checkoutCart: aCartId withCreditCardNumber: aCreditCardNumber withCreditCardExpiredAt: anExpirationDate withOwnerName: aName 
-	| cart  userCreditCard cashierToCheckout  |
+!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/2/2020 20:18:44'!
+checkoutCart: aCartId   withCreditCardNumber: aCreditCardNumber 
+					withCreditCardExpiredAt: anExpirationDate 
+					withOwnerName: aName 
+	| cartToCheckOut  |
 	
-	cart _ self cartWithId: aCartId.
+	cartToCheckOut _ self cartWithId: aCartId.
 	
-	self assertIsNotEmpty: cart.
+	self assertIsNotEmpty: cartToCheckOut .
 		
-	userCreditCard _ CreditCard withNumber: aCreditCardNumber  withName: aName expiringOn: anExpirationDate.
-	cashierToCheckout _ Cashier toCheckout: cart charging: userCreditCard 
-					throught: merchantProcessor 
-					on: clock now 
-					registeringOn: salesBook .
-	cashierToCheckout checkOut.
+	self processSaleOf: cartToCheckOut withCreditCardNumber: aCreditCardNumber
+					                       withCreditCardExpiredAt: anExpirationDate 
+					                       withOwnerName: aName .
 	
-	self updateUserHistoryWhoOwns: aCartId with: cart.
+	self updateUserHistoryWhoOwns: aCartId with: cartToCheckOut.
 	
 	sessions removeKey: aCartId.
 
 	^self generateTransactionId copy.
 	! !
-
-!InternalRestInterface methodsFor: 'checkout' stamp: 'HG 12/1/2020 10:03:59'!
-generateTransactionId
-	lastTransactionId _ lastTransactionId + 1.
-	^lastTransactionId asString.! !
 
 
 !InternalRestInterface methodsFor: 'assertions' stamp: 'FS 12/2/2020 19:23:12'!
@@ -1310,7 +1304,7 @@ assertSessionNotExpiredOf: aCartSession
 	(aCartSession isExpiredOn: clock now) ifTrue: [^self error: self class notActiveSessionError ].! !
 
 
-!InternalRestInterface methodsFor: 'checkout -- private' stamp: 'FS 12/2/2020 19:35:36'!
+!InternalRestInterface methodsFor: 'user history -- private' stamp: 'FS 12/2/2020 19:35:36'!
 updateHistoryOf: anUser withItems: itemsSold
 	| userPurchasesHistory |
 	
@@ -1319,12 +1313,34 @@ updateHistoryOf: anUser withItems: itemsSold
 
 	! !
 
-!InternalRestInterface methodsFor: 'checkout -- private' stamp: 'FS 12/2/2020 19:08:47'!
+!InternalRestInterface methodsFor: 'user history -- private' stamp: 'FS 12/2/2020 19:08:47'!
 updateUserHistoryWhoOwns: aCartId with: aCartToPurchase
 	| userCheckingOut |
 	
 	userCheckingOut _ self userOwnerOf: aCartId.
 	self updateHistoryOf: userCheckingOut withItems: aCartToPurchase contents.
+	! !
+
+
+!InternalRestInterface methodsFor: 'checkout -- private' stamp: 'HG 12/1/2020 10:03:59'!
+generateTransactionId
+	lastTransactionId _ lastTransactionId + 1.
+	^lastTransactionId asString.! !
+
+!InternalRestInterface methodsFor: 'checkout -- private' stamp: 'FS 12/2/2020 20:17:13'!
+processSaleOf: aCartToCheckOut withCreditCardNumber: aCreditCardNumber
+					              withCreditCardExpiredAt: anExpirationDate 
+					              withOwnerName: aName 
+	| cashierToCheckoutOn userCreditCard |
+	
+	userCreditCard _ CreditCard withNumber: aCreditCardNumber  withName: aName expiringOn: anExpirationDate.
+	
+	cashierToCheckoutOn _ Cashier toCheckout: aCartToCheckOut charging: userCreditCard 
+					throught: merchantProcessor 
+					on: clock now 
+					registeringOn: salesBook .
+	cashierToCheckoutOn checkOut.
+	
 	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
