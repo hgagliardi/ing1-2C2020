@@ -245,6 +245,7 @@ debit: anAmount from: aCreditCard
 
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
+
 
 !classDefinition: #CreditCardTest category: 'TusLibros'!
 TestCase subclass: #CreditCardTest
@@ -414,7 +415,7 @@ test08CannotCheckoutNotCreatedCart
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [:anError | self assert: anError messageText = InternalRestInterface invalidCartErrorMessage .].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/2/2020 00:21:37'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/2/2020 15:02:03'!
 test09CannotCheckoutEmptyCart
 	
 	| interface cartId |		
@@ -424,16 +425,21 @@ test09CannotCheckoutEmptyCart
 	self should: [self checkout: cartId using: interface.]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [:anError | self assert: anError messageText = InternalRestInterface emptyCartErrorMessage.
-							    self assert: (self validUserHasNoPuchasesIn: interface)].! !
+							    self assert: interface salesBook isEmpty].! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/2/2020 00:22:31'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/2/2020 15:07:19'!
 test10ClientStartsWithNoPurchases
 	
-	| interface |
+	| interface userPurchaseHistory |
 	
 	interface _ interfaceObjectsFactory defaultInterfaceThrough: self .
 	
-	self assert:  (self validUserHasNoPuchasesIn: interface)  ! !
+	userPurchaseHistory _  (interface listPurchasesOf: interfaceObjectsFactory validUser 
+				                withPassword:  interfaceObjectsFactory validUserPassword) .
+											      
+	self assert: userPurchaseHistory amountPurchased equals: 0  .
+	self assert: userPurchaseHistory itemsPurchased isEmpty  .
+! !
 
 !InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 17:44:01'!
 test11CannotListPurchasesOfUnregisteredUser
@@ -481,14 +487,15 @@ test13TransactionIdsDontCollide
 	
 	self deny: transactionId = anotherTransactionId.! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 22:32:16'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/2/2020 15:11:26'!
 test14ListPurchasesCorrectlyAfterCheckout
-	| cartId interface userPurchases itemToBuy quantityToBuy receiptForFirstPurchase |
+	| cartId interface userPurchases itemToBuy quantityToBuy  amountBought |
 	
 	interface _  interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	itemToBuy _ storeObjectsFactory itemSellByTheStore.
 	quantityToBuy _ 3.
+	amountBought _ quantityToBuy * storeObjectsFactory itemSellByTheStorePrice .
 	
 	interface addToCart: cartId anItem: itemToBuy withQuantity: quantityToBuy.
 	
@@ -496,10 +503,9 @@ test14ListPurchasesCorrectlyAfterCheckout
 	
 	userPurchases _ interface listPurchasesOf: interfaceObjectsFactory validUser 
 						  withPassword: interfaceObjectsFactory validUserPassword .
-	receiptForFirstPurchase _  userPurchases first.
 	
-	self assert: receiptForFirstPurchase amount equals: quantityToBuy * storeObjectsFactory itemSellByTheStorePrice .
-	self assert: (receiptForFirstPurchase itemsSold occurrencesOf: itemToBuy) equals: quantityToBuy.
+	self assert: userPurchases amountPurchased equals: amountBought.
+	self assert: (userPurchases itemsPurchased at: itemToBuy) equals: amountBought.
 ! !
 
 
@@ -544,7 +550,7 @@ test16CannotAddToCartAfterSessionExpired
 		  withExceptionDo: [:anError | self assert: anError messageText = InternalRestInterface sessionExpiredMessageError.]. 
 					! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/2/2020 02:31:29'!
+!InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/2/2020 15:11:54'!
 test17CannotCheckoutCartAfterSessionExpired
 
 	| interface cartId clock |
@@ -559,7 +565,7 @@ test17CannotCheckoutCartAfterSessionExpired
 		  raise: Error - MessageNotUnderstood
 		  withExceptionDo: [:anError | 
 								self assert: anError messageText = InternalRestInterface sessionExpiredMessageError. 
-								self assert:  (self validUserHasNoPuchasesIn: interface)]. 
+								self assert:  interface salesBook isEmpty]. 
 					! !
 
 !InternalRestInterfaceTest methodsFor: 'testing - session' stamp: 'FS 12/1/2020 17:44:01'!
@@ -615,42 +621,90 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard! !
 
 
-!InternalRestInterfaceTest methodsFor: 'interface -- private' stamp: 'FS 12/2/2020 00:20:50'!
-validUserHasNoPuchasesIn: interface
+
+!classDefinition: #PurchaseHistoryTest category: 'TusLibros'!
+TestCase subclass: #PurchaseHistoryTest
+	instanceVariableNames: 'testObjectFactory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
 
-	^ (interface listPurchasesOf: interfaceObjectsFactory validUser 
-							                                   withPassword:  interfaceObjectsFactory validUserPassword) 
-											      isEmpty! !
+!PurchaseHistoryTest methodsFor: 'setUp' stamp: 'FS 12/2/2020 14:10:08'!
+setUp
+	testObjectFactory  _ StoreTestObjectsFactory new.! !
+
+
+!PurchaseHistoryTest methodsFor: 'tests' stamp: 'FS 12/2/2020 15:07:19'!
+test01HistoryUpdatesCorrectly
+	| purchaseHistory newPurchase itemPurchased itemPurchasedPrice quantityPurchased totalPurchased |
+	itemPurchased _ testObjectFactory itemSellByTheStore .
+	itemPurchasedPrice _ testObjectFactory itemSellByTheStorePrice .
+	quantityPurchased _ 7.
+	totalPurchased _ quantityPurchased * itemPurchasedPrice.
+	
+	purchaseHistory _ PurchaseHistory using: testObjectFactory defaultCatalog.
+	
+	newPurchase _ Bag new  add: itemPurchased withOccurrences: quantityPurchased; yourself.
+	purchaseHistory newSaleOf: newPurchase.
+	
+	self assert: (purchaseHistory itemsPurchased at: itemPurchased) equals: totalPurchased.
+	self assert: (purchaseHistory amountPurchased) equals: totalPurchased
+	
+	
+
+	! !
+
+!PurchaseHistoryTest methodsFor: 'tests' stamp: 'FS 12/2/2020 15:06:42'!
+test02CannotUpdateWithItemsNotPresentInCatalog
+	| purchaseHistory newPurchase itemNotInCatalog |
+
+	itemNotInCatalog _ testObjectFactory itemNotSellByTheStore .
+	
+	purchaseHistory _ PurchaseHistory using: testObjectFactory defaultCatalog.
+	
+	newPurchase _ Bag new  add: itemNotInCatalog withOccurrences: 3; yourself.
+	
+	self should:[purchaseHistory newSaleOf: newPurchase.]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo:[:anError| self assert: anError messageText = PurchaseHistory cannotUpdateWithItemNotInCatalog.
+							  self assert: purchaseHistory amountPurchased equals: 0]
+	
+	
+	
+
+	! !
+
+!PurchaseHistoryTest methodsFor: 'tests' stamp: 'FS 12/2/2020 14:39:53'!
+test03CannotCreateHistoryWithEmptyCatalog
+	
+	self should:[PurchaseHistory using: Dictionary new.]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo:[:anError | self assert: anError messageText = PurchaseHistory cannotCreateHistoryOnEmptyCatalog.
+							     ] 
+	
+	
+	
+	
+
+	! !
 
 
-!classDefinition: #SalesReceiptTest category: 'TusLibros'!
-TestCase subclass: #SalesReceiptTest
+!classDefinition: #SaleTest category: 'TusLibros'!
+TestCase subclass: #SaleTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!SalesReceiptTest methodsFor: 'tests' stamp: 'FS 12/1/2020 22:27:10'!
+!SaleTest methodsFor: 'tests' stamp: 'FS 12/2/2020 14:58:02'!
 test01AmountShouldBePositive
 	
-	| itemsSold |
-	itemsSold _ Bag new.
-	itemsSold add: 'itemSold'.
-	
-	self should: [SalesReceipt totaling: -1  for: itemsSold ]
+	self should: [Sale for: -1 ]
 	 raise: Error - MessageNotUnderstood
 	 withExceptionDo: [:anError | self assert: anError messageText = 
-										SalesReceipt cannotReceiptForNonPositiveAmountErrorMesage]
+										Sale amountShouldBePositive]
 	
 	 ! !
-
-!SalesReceiptTest methodsFor: 'tests' stamp: 'FS 12/1/2020 22:26:53'!
-test02CannotCreateReceiptWithNoItemsSold
-
-	self should: [SalesReceipt totaling: 10  for: Bag new. ]
-	 raise: Error - MessageNotUnderstood
-	 withExceptionDo: [:anError | self assert: anError messageText = 
-											SalesReceipt cannotReceiptWhenNoItemsBought]! !
 
 
 !classDefinition: #SessionTest category: 'TusLibros'!
@@ -689,6 +743,19 @@ test02SessionUpdatesLastUsedTimeCorrectly
 						
 	cartSession updateLastTimeUsed: testObjectFactory today + 10 minutes.
 	self deny: (cartSession isExpiredOn: (testObjectFactory today + expirationTime)).! !
+
+!SessionTest methodsFor: 'as yet unclassified' stamp: 'FS 12/2/2020 16:23:17'!
+test03SessionOwnerNameShouldNotBeBlank
+	| expirationTime |
+ 
+	expirationTime _ 30 minutes.
+	self should: [Session usedLastOn: (testObjectFactory today) 
+			        ownedBy: '' withExpirationTime:
+		                expirationTime. ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo:[:anError | self assert: anError messageText = Session cannotCreateSessionWithBlankOwnersName]		
+						
+ ! !
 
 
 !classDefinition: #Cart category: 'TusLibros'!
@@ -748,7 +815,7 @@ isEmpty
 	^items isEmpty ! !
 
 
-!Cart methodsFor: 'total' stamp: 'HernanWilkinson 6/17/2013 19:09'!
+!Cart methodsFor: 'total' stamp: 'FS 12/2/2020 14:38:12'!
 total
 
 	^ items sum: [ :anItem | catalog at: anItem ]! !
@@ -786,16 +853,16 @@ Object subclass: #Cashier
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:08'!
+!Cashier methodsFor: 'checkout - private' stamp: 'FS 12/2/2020 14:38:37'!
 calculateTotal
 
 	total := cart total.
 	! !
 
-!Cashier methodsFor: 'checkout - private' stamp: 'FS 12/1/2020 23:59:31'!
+!Cashier methodsFor: 'checkout - private' stamp: 'FS 12/2/2020 13:42:37'!
 createSale
 
-	^ SalesReceipt totaling:  total for: cart
+	^ Sale for: total
 ! !
 
 !Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:06'!
@@ -1062,29 +1129,36 @@ clock
 
 !classDefinition: #InternalRestInterface category: 'TusLibros'!
 Object subclass: #InternalRestInterface
-	instanceVariableNames: 'validUsers sessions lastCartId catalog lastTransactionId clock merchantProcessor salesByUser expirationTime carts'
+	instanceVariableNames: 'validUsers sessions lastCartId catalog lastTransactionId clock merchantProcessor salesByUser expirationTime carts salesBook'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!InternalRestInterface methodsFor: 'initialization' stamp: 'FS 12/2/2020 02:46:33'!
+!InternalRestInterface methodsFor: 'initialization' stamp: 'FS 12/2/2020 16:31:28'!
+initializeUsersHistory 
+	salesByUser _ Dictionary new.
+	validUsers keysDo: [:anUser | salesByUser at: anUser put: (PurchaseHistory using: catalog) ].
+	
+	! !
+
+!InternalRestInterface methodsFor: 'initialization' stamp: 'FS 12/2/2020 16:32:11'!
 initializeWithValidUsers: aValidUsersList withCatalog: aCatalog withClock: aClock through: aMerchantProcessor
 withExpirationTime: aTimeForSessionToExpire.
 	validUsers := aValidUsersList.
 	
 	lastCartId _ 1.
 	lastTransactionId _ 0.
-	
-	sessions _ Dictionary new.
-	carts _ Dictionary new.
-	
-	salesByUser _ Dictionary newFrom: aValidUsersList.
-	aValidUsersList keysDo: [:anUser | salesByUser at: anUser put: OrderedCollection new].
 
 	merchantProcessor _ aMerchantProcessor .
 	catalog _ aCatalog.
 	clock _ aClock.
-	expirationTime _ aTimeForSessionToExpire .! !
+	expirationTime _ aTimeForSessionToExpire .
+	
+	sessions _ Dictionary new.
+	carts _ Dictionary new.
+	self initializeUsersHistory.
+	salesBook _ OrderedCollection new.
+	! !
 
 
 !InternalRestInterface methodsFor: 'authentication' stamp: 'FS 11/30/2020 23:20:20'!
@@ -1171,29 +1245,35 @@ listPurchasesOf: anUsername withPassword: aPassword
 	
 	^salesByUser at: anUsername! !
 
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/2/2020 15:02:39'!
+salesBook
+	^salesBook copy! !
 
-!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/2/2020 02:45:15'!
+
+!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/2/2020 16:01:48'!
 checkoutCart: aCartId withCreditCardNumber: aCreditCardNumber withCreditCardExpiredAt: anExpirationDate withOwnerName: aName 
-	| cart  userCreditCard userCheckingOut cashierToCheckout currentTime userPurchases |
+	| cart  userCreditCard userCheckingOut cashierToCheckout currentTime |
+	
 	cart _ self cartWithId: aCartId.
 	
 	self assertIsNotEmpty: cart.
 	self assertSessionNotExpiredOf: aCartId.
 	
 	userCheckingOut _ self userOwnerOf: aCartId.
-	
 	userCreditCard _ CreditCard withNumber: aCreditCardNumber  withName: aName expiringOn: anExpirationDate.
 	currentTime _ clock now.
-	userPurchases _ salesByUser at: userCheckingOut . 
 	
 	cashierToCheckout _ Cashier toCheckout: cart charging: userCreditCard 
 					throught: merchantProcessor 
 					on: currentTime 
-					registeringOn: userPurchases.
+					registeringOn: salesBook .
 	cashierToCheckout checkOut.
 	
 	sessions removeKey: aCartId.
 	
+	self updateHistoryOf: userCheckingOut withItems: cart contents.
+
+
 	^ self generateTransactionId.
 	! !
 
@@ -1208,15 +1288,25 @@ assertIsNotEmpty: cart
 
 	^ cart isEmpty ifTrue: [self error: self class emptyCartErrorMessage]! !
 
-!InternalRestInterface methodsFor: 'assertions' stamp: 'FS 12/2/2020 02:45:02'!
+!InternalRestInterface methodsFor: 'assertions' stamp: 'FS 12/2/2020 16:58:35'!
 assertSessionNotExpiredOf: aCartId
 	
-	| cartSession errorClosure |
+	| cartSession sessionExpiredErrorClosure |
 	
-	errorClosure _ [^self error: self class sessionExpiredMessageError].
+	sessionExpiredErrorClosure _ [^self error: self class sessionExpiredMessageError].
 	
-	cartSession _ sessions at: aCartId ifAbsent: errorClosure.
-	(cartSession isExpiredOn: clock now) ifTrue: errorClosure.! !
+	cartSession _ sessions at: aCartId ifAbsent: sessionExpiredErrorClosure.
+	(cartSession isExpiredOn: clock now) ifTrue: sessionExpiredErrorClosure.! !
+
+
+!InternalRestInterface methodsFor: 'checkout -- private' stamp: 'FS 12/2/2020 16:59:25'!
+updateHistoryOf: anUser withItems: itemsSold
+	| userPurchasesHistory |
+	
+	userPurchasesHistory _ salesByUser at: anUser . 
+	userPurchasesHistory newSaleOf: itemsSold .
+
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1224,9 +1314,10 @@ assertSessionNotExpiredOf: aCartId
 InternalRestInterface class
 	instanceVariableNames: ''!
 
-!InternalRestInterface class methodsFor: 'instance creation' stamp: 'FS 12/2/2020 02:20:27'!
+!InternalRestInterface class methodsFor: 'instance creation' stamp: 'FS 12/2/2020 15:41:59'!
 withValidUsers: aValidUsersList withCatalog: aCatalog using: aClock through: aMerchantProcessor 
 withSessionExpirationTime: aTimeForASessionToExpire
+
 	^self new initializeWithValidUsers: aValidUsersList 
 			withCatalog: aCatalog 
 			withClock: aClock
@@ -1255,57 +1346,138 @@ sessionExpiredMessageError
 	^'Session Expired'.! !
 
 
-!classDefinition: #SalesReceipt category: 'TusLibros'!
-Object subclass: #SalesReceipt
+!classDefinition: #PurchaseHistory category: 'TusLibros'!
+Object subclass: #PurchaseHistory
+	instanceVariableNames: 'totalAmount itemsBought priceList'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!PurchaseHistory methodsFor: 'initialization' stamp: 'FS 12/2/2020 13:48:55'!
+initializeUsing: aPriceList
+	priceList  _ aPriceList.
+	itemsBought _ Dictionary new.
+	totalAmount _ 0.
+	! !
+
+
+!PurchaseHistory methodsFor: 'accessing -- private' stamp: 'FS 12/2/2020 14:24:51'!
+priceOf: anItemSold
+	^ priceList at: anItemSold .! !
+
+
+!PurchaseHistory methodsFor: 'adding -- private' stamp: 'FS 12/2/2020 16:47:57'!
+addElementToHistory: anItemSold
+
+	|itemPrice previousAmountOfItemSold|
+			itemPrice _ self priceOf: anItemSold .						
+			previousAmountOfItemSold _ itemsBought at: anItemSold ifAbsent:[0] .
+			itemsBought at: anItemSold put: itemPrice + previousAmountOfItemSold! !
+
+
+!PurchaseHistory methodsFor: 'updating -- private' stamp: 'FS 12/2/2020 16:47:46'!
+updateHistoryUsing: aCollectionOfItemsSold
+
+	^ aCollectionOfItemsSold do: [:anItemSold | 						self addElementToHistory: anItemSold.						]! !
+
+
+!PurchaseHistory methodsFor: 'updating' stamp: 'FS 12/2/2020 16:46:22'!
+newSaleOf: aCollectionOfItemsSold  
+	self assertItemsAreInPriceList: aCollectionOfItemsSold .
+	
+	self updateHistoryUsing: aCollectionOfItemsSold .
+	
+	totalAmount  _ aCollectionOfItemsSold inject: totalAmount 
+								      into:[ :subTotal :nextItem | subTotal + (self priceOf: nextItem)]
+	! !
+
+
+!PurchaseHistory methodsFor: 'accessing' stamp: 'FS 12/2/2020 15:06:42'!
+amountPurchased
+	^totalAmount ! !
+
+!PurchaseHistory methodsFor: 'accessing' stamp: 'FS 12/2/2020 15:07:19'!
+itemsPurchased
+	^itemsBought copy! !
+
+
+!PurchaseHistory methodsFor: 'testing -- private' stamp: 'FS 12/2/2020 14:50:55'!
+itemIsInPriceList: anItemToPurchase
+
+	^ priceList keys includes: anItemToPurchase! !
+
+
+!PurchaseHistory methodsFor: 'assertions' stamp: 'FS 12/2/2020 14:50:56'!
+assertItemsAreInPriceList: aCollectionOfItemsToPurchase
+	(aCollectionOfItemsToPurchase allSatisfy: [:anItemToPurchase | self itemIsInPriceList: anItemToPurchase])
+					ifFalse:[self error: self class cannotUpdateWithItemNotInCatalog ]! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PurchaseHistory class' category: 'TusLibros'!
+PurchaseHistory class
+	instanceVariableNames: ''!
+
+!PurchaseHistory class methodsFor: 'assertions' stamp: 'FS 12/2/2020 14:50:05'!
+assertPriceListNotEmpty: aPriceList 
+	(aPriceList isEmpty) ifTrue:[self error: self cannotCreateHistoryOnEmptyCatalog ]! !
+
+
+!PurchaseHistory class methodsFor: 'instance creation' stamp: 'FS 12/2/2020 14:48:56'!
+using: aPriceList
+	self assertPriceListNotEmpty: aPriceList.
+	^self new initializeUsing: aPriceList! !
+
+
+!PurchaseHistory class methodsFor: 'error description' stamp: 'FS 12/2/2020 14:40:18'!
+cannotCreateHistoryOnEmptyCatalog
+	^'Cannot create history on empty catalog'! !
+
+!PurchaseHistory class methodsFor: 'error description' stamp: 'FS 12/2/2020 14:40:41'!
+cannotUpdateWithItemNotInCatalog
+	^'Cannot update with Item not present in price list'! !
+
+
+!classDefinition: #Sale category: 'TusLibros'!
+Object subclass: #Sale
 	instanceVariableNames: 'amount itemsSold'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!SalesReceipt methodsFor: 'initialization' stamp: 'FS 12/1/2020 22:27:36'!
-initializeTotaling: anAmount  for: aCollectionOfitemsSold
-	self assertAmountIsPositive: anAmount.
-	self assertNonEmptyItemsSold: aCollectionOfitemsSold .
+!Sale methodsFor: 'initialization' stamp: 'FS 12/2/2020 14:55:48'!
+initializeFor:	 anAmount.
 	amount  _ anAmount .
-	itemsSold  _ aCollectionOfitemsSold.! !
+! !
 
 
-!SalesReceipt methodsFor: 'accessing' stamp: 'FS 12/1/2020 21:50:01'!
+!Sale methodsFor: 'accessing' stamp: 'FS 12/1/2020 21:50:01'!
 amount
 	^amount! !
 
-!SalesReceipt methodsFor: 'accessing' stamp: 'FS 12/1/2020 22:27:36'!
-itemsSold
-	^itemsSold copy! !
-
-
-!SalesReceipt methodsFor: 'assertions' stamp: 'FS 12/1/2020 22:22:36'!
-assertAmountIsPositive: anAmount 
-	anAmount <= 0 ifTrue: [self error: self class cannotReceiptForNonPositiveAmountErrorMesage ]! !
-
-!SalesReceipt methodsFor: 'assertions' stamp: 'FS 12/1/2020 22:26:41'!
-assertNonEmptyItemsSold: aCollectionOfitemsSold 
-	aCollectionOfitemsSold isEmpty ifTrue:[self error: self class cannotReceiptWhenNoItemsBought]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'SalesReceipt class' category: 'TusLibros'!
-SalesReceipt class
+!classDefinition: 'Sale class' category: 'TusLibros'!
+Sale class
 	instanceVariableNames: ''!
 
-!SalesReceipt class methodsFor: 'instance creation' stamp: 'FS 12/1/2020 21:45:40'!
-totaling: anAmount for: aCollectionOfItemsBought
-	^self new initializeTotaling: anAmount for: aCollectionOfItemsBought .
+!Sale class methodsFor: 'assertions' stamp: 'FS 12/2/2020 14:57:24'!
+assertAmountIsPositive: anAmount
+	(anAmount >0) ifFalse: [self error: self amountShouldBePositive]! !
+
+
+!Sale class methodsFor: 'instance creation' stamp: 'FS 12/2/2020 14:57:33'!
+for: anAmount
+	self assertAmountIsPositive: anAmount.
+	
+	^self new initializeFor: anAmount .
 	! !
 
 
-!SalesReceipt class methodsFor: 'error description' stamp: 'FS 12/1/2020 22:21:01'!
-cannotReceiptForNonPositiveAmountErrorMesage
+!Sale class methodsFor: 'error description' stamp: 'FS 12/2/2020 14:57:46'!
+amountShouldBePositive
 	^'Cannot create receipt for non positive amount'! !
-
-!SalesReceipt class methodsFor: 'error description' stamp: 'FS 12/1/2020 22:25:44'!
-cannotReceiptWhenNoItemsBought
-	^'Cannot receipt when no items were sold'! !
 
 
 !classDefinition: #Session category: 'TusLibros'!
@@ -1316,9 +1488,9 @@ Object subclass: #Session
 	category: 'TusLibros'!
 
 
-!Session methodsFor: 'initialization' stamp: 'FS 12/2/2020 02:58:55'!
-initializeUsedLastOn: aLastUsedTime ownedBy: aNameOwner withExpirationTime: aTimeToExpire 
-	lastTimeUsed := aLastUsedTime.
+!Session methodsFor: 'initialization' stamp: 'FS 12/2/2020 13:43:29'!
+initializeUsedLastOn: aTimeWhenWasLastUsed ownedBy: aNameOwner withExpirationTime: aTimeToExpire 
+	lastTimeUsed := aTimeWhenWasLastUsed.
 	nameOwner := aNameOwner.
 	expirationTime := aTimeToExpire.! !
 
@@ -1343,10 +1515,20 @@ updateLastTimeUsed: aDateAndTime
 Session class
 	instanceVariableNames: ''!
 
-!Session class methodsFor: 'instance creation' stamp: 'FS 12/2/2020 02:56:39'!
-usedLastOn: aLastUsedTime ownedBy: aNameOwner withExpirationTime: aTimeToExpire 
+!Session class methodsFor: 'error description' stamp: 'FS 12/2/2020 16:24:16'!
+cannotCreateSessionWithBlankOwnersName
+	^'Cannot create session with blank owners name'! !
 
-	^self new initializeUsedLastOn: aLastUsedTime ownedBy: aNameOwner withExpirationTime: aTimeToExpire ! !
+
+!Session class methodsFor: 'assertions' stamp: 'FS 12/2/2020 16:25:53'!
+assertNameNotBlank: aOwnersName
+	(aOwnersName isEmpty) ifTrue: [self error: self cannotCreateSessionWithBlankOwnersName ]! !
+
+
+!Session class methodsFor: 'instance creation' stamp: 'FS 12/2/2020 16:24:41'!
+usedLastOn: aTimeWhenWasLastUsed ownedBy: aNameOwner withExpirationTime: aTimeToExpire 
+	self assertNameNotBlank: aNameOwner.
+	^self new initializeUsedLastOn: aTimeWhenWasLastUsed ownedBy: aNameOwner withExpirationTime: aTimeToExpire ! !
 
 
 !classDefinition: #StoreTestObjectsFactory category: 'TusLibros'!
