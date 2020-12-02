@@ -442,24 +442,26 @@ test13TransactionIdsDontCollide
 	
 	self deny: transactionId = anotherTransactionId.! !
 
-!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 18:13:10'!
+!InternalRestInterfaceTest methodsFor: 'testing - checkout / purchases' stamp: 'FS 12/1/2020 22:29:27'!
 test14ListPurchasesCorrectlyAfterCheckout
-	| cartId interface userPurchases itemToBuy |
-	'TODO: Ademas de chequear que la lista de purchases se modifica con el checkout que hiciste, creo que tambien hay que chequear que se hicieron las ventas con el salesBook, como hicieron en cashier ellos (para demostrar que se contacto al merchant processor'.
+	| cartId interface userPurchases itemToBuy quantityToBuy |
 	
 	interface _  interfaceObjectsFactory defaultInterfaceThrough: self .
 	cartId _ interfaceObjectsFactory createCartForValidUserIn: interface.
 	itemToBuy _ storeObjectsFactory itemSellByTheStore.
-	interface addToCart: cartId anItem: itemToBuy withQuantity: 3.
+	quantityToBuy _ 3.
+	
+	interface addToCart: cartId anItem: itemToBuy withQuantity: quantityToBuy.
 	
 	self checkout: cartId using: interface.
 	
 	userPurchases _ interface listPurchasesOf: interfaceObjectsFactory validUser 
 						  withPassword: interfaceObjectsFactory validUserPassword .
-						
-	self assert: (userPurchases occurrencesOf: itemToBuy) = 3.
-	'TODO: Falta hacer la jugada para que ademas de alguna forma tenga la cantidad de guita que compro el user'.
-	! !
+	
+	 
+	self assert: userPurchases first amount equals: quantityToBuy * storeObjectsFactory itemSellByTheStorePrice .
+	self assert: (userPurchases first itemsSold occurrencesOf: itemToBuy) equals: quantityToBuy.
+! !
 
 
 !InternalRestInterfaceTest methodsFor: 'checkout support' stamp: 'HG 12/1/2020 14:55:20'!
@@ -575,6 +577,36 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard! !
 
 
+!classDefinition: #SalesReceiptTest category: 'TusLibros'!
+TestCase subclass: #SalesReceiptTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!SalesReceiptTest methodsFor: 'tests' stamp: 'FS 12/1/2020 22:27:10'!
+test01AmountShouldBePositive
+	
+	| itemsSold |
+	itemsSold _ Bag new.
+	itemsSold add: 'itemSold'.
+	
+	self should: [SalesReceipt totaling: -1  for: itemsSold ]
+	 raise: Error - MessageNotUnderstood
+	 withExceptionDo: [:anError | self assert: anError messageText = 
+										SalesReceipt cannotReceiptForNonPositiveAmountErrorMesage]
+	
+	 ! !
+
+!SalesReceiptTest methodsFor: 'tests' stamp: 'FS 12/1/2020 22:26:53'!
+test02CannotCreateReceiptWithNoItemsSold
+
+	self should: [SalesReceipt totaling: 10  for: Bag new. ]
+	 raise: Error - MessageNotUnderstood
+	 withExceptionDo: [:anError | self assert: anError messageText = 
+											SalesReceipt cannotReceiptWhenNoItemsBought]! !
+
+
 !classDefinition: #Cart category: 'TusLibros'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
@@ -611,9 +643,9 @@ initializeAcceptingItemsOf: aCatalog
 	items := OrderedCollection new.! !
 
 
-!Cart methodsFor: 'queries' stamp: 'FS 12/1/2020 18:02:03'!
+!Cart methodsFor: 'queries' stamp: 'FS 12/1/2020 22:06:02'!
 items
-	^items copy! !
+	^items copy asBag ! !
 
 !Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
 occurrencesOf: anItem
@@ -905,12 +937,12 @@ initialize
 
 !classDefinition: #InternalRestInterface category: 'TusLibros'!
 Object subclass: #InternalRestInterface
-	instanceVariableNames: 'validUsers cartsContents lastCartId catalog lastTransactionId clock cartsLastUsed cartsOwners merchantProcessor purchasesByUser lastpurchasetotal'
+	instanceVariableNames: 'validUsers cartsContents lastCartId catalog lastTransactionId clock cartsLastUsed cartsOwners merchantProcessor purchasesByUser'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!InternalRestInterface methodsFor: 'initialization' stamp: 'FS 12/1/2020 17:52:36'!
+!InternalRestInterface methodsFor: 'initialization' stamp: 'FS 12/1/2020 21:59:01'!
 initializeWithValidUsers: aValidUsersList withCatalog: aCatalog withClock: aClock through: aMerchantProcessor
 	validUsers := aValidUsersList.
 	
@@ -922,7 +954,7 @@ initializeWithValidUsers: aValidUsersList withCatalog: aCatalog withClock: aCloc
 	cartsOwners _ Dictionary new.
 	
 	purchasesByUser _ Dictionary newFrom: aValidUsersList.
-	aValidUsersList keysDo: [:anUser | purchasesByUser at: anUser put: Bag new].
+	aValidUsersList keysDo: [:anUser | purchasesByUser at: anUser put: OrderedCollection new].
 
 	merchantProcessor _ aMerchantProcessor .
 	catalog _ aCatalog.
@@ -988,24 +1020,13 @@ addToCart: aCartId anItem: anItem withQuantity: aQuantity
 	aCartToAdd add: aQuantity of: anItem.! !
 
 
-!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 17:03:45'!
-assertSessionNotExpiredOf: aCartId
-	
-	| cartLastUpdate errorClosure |
-	
-	errorClosure _ [^self error: StoreSession sessionExpiredMessageError].
-	
-	cartLastUpdate _ cartsLastUsed at: aCartId ifAbsent: errorClosure.
-	( clock now - cartLastUpdate < 30 minutes )
-		ifFalse: errorClosure.! !
-
 !InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 17:03:18'!
 cartWithId: aCartId
 
 	^ cartsContents at: aCartId 
 		ifAbsent: [self error: self class invalidCartErrorMessage]! !
 
-!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 18:02:30'!
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 21:34:45'!
 listCart: aCartId 
 	
 	| aCartToList |
@@ -1016,21 +1037,17 @@ listCart: aCartId
 	
 	^aCartToList items.! !
 
-!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 18:06:05'!
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/1/2020 21:33:56'!
 listPurchasesOf: anUsername withPassword: aPassword 
 
 	self authenticateUser: anUsername withPassword: aPassword.
+	
 	^purchasesByUser at: anUsername! !
 
 
-!InternalRestInterface methodsFor: 'checkout' stamp: 'HG 12/1/2020 00:47:04'!
-assertIsNotEmpty: cart
-
-	^ cart isEmpty ifTrue: [self error: self class emptyCartErrorMessage]! !
-
-!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/1/2020 18:05:45'!
+!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/1/2020 22:05:52'!
 checkoutCart: aCartId withCreditCardNumber: aCreditCardNumber withCreditCardExpiredAt: anExpirationDate withOwnerName: aName 
-	| cart  userCreditCard userCheckingOut cashierToCheckout currentTime salesBook total |
+	| cart  userCreditCard userCheckingOut cashierToCheckout currentTime salesBook total itemsSold userReceipt userPurchases |
 	cart _ self cartWithId: aCartId.
 	
 	self assertIsNotEmpty: cart.
@@ -1046,12 +1063,15 @@ checkoutCart: aCartId withCreditCardNumber: aCreditCardNumber withCreditCardExpi
 					on: currentTime 
 					registeringOn: salesBook.
 					
+					
 	total _ cashierToCheckout checkOut.
-	
-	(purchasesByUser at: userCheckingOut ) addAll: (self listCart: aCartId).
-	lastpurchasetotal _ total.
+	itemsSold _ self listCart: aCartId.
 	 
-	cartsLastUsed removeKey: aCartId.
+	userReceipt _ SalesReceipt totaling: total for: itemsSold. 
+	userPurchases _ purchasesByUser at: userCheckingOut .
+	userPurchases add: userReceipt.
+	 
+	 cartsLastUsed removeKey: aCartId.
 	
 	^ self generateTransactionId.
 	! !
@@ -1060,6 +1080,23 @@ checkoutCart: aCartId withCreditCardNumber: aCreditCardNumber withCreditCardExpi
 generateTransactionId
 	lastTransactionId _ lastTransactionId + 1.
 	^lastTransactionId asString.! !
+
+
+!InternalRestInterface methodsFor: 'assertions' stamp: 'HG 12/1/2020 00:47:04'!
+assertIsNotEmpty: cart
+
+	^ cart isEmpty ifTrue: [self error: self class emptyCartErrorMessage]! !
+
+!InternalRestInterface methodsFor: 'assertions' stamp: 'FS 12/1/2020 17:03:45'!
+assertSessionNotExpiredOf: aCartId
+	
+	| cartLastUpdate errorClosure |
+	
+	errorClosure _ [^self error: StoreSession sessionExpiredMessageError].
+	
+	cartLastUpdate _ cartsLastUsed at: aCartId ifAbsent: errorClosure.
+	( clock now - cartLastUpdate < 30 minutes )
+		ifFalse: errorClosure.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1118,6 +1155,59 @@ of: aTotal
 
 	"should assert total is not negative or 0!!"
 	^self new initializeTotal: aTotal ! !
+
+
+!classDefinition: #SalesReceipt category: 'TusLibros'!
+Object subclass: #SalesReceipt
+	instanceVariableNames: 'amount itemsSold'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!SalesReceipt methodsFor: 'initialization' stamp: 'FS 12/1/2020 22:27:36'!
+initializeTotaling: anAmount  for: aCollectionOfitemsSold
+	self assertAmountIsPositive: anAmount.
+	self assertNonEmptyItemsSold: aCollectionOfitemsSold .
+	amount  _ anAmount .
+	itemsSold  _ aCollectionOfitemsSold.! !
+
+
+!SalesReceipt methodsFor: 'accessing' stamp: 'FS 12/1/2020 21:50:01'!
+amount
+	^amount! !
+
+!SalesReceipt methodsFor: 'accessing' stamp: 'FS 12/1/2020 22:27:36'!
+itemsSold
+	^itemsSold copy! !
+
+
+!SalesReceipt methodsFor: 'assertions' stamp: 'FS 12/1/2020 22:22:36'!
+assertAmountIsPositive: anAmount 
+	anAmount <= 0 ifTrue: [self error: self class cannotReceiptForNonPositiveAmountErrorMesage ]! !
+
+!SalesReceipt methodsFor: 'assertions' stamp: 'FS 12/1/2020 22:26:41'!
+assertNonEmptyItemsSold: aCollectionOfitemsSold 
+	aCollectionOfitemsSold isEmpty ifTrue:[self error: self class cannotReceiptWhenNoItemsBought]! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SalesReceipt class' category: 'TusLibros'!
+SalesReceipt class
+	instanceVariableNames: ''!
+
+!SalesReceipt class methodsFor: 'instance creation' stamp: 'FS 12/1/2020 21:45:40'!
+totaling: anAmount for: aCollectionOfItemsBought
+	^self new initializeTotaling: anAmount for: aCollectionOfItemsBought .
+	! !
+
+
+!SalesReceipt class methodsFor: 'error description' stamp: 'FS 12/1/2020 22:21:01'!
+cannotReceiptForNonPositiveAmountErrorMesage
+	^'Cannot create receipt for non positive amount'! !
+
+!SalesReceipt class methodsFor: 'error description' stamp: 'FS 12/1/2020 22:25:44'!
+cannotReceiptWhenNoItemsBought
+	^'Cannot receipt when no items were sold'! !
 
 
 !classDefinition: #StoreSession category: 'TusLibros'!
