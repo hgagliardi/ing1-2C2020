@@ -261,6 +261,28 @@ debit: anAmount from: aCreditCard
 
 
 
+!classDefinition: #ClockTest category: 'TusLibros'!
+TestCase subclass: #ClockTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!ClockTest methodsFor: 'tests' stamp: 'FS 12/3/2020 11:53:59'!
+test01TimesMovesForwardsCorrectly
+	
+	| clock aDateTimetoTest currentTime aTimeToLeapIntoTheFuture |
+	
+	currentTime _  DateAndTime now.
+	aDateTimetoTest _ currentTime.
+	aTimeToLeapIntoTheFuture _ 7 minutes.
+	clock _ Clock startingAt: currentTime.
+	
+	clock moveForward: aTimeToLeapIntoTheFuture.
+	
+	self assert: aDateTimetoTest + aTimeToLeapIntoTheFuture equals: clock now.! !
+
+
 !classDefinition: #CreditCardTest category: 'TusLibros'!
 TestCase subclass: #CreditCardTest
 	instanceVariableNames: 'validNumber validName today futureExpirationDate now'
@@ -647,7 +669,7 @@ setUp
 	testObjectFactory  _ StoreTestObjectsFactory new.! !
 
 
-!PurchaseHistoryTest methodsFor: 'tests' stamp: 'FS 12/2/2020 17:04:33'!
+!PurchaseHistoryTest methodsFor: 'tests' stamp: 'FS 12/3/2020 12:04:23'!
 test01HistoryUpdatesCorrectly
 	| purchaseHistory newPurchase itemPurchased itemPurchasedPrice quantityPurchased totalPurchased |
 	itemPurchased _ testObjectFactory itemSellByTheStore .
@@ -658,7 +680,7 @@ test01HistoryUpdatesCorrectly
 	purchaseHistory _ PurchaseHistory using: testObjectFactory defaultCatalog.
 	
 	newPurchase _ Bag new  add: itemPurchased withOccurrences: quantityPurchased; yourself.
-	purchaseHistory newSaleOf: newPurchase.
+	purchaseHistory newPurchaseOf: newPurchase.
 	
 	self assert: (purchaseHistory itemsPurchased at: itemPurchased) equals: quantityPurchased.
 	self assert: (purchaseHistory amountPurchased) equals: totalPurchased
@@ -667,7 +689,7 @@ test01HistoryUpdatesCorrectly
 
 	! !
 
-!PurchaseHistoryTest methodsFor: 'tests' stamp: 'FS 12/2/2020 15:06:42'!
+!PurchaseHistoryTest methodsFor: 'tests' stamp: 'FS 12/3/2020 12:04:23'!
 test02CannotUpdateWithItemsNotPresentInCatalog
 	| purchaseHistory newPurchase itemNotInCatalog |
 
@@ -677,7 +699,7 @@ test02CannotUpdateWithItemsNotPresentInCatalog
 	
 	newPurchase _ Bag new  add: itemNotInCatalog withOccurrences: 3; yourself.
 	
-	self should:[purchaseHistory newSaleOf: newPurchase.]
+	self should:[purchaseHistory newPurchaseOf: newPurchase.]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo:[:anError| self assert: anError messageText = PurchaseHistory cannotUpdateWithItemNotInCatalog.
 							  self assert: purchaseHistory amountPurchased equals: 0]
@@ -958,30 +980,25 @@ creditCardHasNoCreditErrorMessage
 
 !classDefinition: #Clock category: 'TusLibros'!
 Object subclass: #Clock
-	instanceVariableNames: 'startingAt offset'
+	instanceVariableNames: 'clockCurrentTime'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Clock methodsFor: 'accesing' stamp: 'FS 12/2/2020 02:00:02'!
+!Clock methodsFor: 'accesing' stamp: 'FS 12/3/2020 11:53:05'!
 now
-	^startingAt + offset. ! !
+	^clockCurrentTime. ! !
 
 
-!Clock methodsFor: 'time control' stamp: 'FS 12/2/2020 02:00:09'!
-moveForward: aTimelapse
-	^offset _ offset + aTimelapse.! !
+!Clock methodsFor: 'time control' stamp: 'FS 12/3/2020 11:53:05'!
+moveForward: aTimelapseToMoveForward
+	^clockCurrentTime _ clockCurrentTime + aTimelapseToMoveForward.! !
 
 
-!Clock methodsFor: 'initialization' stamp: 'FS 12/2/2020 01:49:09'!
-initializeStartingAt: aDateAndTime 
-	startingAt := aDateAndTime.
-	offset _ 0 seconds.! !
-
-
-!Clock methodsFor: 'accessing' stamp: 'HG 12/1/2020 13:57:34'!
-startingTime
-	^startingAt. ! !
+!Clock methodsFor: 'initialization' stamp: 'FS 12/3/2020 11:53:05'!
+initializeStartingAt: aDateAndTimeToStartFrom 
+	clockCurrentTime := aDateAndTimeToStartFrom.
+! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1179,29 +1196,29 @@ withExpirationTime: aTimeForSessionToExpire.
 	! !
 
 
-!InternalRestInterface methodsFor: 'authentication' stamp: 'FS 11/30/2020 23:20:20'!
-authenticateUser: anUserId withPassword: anUserPassword
+!InternalRestInterface methodsFor: 'authentication' stamp: 'FS 12/3/2020 11:55:39'!
+authenticateUser: anUser withPassword: anUserPassword
 
 	| validUserPassword |
 	
-	validUserPassword _ validUsers at: anUserId 
+	validUserPassword _ validUsers at: anUser 
 								ifAbsent: [self error: self class invalidUserErrorMessage.]. 
 								
 	(validUserPassword = anUserPassword) 
 								ifFalse: [ self error: self class invalidPasswordErrorMessage. ]! !
 
 
-!InternalRestInterface methodsFor: 'cart creation' stamp: 'FS 12/2/2020 18:58:59'!
-createCartForUser: anUserId withPassword: anUserPassword
+!InternalRestInterface methodsFor: 'cart creation' stamp: 'FS 12/3/2020 11:55:50'!
+createCartForUser: anUser withPassword: anUserPassword
 	
 	| newCartId cart |
-	self authenticateUser: anUserId withPassword: anUserPassword.
+	self authenticateUser: anUser withPassword: anUserPassword.
 		
 	newCartId _ self generateCartId.
 	cart _ Cart acceptingItemsOf: catalog.
 
 	sessions at: newCartId put: (SessionCart with: cart usedLastOn: clock now
-						   ownedBy: anUserId
+						   ownedBy: anUser
 						   for: self).	
 	^newCartId copy.! !
 
@@ -1211,36 +1228,36 @@ generateCartId
 	^lastCartId asString.! !
 
 
-!InternalRestInterface methodsFor: 'testing' stamp: 'FS 12/2/2020 02:21:26'!
-hasRegisteredCart: aCartId 
-	^sessions includesKey: aCartId.! !
+!InternalRestInterface methodsFor: 'testing' stamp: 'FS 12/3/2020 11:56:55'!
+hasRegisteredCart: aCartIDToTest 
+	^sessions includesKey: aCartIDToTest.! !
 
 
-!InternalRestInterface methodsFor: 'session' stamp: 'FS 12/2/2020 19:17:53'!
-updateSessionOf: aCartId with: aDateTime
+!InternalRestInterface methodsFor: 'session' stamp: 'FS 12/3/2020 11:57:05'!
+updateSessionOf: aCartID with: aDateTime
 
-	^ (sessions at: aCartId) updateLastTimeUsed: aDateTime. ! !
+	^ (sessions at: aCartID) updateLastTimeUsed: aDateTime. ! !
 
-!InternalRestInterface methodsFor: 'session' stamp: 'FS 12/2/2020 02:22:35'!
-userOwnerOf: aCartId
-	^(sessions at: aCartId) owner! !
+!InternalRestInterface methodsFor: 'session' stamp: 'FS 12/3/2020 11:57:18'!
+userOwnerOf: aCartID
+	^(sessions at: aCartID) owner! !
 
 
-!InternalRestInterface methodsFor: 'adding' stamp: 'FS 12/2/2020 19:21:32'!
-addToCart: aCartId anItem: anItem withQuantity: aQuantity 
+!InternalRestInterface methodsFor: 'adding' stamp: 'FS 12/3/2020 11:58:58'!
+addToCart: aCartID anItem: anItem withQuantity: aQuantity 
 	
 	| aCartToAdd |
-	aCartToAdd _ self cartWithId: aCartId.
-	self updateSessionOf: aCartId with: clock now.
+	aCartToAdd _ self cartWithID: aCartID.
+	self updateSessionOf: aCartID with: clock now.
 	
 	aCartToAdd add: aQuantity of: anItem.! !
 
 
-!InternalRestInterface methodsFor: 'accessing -- private' stamp: 'FS 12/2/2020 20:28:55'!
-cartWithId: aCartId
+!InternalRestInterface methodsFor: 'accessing -- private' stamp: 'FS 12/3/2020 11:59:08'!
+cartWithID: aCartID
 
 	| sessionCart |
-	sessionCart _  sessions at: aCartId  		ifAbsent: [self error: self class notActiveSessionError ].
+	sessionCart _  sessions at: aCartID 		ifAbsent: [self error: self class notActiveSessionError ].
 	self assertSessionNotExpiredOf: sessionCart.
 	
 	^sessionCart.! !
@@ -1254,14 +1271,14 @@ salesBook
 	^salesBook copy! !
 
 
-!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/2/2020 19:21:42'!
-listCart: aCartId 
+!InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/3/2020 12:01:19'!
+listCart: aCartID 
 	
-	| aCartToList |
-	aCartToList _ self cartWithId: aCartId.
-	self updateSessionOf: aCartId with: clock now.
+	| aCartToListContents |
+	aCartToListContents _ self cartWithID: aCartID.
+	self updateSessionOf: aCartID with: clock now.
 	
-	^aCartToList contents.! !
+	^aCartToListContents contents.! !
 
 !InternalRestInterface methodsFor: 'accessing' stamp: 'FS 12/2/2020 19:35:36'!
 listPurchasesOf: anUsername withPassword: aPassword 
@@ -1271,13 +1288,13 @@ listPurchasesOf: anUsername withPassword: aPassword
 	^usersHistory at: anUsername! !
 
 
-!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/2/2020 20:18:44'!
-checkoutCart: aCartId   withCreditCardNumber: aCreditCardNumber 
+!InternalRestInterface methodsFor: 'checkout' stamp: 'FS 12/3/2020 12:08:31'!
+checkoutCart: aCartID   withCreditCardNumber: aCreditCardNumber 
 					withCreditCardExpiredAt: anExpirationDate 
 					withOwnerName: aName 
 	| cartToCheckOut  |
 	
-	cartToCheckOut _ self cartWithId: aCartId.
+	cartToCheckOut _ self cartWithID: aCartID.
 	
 	self assertIsNotEmpty: cartToCheckOut .
 		
@@ -1285,40 +1302,40 @@ checkoutCart: aCartId   withCreditCardNumber: aCreditCardNumber
 					                       withCreditCardExpiredAt: anExpirationDate 
 					                       withOwnerName: aName .
 	
-	self updateUserHistoryWhoOwns: aCartId with: cartToCheckOut.
+	self updateUserHistoryWhoOwns: aCartID andPurchased: cartToCheckOut.
 	
-	sessions removeKey: aCartId.
+	sessions removeKey: aCartID.
 
 	^self generateTransactionId copy.
 	! !
 
 
-!InternalRestInterface methodsFor: 'assertions' stamp: 'FS 12/2/2020 19:23:12'!
-assertIsNotEmpty: aCart
+!InternalRestInterface methodsFor: 'assertions' stamp: 'FS 12/3/2020 11:54:52'!
+assertIsNotEmpty: aCartToTest
 
-	^ aCart isEmpty ifTrue: [self error: self class emptyCartErrorMessage]! !
+	^ aCartToTest isEmpty ifTrue: [self error: self class emptyCartErrorMessage]! !
 
-!InternalRestInterface methodsFor: 'assertions' stamp: 'FS 12/2/2020 19:22:45'!
-assertSessionNotExpiredOf: aCartSession
+!InternalRestInterface methodsFor: 'assertions' stamp: 'FS 12/3/2020 11:54:57'!
+assertSessionNotExpiredOf: aCartSessionToTest
 	
-	(aCartSession isExpiredOn: clock now) ifTrue: [^self error: self class notActiveSessionError ].! !
+	(aCartSessionToTest isExpiredOn: clock now) ifTrue: [^self error: self class notActiveSessionError ].! !
 
 
-!InternalRestInterface methodsFor: 'user history -- private' stamp: 'FS 12/2/2020 19:35:36'!
-updateHistoryOf: anUser withItems: itemsSold
+!InternalRestInterface methodsFor: 'user history -- private' stamp: 'FS 12/3/2020 12:09:52'!
+updateHistoryOf: anUserToUpdateHistory whoPurchased: itemsSold
 	| userPurchasesHistory |
 	
-	userPurchasesHistory _ usersHistory at: anUser . 
-	userPurchasesHistory newSaleOf: itemsSold .
+	userPurchasesHistory _ usersHistory at: anUserToUpdateHistory . 
+	userPurchasesHistory newPurchaseOf: itemsSold .
 
 	! !
 
-!InternalRestInterface methodsFor: 'user history -- private' stamp: 'FS 12/2/2020 19:08:47'!
-updateUserHistoryWhoOwns: aCartId with: aCartToPurchase
+!InternalRestInterface methodsFor: 'user history -- private' stamp: 'FS 12/3/2020 12:09:59'!
+updateUserHistoryWhoOwns: aCartID andPurchased: aCartSold
 	| userCheckingOut |
 	
-	userCheckingOut _ self userOwnerOf: aCartId.
-	self updateHistoryOf: userCheckingOut withItems: aCartToPurchase contents.
+	userCheckingOut _ self userOwnerOf: aCartID.
+	self updateHistoryOf: userCheckingOut whoPurchased: aCartSold contents.
 	! !
 
 
@@ -1384,41 +1401,48 @@ Object subclass: #PurchaseHistory
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!PurchaseHistory methodsFor: 'initialization' stamp: 'FS 12/2/2020 13:48:55'!
-initializeUsing: aPriceList
-	priceList  _ aPriceList.
+!PurchaseHistory methodsFor: 'initialization' stamp: 'FS 12/3/2020 12:12:33'!
+initializeUsing: aCatalog
+	priceList  _ aCatalog.
 	itemsBought _ Dictionary new.
 	totalAmount _ 0.
 	! !
 
 
-!PurchaseHistory methodsFor: 'accessing -- private' stamp: 'FS 12/2/2020 14:24:51'!
-priceOf: anItemSold
-	^ priceList at: anItemSold .! !
+!PurchaseHistory methodsFor: 'accessing -- private' stamp: 'FS 12/3/2020 12:12:42'!
+priceOf: anItemPurchased
+	^ priceList at: anItemPurchased .! !
 
 
-!PurchaseHistory methodsFor: 'adding -- private' stamp: 'FS 12/2/2020 17:05:55'!
-addElementToHistory: anItemSold
+!PurchaseHistory methodsFor: 'adding -- private' stamp: 'FS 12/3/2020 12:13:15'!
+addItemPurchasedToHistory: anItemPurchased
 
-	|previousQuantitySold|
-			previousQuantitySold _ itemsBought at: anItemSold ifAbsent:[0] .
-			itemsBought at: anItemSold put: 1 + previousQuantitySold! !
+	|previousQuantityPurchased|
+			previousQuantityPurchased _ itemsBought at: anItemPurchased ifAbsent:[0] .
+			itemsBought at: anItemPurchased put: 1 + previousQuantityPurchased! !
 
 
-!PurchaseHistory methodsFor: 'updating -- private' stamp: 'FS 12/2/2020 16:47:46'!
+!PurchaseHistory methodsFor: 'updating -- private' stamp: 'FS 12/3/2020 12:13:04'!
 updateHistoryUsing: aCollectionOfItemsSold
 
-	^ aCollectionOfItemsSold do: [:anItemSold | 						self addElementToHistory: anItemSold.						]! !
+	^ aCollectionOfItemsSold do: [:anItemSold | 						self addItemPurchasedToHistory: anItemSold.						]! !
 
-
-!PurchaseHistory methodsFor: 'updating' stamp: 'FS 12/2/2020 16:46:22'!
-newSaleOf: aCollectionOfItemsSold  
-	self assertItemsAreInPriceList: aCollectionOfItemsSold .
+!PurchaseHistory methodsFor: 'updating -- private' stamp: 'FS 12/3/2020 12:19:31'!
+updateTotalAmountUsing: aCollectionOfItemsPurchased .
 	
-	self updateHistoryUsing: aCollectionOfItemsSold .
-	
-	totalAmount  _ aCollectionOfItemsSold inject: totalAmount 
+	totalAmount  _ aCollectionOfItemsPurchased inject: totalAmount 
 								      into:[ :subTotal :nextItem | subTotal + (self priceOf: nextItem)]
+	! !
+
+
+!PurchaseHistory methodsFor: 'updating' stamp: 'FS 12/3/2020 12:19:47'!
+newPurchaseOf: aCollectionOfItemsPurchased
+	
+	self assertItemsAreInPriceList: aCollectionOfItemsPurchased .
+	
+	self updateHistoryUsing: aCollectionOfItemsPurchased .
+	self updateTotalAmountUsing: aCollectionOfItemsPurchased .
+	
 	! !
 
 
@@ -1431,15 +1455,15 @@ itemsPurchased
 	^itemsBought copy! !
 
 
-!PurchaseHistory methodsFor: 'testing -- private' stamp: 'FS 12/2/2020 14:50:55'!
-itemIsInPriceList: anItemToPurchase
+!PurchaseHistory methodsFor: 'testing -- private' stamp: 'FS 12/3/2020 12:16:20'!
+itemIsInPriceList: anItemPurchased
 
-	^ priceList keys includes: anItemToPurchase! !
+	^ priceList includesKey: anItemPurchased! !
 
 
-!PurchaseHistory methodsFor: 'assertions' stamp: 'FS 12/2/2020 14:50:56'!
-assertItemsAreInPriceList: aCollectionOfItemsToPurchase
-	(aCollectionOfItemsToPurchase allSatisfy: [:anItemToPurchase | self itemIsInPriceList: anItemToPurchase])
+!PurchaseHistory methodsFor: 'assertions' stamp: 'FS 12/3/2020 12:15:46'!
+assertItemsAreInPriceList: aCollectionOfItemsPurchased
+	(aCollectionOfItemsPurchased allSatisfy: [:anItemPurchased | self itemIsInPriceList: anItemPurchased])
 					ifFalse:[self error: self class cannotUpdateWithItemNotInCatalog ]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1511,16 +1535,16 @@ amountShouldBePositive
 
 !classDefinition: #SessionCart category: 'TusLibros'!
 Object subclass: #SessionCart
-	instanceVariableNames: 'cart lastTimeUsed nameOwner interface'
+	instanceVariableNames: 'cart lastTimeUsed nameOwner interfaceOwningSession'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!SessionCart methodsFor: 'initialization' stamp: 'FS 12/2/2020 19:04:01'!
+!SessionCart methodsFor: 'initialization' stamp: 'FS 12/3/2020 11:31:54'!
 initializeWith: aCart usedLastOn: aTimeWhenWasLastUsed ownedBy: aNameOwner for: anInterface 
 	lastTimeUsed := aTimeWhenWasLastUsed.
 	nameOwner := aNameOwner.
-	interface := anInterface.
+	interfaceOwningSession := anInterface.
 	cart _ aCart.! !
 
 
@@ -1529,9 +1553,9 @@ owner
 	^nameOwner copy! !
 
 
-!SessionCart methodsFor: 'testing' stamp: 'FS 12/2/2020 17:41:45'!
+!SessionCart methodsFor: 'testing' stamp: 'FS 12/3/2020 11:31:54'!
 isExpiredOn: aDateAndTime 
-	^aDateAndTime - lastTimeUsed >= interface expirationTime ! !
+	^aDateAndTime - lastTimeUsed >= interfaceOwningSession expirationTime ! !
 
 
 !SessionCart methodsFor: 'updating' stamp: 'FS 12/2/2020 02:59:21'!
